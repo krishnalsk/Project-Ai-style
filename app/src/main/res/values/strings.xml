@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">Style AI</string>
+    <!-- TODO: Replace with your actual Web Client ID from Firebase Console -> Authentication -> Settings -> Google -->
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID.apps.googleusercontent.com</string>
+
+    <!-- Auth Screens -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="login_subtitle">Sign in securely to continue your Style AI journey</string>
+    <string name="email_or_username">Email or Username</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="sign_in">Sign In</string>
+    <string name="or_divider">OR</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_account">Create Account</string>
+    <string name="signup_subtitle">Join Style AI for a personalized experience</string>
+    <string name="email_address">Email Address</string>
+    <string name="create_my_account">Create My Account</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="log_in">Log In</string>
+
+    <!-- Home Screen -->
+    <string name="hello_user">Hello, %1$s</string>
+    <string name="home_subtitle">Perfect breathable fashion for your comfort</string>
+    <string name="search_placeholder">Search skin-safe fashion&#8230;</string>
+    <string name="track_order">Track Order</string>
+    <string name="arriving_today">Arriving Today</string>
+    <string name="virtual_closet">Virtual Closet</string>
+    <string name="mix_match">Mix &amp; Match</string>
+    <string name="live_skin_forecast">Live Skin Forecast</string>
+    <string name="categories">Categories</string>
+    <string name="fabric_guide">Fabric Guide</string>
+    <string name="wash_care">Wash Care</string>
+    <string name="new_arrivals">New Arrivals</string>
+    <string name="search_results">Search Results</string>
+
+    <!-- Profile Screen -->
+    <string name="account_details">Account Details</string>
+    <string name="edit_all">Edit All</string>
+    <string name="ai_comfort_score">AI Comfort Score: %1$d%%</string>
+    <string name="recommended_fabrics">Recommended Fabrics</string>
+    <string name="avoid">Avoid</string>
+    <string name="activity_dashboard">Activity Dashboard</string>
+    <string name="orders">Orders</string>
+    <string name="wishlist">Wishlist</string>
+    <string name="saved">Saved</string>
+    <string name="rewards">Rewards</string>
+    <string name="settings_preferences">Settings &amp; Preferences</string>
+    <string name="logout">Logout</string>
+    <string name="change_profile_picture">Change Profile Picture</string>
+    <string name="change_profile_picture_desc">Take a new photo or choose an existing one from your gallery.</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="cancel">Cancel</string>
+</resources>
