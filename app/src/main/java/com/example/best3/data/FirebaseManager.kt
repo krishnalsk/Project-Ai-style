@@ -21,8 +21,8 @@ data class UserProfile(
 
 object FirebaseManager {
     private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
-    private val usersCollection = db.collection("users")
+    private val db get() = FirebaseFirestore.getInstance()
+    private val usersCollection get() = db.collection("users")
 
     var tempProfile = UserProfile()
 

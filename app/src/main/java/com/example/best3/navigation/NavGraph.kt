@@ -197,8 +197,13 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
         composable(Screen.Login.route) {
             LoginScreen(
                 onBackClick = { navController.popBackStack() },
-                onLoginSuccess = {
-                    navController.navigate(Screen.AiLoading.route) {
+                onLoginSuccess = { isEmailVerified, isProfileComplete ->
+                    val destination = when {
+                        !isEmailVerified -> Screen.EmailVerify.route
+                        !isProfileComplete -> Screen.PersonalInfo.route
+                        else -> Screen.AiLoading.route
+                    }
+                    navController.navigate(destination) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },

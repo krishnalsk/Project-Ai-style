@@ -14,6 +14,10 @@ object AiAssistantManager {
     private const val BASE_URL = "https://openrouter.ai/api/v1/"
     private val API_KEY = BuildConfig.OPENROUTER_API_KEY
     
+    // Input Validation Constants
+    private const val MAX_PROMPT_LENGTH = 2000
+    private const val MIN_PROMPT_LENGTH = 2
+    
     private val MODELS = listOf(
         "anthropic/claude-3.5-sonnet", 
         "google/gemini-2.0-flash-exp:free",
@@ -107,12 +111,26 @@ object AiAssistantManager {
     }
 
     suspend fun getAssistantResponse(prompt: String): String? {
-        if (!isPromptSafe(prompt)) {
-            Log.w("AiAssistant", "Blocked unsafe prompt: $prompt")
+        // 1. Pre-validation (Length check)
+        if (prompt.isBlank() || prompt.trim().length < MIN_PROMPT_LENGTH) {
+            return "Your request is too short. Please tell me more about what you're looking for! 😊"
+        }
+
+        if (prompt.length > MAX_PROMPT_LENGTH) {
+            return "Your request is quite long (${prompt.length} chars). To provide the best advice, please keep it under $MAX_PROMPT_LENGTH characters."
+        }
+
+        // 2. Sanitization
+        val cleanedPrompt = prompt.trim()
+            .replace(Regex("[\\p{Cntrl}&&[^\r\n\t]]"), "") // Remove non-printable control characters
+
+        // 3. Prompt Injection Check
+        if (!isPromptSafe(cleanedPrompt)) {
+            Log.w("AiAssistant", "Blocked unsafe prompt: $cleanedPrompt")
             return "I can only help with style and comfort related queries. Please ask something else! 😊"
         }
 
-        Log.d("AiAssistant", "Requesting Style AI response for: $prompt")
+        Log.d("AiAssistant", "Requesting Style AI response for: $cleanedPrompt")
         
         var lastException: Exception? = null
         
@@ -123,7 +141,7 @@ object AiAssistantManager {
                     model = modelId,
                     messages = listOf(
                         Message(role = "system", content = SYSTEM_PROMPT),
-                        Message(role = "user", content = prompt)
+                        Message(role = "user", content = cleanedPrompt)
                     )
                 )
                 val response = api.getChatCompletion(request)

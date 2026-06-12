@@ -178,15 +178,30 @@ fun SplashScreen(onFinished: () -> Unit) {
         // Floating Decorative Icons
         FloatingIcon(
             Icons.Outlined.Eco, 
-            Modifier.align(Alignment.TopStart).offset(60.dp, 120.dp + floatingOffset.dp)
+            Modifier.align(Alignment.TopStart).offset {
+                androidx.compose.ui.unit.IntOffset(
+                    x = 60.dp.roundToPx(),
+                    y = (120.dp + floatingOffset.dp).roundToPx()
+                )
+            }
         )
         FloatingIcon(
             Icons.Outlined.Checkroom, 
-            Modifier.align(Alignment.TopEnd).offset((-80).dp, 220.dp - floatingOffset.dp)
+            Modifier.align(Alignment.TopEnd).offset {
+                androidx.compose.ui.unit.IntOffset(
+                    x = (-80).dp.roundToPx(),
+                    y = (220.dp - floatingOffset.dp).roundToPx()
+                )
+            }
         )
         FloatingIcon(
             Icons.Outlined.Spa, 
-            Modifier.align(Alignment.BottomStart).offset(100.dp, (-250).dp + (floatingOffset * 0.5f).dp)
+            Modifier.align(Alignment.BottomStart).offset {
+                androidx.compose.ui.unit.IntOffset(
+                    x = 100.dp.roundToPx(),
+                    y = ((-250).dp + (floatingOffset * 0.5f).dp).roundToPx()
+                )
+            }
         )
 
         // Bottom Elements Container
