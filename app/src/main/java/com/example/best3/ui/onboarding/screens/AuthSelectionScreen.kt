@@ -33,7 +33,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
-@Preview(showBackghround = true)
+@Preview(showBackground = true)
 @Composable
 fun AuthSelectionScreenPreview() {
     StyleAiTheme {
