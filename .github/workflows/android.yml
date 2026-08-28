@@ -66,3 +66,6 @@ jobs:
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug
+
+    - name: Run Unit Tests
+      run: ./gradlew testDebugUnitTest
