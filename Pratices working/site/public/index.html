@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CookSmart - Find Your Next Meal</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "outline": "#a98a7e",
+                    "tertiary": "#cec5bf",
+                    "surface-tint": "#ffb599",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-container": "#4f1700",
+                    "surface-variant": "#373433",
+                    "primary": "#ffb599",
+                    "inverse-primary": "#a73a00",
+                    "on-primary-fixed": "#370e00",
+                    "on-surface-variant": "#e2bfb2",
+                    "tertiary-fixed-dim": "#cec5bf",
+                    "on-tertiary-fixed": "#1f1b17",
+                    "surface": "#151312",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "surface-bright": "#3c3837",
+                    "surface-container-low": "#1d1b1a",
+                    "on-tertiary-container": "#2e2925",
+                    "surface-dim": "#151312",
+                    "primary-container": "#f66018",
+                    "secondary": "#c6c6c7",
+                    "on-tertiary-fixed-variant": "#4b4641",
+                    "surface-container": "#221f1e",
+                    "on-surface": "#e8e1df",
+                    "outline-variant": "#5a4138",
+                    "primary-fixed-dim": "#ffb599",
+                    "on-background": "#e8e1df",
+                    "on-secondary-fixed-variant": "#454747",
+                    "on-tertiary": "#342f2b",
+                    "on-secondary": "#2f3131",
+                    "surface-container-high": "#2c2928",
+                    "on-primary-fixed-variant": "#7f2b00",
+                    "tertiary-fixed": "#eae1da",
+                    "secondary-fixed": "#e2e2e2",
+                    "background": "#151312",
+                    "inverse-surface": "#e8e1df",
+                    "primary-fixed": "#ffdbce",
+                    "on-secondary-container": "#b4b5b5",
+                    "secondary-container": "#454747",
+                    "on-primary": "#5a1c00",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "inverse-on-surface": "#33302e",
+                    "tertiary-container": "#978f8a",
+                    "on-error": "#690005",
+                    "surface-container-lowest": "#100e0d",
+                    "error-container": "#93000a",
+                    "surface-container-highest": "#373433"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "margin-desktop": "40px",
+                    "base": "4px",
+                    "md": "16px",
+                    "gutter": "16px",
+                    "margin-mobile": "20px",
+                    "2xl": "48px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Outfit"],
+                    "headline-lg": ["Outfit"],
+                    "display-lg": ["Outfit"],
+                    "label-md": ["Outfit"],
+                    "body-md": ["Outfit"],
+                    "body-lg": ["Outfit"],
+                    "caption": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body {
+            background-color: #0C0A09;
+            color: #e8e1df;
+        }
+        .faint-border {
+            border: 1px solid rgba(120, 113, 108, 0.15);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .bg-warm-orange {
+            background-color: #EA580C;
+        }
+        .text-warm-orange {
+            color: #EA580C;
+        }
+        body {
+            min-height: 100dvh;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center font-body-md antialiased pb-24">
+    <div class="w-full max-w-[480px] bg-background min-h-screen relative overflow-hidden faint-border">
+        <!-- TopAppBar -->
+        <header class="bg-surface dark:bg-surface text-primary font-headline-md text-headline-md font-bold text-primary docked full-width top-0 bg-surface flat no shadows transition-opacity duration-200 flex justify-between items-center px-margin-mobile w-full py-md">
+            <div>
+                <h1 class="text-warm-orange font-headline-md text-headline-md">CookSmart</h1>
+                <p class="font-body-md text-body-md text-on-surface mt-1">Find your next meal</p>
+            </div>
+            <div class="w-10 h-10 rounded-full overflow-hidden faint-border">
+                <img class="w-full h-full object-cover" alt="User Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeJtpVJKF1ZXOZ376NSQrUe0VXXS0ap1WhKtta_7dTTW9Ryp_vKmzCcdG2Z92i67ZlZtOx0MQQsmpSoPTG2L3OVrUoSRRNLb1hrrz9pDOpUto1Fq8RfFoVBMqjWMVouhIRByQRw9RABaq2aJXsWWmDBX7gEOfLiAHF1Ol2UYqdTuZjXIGzZcqCWgW3VjakJMvUvGeng8L8j9J5YFoJ_HRssaTsqZGJ1VFdWvq9jTgoz5fAiHrNVhDhZhV4H6tIRp_4PkmU5qYtZnid"/>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="px-margin-mobile flex flex-col gap-lg mt-4">
+            <!-- Search -->
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+                <input class="w-full bg-surface faint-border rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-[#EA580C] focus:ring-1 focus:ring-[#EA580C] font-body-md text-body-md transition-colors" placeholder="Search recipes, cuisines..." type="text"/>
+            </div>
+
+            <!-- Featured Carousel -->
+            <section>
+                <h2 class="font-headline-md text-headline-md text-on-surface mb-md">Featured Recipes</h2>
+                <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-margin-mobile px-margin-mobile">
+                    <!-- Card 1 -->
+                    <a href="recipe.html?recipe=steak" class="min-w-[280px] bg-surface faint-border rounded-[24px] overflow-hidden flex flex-col snap-center hover:scale-[1.02] transition-transform">
+                        <div class="relative h-48">
+                            <img class="w-full h-full object-cover" alt="Garlic Butter Steak Bites" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1lAsgAHqH2b1Pa4wbLE_6AD9B7tYGBreZLwEjyDlxUDbKPhnkRcGLZBKJIfdoTCAc-wisN96otFer7T3U_iJ6u3bcN2TL7FPWfT1xHY0GwpYjudOh2Nbeh2ouuX0vn6rMJlHGsiTOgeY1W4oencaXomAnXR_NL61IcsXKEKV3Lzjb0w3uPOti5yLfA3dVf-irATYG9F1rx0fB1veVCLFyFCCa5n5QzjcxHMB0g920WSZzpICWAKKp1aw5zi1PWxkM7Tis2edZ35uM"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-3 left-3 bg-warm-orange text-white font-label-md text-label-md px-3 py-1 rounded-full text-xs font-bold">Featured</span>
+                        </div>
+                        <div class="p-md">
+                            <h3 class="font-headline-md text-[20px] leading-tight text-on-surface mb-2">Garlic Butter Steak Bites</h3>
+                            <div class="flex items-center gap-4 font-caption text-caption text-on-surface-variant">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 25 min</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-warm-orange" style="font-variation-settings: 'FILL' 1;">star</span> 4.9</span>
+                            </div>
+                        </div>
+                    </a>
+                    <!-- Card 2 -->
+                    <a href="recipe.html?recipe=noodles" class="min-w-[280px] bg-surface faint-border rounded-[24px] overflow-hidden flex flex-col snap-center hover:scale-[1.02] transition-transform">
+                        <div class="relative h-48">
+                            <img class="w-full h-full object-cover" alt="Spicy Sesame Noodles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpTtZejf4K7V18aA7VyjNWHghjGXx_AhBd8P4Dc5CDIpOW4MjCqo1oZhAgmq4R82u6PhYYwVmdlVr9yQIapqyglJwb8XIHYXlKQG1mDSdfzlFJD_Y2RrzNnZFglqf3ldhs_FwBJFCre-ymbuVYKvlMpGuvvEdvzVTO3zIyDk3hcmjnRzJFUMz8V6t15Sl8zt-f3zYC6tRTRaSB_FlcFeIXY5N_tpQ5SY6_YXhl3GQA8bjLVWGmXUBayQJoicBbjjxMu9FBQh0ov_ET"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-3 left-3 bg-warm-orange text-white font-label-md text-label-md px-3 py-1 rounded-full text-xs font-bold">Featured</span>
+                        </div>
+                        <div class="p-md">
+                            <h3 class="font-headline-md text-[20px] leading-tight text-on-surface mb-2">Spicy Sesame Noodles</h3>
+                            <div class="flex items-center gap-4 font-caption text-caption text-on-surface-variant">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 15 min</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-warm-orange" style="font-variation-settings: 'FILL' 1;">star</span> 4.8</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Categories -->
+            <section class="mb-8">
+                <h2 class="font-headline-md text-headline-md text-on-surface mb-md">Categories</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="bg-surface faint-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="material-symbols-outlined text-warm-orange text-[32px]">egg_alt</span>
+                        <span class="font-label-md text-label-md text-on-surface">Breakfast</span>
+                    </button>
+                    <button class="bg-surface faint-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="material-symbols-outlined text-warm-orange text-[32px]">lunch_dining</span>
+                        <span class="font-label-md text-label-md text-on-surface">Lunch</span>
+                    </button>
+                    <button class="bg-surface faint-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="material-symbols-outlined text-warm-orange text-[32px]">dinner_dining</span>
+                        <span class="font-label-md text-label-md text-on-surface">Dinner</span>
+                    </button>
+                    <button class="bg-surface faint-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="material-symbols-outlined text-warm-orange text-[32px]">cake</span>
+                        <span class="font-label-md text-label-md text-on-surface">Dessert</span>
+                    </button>
+                    <button class="bg-surface faint-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="material-symbols-outlined text-warm-orange text-[32px]">eco</span>
+                        <span class="font-label-md text-label-md text-on-surface">Vegan</span>
+                    </button>
+                    <button class="bg-surface faint-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="material-symbols-outlined text-warm-orange text-[32px]">monitor_weight</span>
+                        <span class="font-label-md text-label-md text-on-surface">Healthy</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- BottomNavBar -->
+        <nav class="bg-surface-container dark:bg-surface-container font-label-md text-label-md absolute bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/15 shadow-lg flex justify-around items-center px-4 py-2 left-0 max-w-[480px]">
+            <a href="index.html" class="flex flex-col items-center justify-center text-warm-orange bg-primary-container/10 rounded-xl px-4 py-1 hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+                <span>Home</span>
+            </a>
+            <a href="ingredients.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform">
+                <span class="material-symbols-outlined">kitchen</span>
+                <span>Ingredients</span>
+            </a>
+            <a href="saved.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform">
+                <span class="material-symbols-outlined">bookmark</span>
+                <span>Saved</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

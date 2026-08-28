@@ -21,12 +21,14 @@ import com.example.best3.ui.search.SearchScreen
 import com.example.best3.ui.splash.SplashScreen
 import com.example.best3.ui.wishlist.*
 
+import android.net.Uri
+
 sealed class Screen(val route: String) {
     // Auth & Onboarding
     object Splash : Screen("splash")
     object AuthSelection : Screen("auth_selection")
     object GoogleCredential : Screen("google_credential/{email}") {
-        fun createRoute(email: String) = "google_credential/$email"
+        fun createRoute(email: String) = "google_credential/${Uri.encode(email)}"
     }
     object WelcomeBack : Screen("welcome_back")
     object EmailVerify : Screen("email_verify")
@@ -38,10 +40,7 @@ sealed class Screen(val route: String) {
     object SignUp : Screen("signup")
     object ForgotPassword : Screen("forgot_password")
     object OtpVerifyReset : Screen("otp_verify_reset/{email}") {
-        fun createRoute(email: String) = "otp_verify_reset/$email"
-    }
-    object CreateNewPassword : Screen("create_new_password/{email}") {
-        fun createRoute(email: String) = "create_new_password/$email"
+        fun createRoute(email: String) = "otp_verify_reset/${Uri.encode(email)}"
     }
     object ResetSuccess : Screen("reset_success")
 
@@ -52,17 +51,17 @@ sealed class Screen(val route: String) {
     object SavedItems : Screen("saved_items")
     object Cart : Screen("cart")
     object Checkout : Screen("checkout/{productName}") {
-        fun createRoute(productName: String) = "checkout/$productName"
+        fun createRoute(productName: String) = "checkout/${Uri.encode(productName)}"
     }
     object PaymentSuccess : Screen("payment_success/{productName}") {
-        fun createRoute(productName: String) = "payment_success/$productName"
+        fun createRoute(productName: String) = "payment_success/${Uri.encode(productName)}"
     }
     
     // User Profile & Settings
     object Profile : Screen("profile")
     object MyOrders : Screen("my_orders")
     object OrderTracking : Screen("order_tracking/{productName}") {
-        fun createRoute(productName: String) = "order_tracking/$productName"
+        fun createRoute(productName: String) = "order_tracking/${Uri.encode(productName)}"
     }
     object OrderHistory : Screen("order_history")
     object Rewards : Screen("rewards")
@@ -85,10 +84,10 @@ sealed class Screen(val route: String) {
 
     // Shopping Categories
     object Category : Screen("category/{categoryName}") {
-        fun createRoute(categoryName: String) = "category/$categoryName"
+        fun createRoute(categoryName: String) = "category/${Uri.encode(categoryName)}"
     }
     object ProductDetails : Screen("product_details/{productName}") {
-        fun createRoute(productName: String) = "product_details/$productName"
+        fun createRoute(productName: String) = "product_details/${Uri.encode(productName)}"
     }
     object Notifications : Screen("notifications")
 }
@@ -245,6 +244,16 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
             ForgotPasswordScreen(
                 onBackClick = { navController.popBackStack() },
                 onCodeSent = { email ->
+                    navController.navigate(Screen.OtpVerifyReset.createRoute(email))
+                }
+            )
+        }
+
+        composable(Screen.OtpVerifyReset.route) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            ResetOtpScreen(
+                email = email,
+                onBackClick = { 
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.ForgotPassword.route) { inclusive = true }
                     }
@@ -281,7 +290,7 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
                 onCartClick = { navController.navigate(Screen.Cart.route) },
                 onNotificationClick = { navController.navigate(Screen.Notifications.route) },
                 onTrackOrderClick = {
-                    navController.navigate(Screen.OrderTracking.createRoute("Azure Linen Shirt"))
+                    navController.navigate(Screen.OrderTracking.createRoute("Latest Order"))
                 },
                 onLabelLensClick = { navController.navigate(Screen.LabelLens.route) },
                 onWashCareClick = { navController.navigate(Screen.WashCareGuide.route) }
@@ -336,12 +345,14 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
         composable(Screen.Cart.route) {
             CartScreen(
                 onBackClick = { navController.popBackStack() },
-                onCheckoutClick = { navController.navigate(Screen.Checkout.route) }
+                onCheckoutClick = {
+                    navController.navigate(Screen.Checkout.createRoute("My Cart"))
+                }
             )
         }
 
         composable(Screen.Checkout.route) { backStackEntry ->
-            val productName = backStackEntry.arguments?.getString("productName") ?: "Azure Linen Shirt"
+            val productName = backStackEntry.arguments?.getString("productName") ?: ""
             CheckoutScreen(
                 productName = productName,
                 onBackClick = { navController.popBackStack() },
@@ -354,7 +365,7 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
         }
 
         composable(Screen.PaymentSuccess.route) { backStackEntry ->
-            val productName = backStackEntry.arguments?.getString("productName") ?: "Azure Linen Shirt"
+            val productName = backStackEntry.arguments?.getString("productName") ?: ""
             PaymentSuccessScreen(
                 productName = productName,
                 onTrackOrderClick = {
@@ -377,7 +388,7 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
                 onAiStylistClick = { navController.navigate(Screen.AiStylist.route) },
                 onLogout = {
                     navController.navigate(Screen.AuthSelection.route) {
-                        popUpTo(0) { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
                 onSettingsClick = { navController.navigate(Screen.Settings.route) },
@@ -406,14 +417,14 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
             MyOrdersScreen(
                 onBackClick = { navController.popBackStack() },
                 onOrderClick = { orderId ->
-                    val productName = if (orderId == "#ST67890") "Azure Linen Shirt" else "Organic Cotton Hoodie"
-                    navController.navigate(Screen.OrderTracking.createRoute(productName))
+                    // Pass the order ID as the product identifier for tracking
+                    navController.navigate(Screen.OrderTracking.createRoute(orderId))
                 }
             )
         }
 
         composable(Screen.OrderTracking.route) { backStackEntry ->
-            val productName = backStackEntry.arguments?.getString("productName") ?: "Azure Linen Shirt"
+            val productName = backStackEntry.arguments?.getString("productName") ?: ""
             val goHome = {
                 navController.navigate(Screen.Home.route) {
                     popUpTo(Screen.Home.route) { inclusive = true }
@@ -435,7 +446,7 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
                 onBackClick = { navController.popBackStack() },
                 onLogout = {
                     navController.navigate(Screen.AuthSelection.route) {
-                        popUpTo(0) { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 }
             )
@@ -479,7 +490,7 @@ fun StyleAiNavGraph(startDestination: String = Screen.Splash.route) {
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: "Summer"
             val category = try {
                 StyleCategory.valueOf(categoryName)
-            } catch (e: Exception) {
+            } catch (_: IllegalArgumentException) {
                 StyleCategory.Summer
             }
             CategoryScreen(

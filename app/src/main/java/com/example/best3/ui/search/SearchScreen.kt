@@ -71,7 +71,7 @@ fun SearchScreen(
     )
 
     val products = listOf(
-        Product("Cooling Linen Shirt", "100% Organic Linen", "₹4,399", "98", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800"),
+        Product("Cooling Linen Shirt", "100% Organic Linen", "₹4,399", "98", "https://images.unsplash.com/photoAN-1596755094514-f87e34085b2c?w=800"),
         Product("Organic Cotton Hoodie", "GOTS Certified Cotton", "₹5,799", "95", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800"),
         Product("Premium Silk Blouse", "100% Mulberry Silk", "₹6,499", "99", "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800"),
         Product("Eco-Cotton Dress", "Recycled Cotton Blend", "₹4,199", "94", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800")
@@ -86,13 +86,13 @@ fun SearchScreen(
                 NavigationBarItem(
                     selected = false,
                     onClick = onHomeClick,
-                    icon = { Icon(Icons.Default.Home, null) },
+                    icon = { Icon(Icons.Default.Home, "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
                     selected = true,
                     onClick = { },
-                    icon = { Icon(Icons.Default.Search, null) },
+                    icon = { Icon(Icons.Default.Search, "Search") },
                     label = { Text("Search") },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = AccentBlue,
@@ -103,13 +103,13 @@ fun SearchScreen(
                 NavigationBarItem(
                     selected = false,
                     onClick = onWishlistClick,
-                    icon = { Icon(Icons.Outlined.FavoriteBorder, null) },
+                    icon = { Icon(Icons.Outlined.FavoriteBorder, "Wishlist") },
                     label = { Text("Wishlist") }
                 )
                 NavigationBarItem(
                     selected = false,
                     onClick = onProfileClick,
-                    icon = { Icon(Icons.Default.Person, null) },
+                    icon = { Icon(Icons.Default.Person, "Profile") },
                     label = { Text("Profile") }
                 )
             }
@@ -142,7 +142,7 @@ fun SearchScreen(
                             .weight(1f)
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        leadingIcon = { Icon(Icons.Outlined.Search, null, tint = AccentBlue) },
+                        leadingIcon = { Icon(Icons.Outlined.Search, "Search", tint = AccentBlue) },
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedBorderColor = Color.Transparent,
                             focusedBorderColor = AccentBlue,
@@ -158,7 +158,7 @@ fun SearchScreen(
                         color = AccentBlue
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.Tune, null, tint = White)
+                            Icon(Icons.Default.Tune, "Filter", tint = White)
                         }
                     }
                 }
@@ -212,7 +212,7 @@ fun SearchScreen(
                             Box {
                                 AsyncImage(
                                     model = image,
-                                    contentDescription = null,
+                                    contentDescription = title,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop,
                                     placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
@@ -243,9 +243,33 @@ fun SearchScreen(
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                products.forEach { product ->
-                    ProductCard(product, onProductClick)
-                    Spacer(modifier = Modifier.height(16.dp))
+                if (products.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SearchOff,
+                            contentDescription = null,
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "No results found",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color.Gray)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Try adjusting your search or filters",
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.LightGray)
+                        )
+                    }
+                } else {
+                    products.forEach { product ->
+                        ProductCard(product, onProductClick)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -264,7 +288,7 @@ fun ProductCard(product: Product, onClick: (String) -> Unit) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model = product.image,
-                contentDescription = null,
+                contentDescription = product.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(16.dp)),
@@ -338,7 +362,7 @@ fun ProductCard(product: Product, onClick: (String) -> Unit) {
                             .size(32.dp)
                             .background(AccentBlue, CircleShape)
                     ) {
-                        Icon(Icons.Default.Add, null, tint = White, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Add, "Add to cart", tint = White, modifier = Modifier.size(20.dp))
                     }
                 }
             }

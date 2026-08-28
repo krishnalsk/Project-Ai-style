@@ -48,10 +48,21 @@ fun AddressManagementScreen(onBackClick: () -> Unit) {
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
 
-    val savedAddresses = listOf(
-        UserAddress("1", "Home", "Flat 402, Sunshine Apartments, Jubilee Hills, Hyderabad, Telangana - 500033", "+91 98765 43210", true),
-        UserAddress("2", "Office", "Cyber Towers, Hitech City, Hyderabad, Telangana - 500081", "+91 98765 12345")
-    )
+    // Form State
+    var fullName by remember { mutableStateOf("") }
+    var mobileNumber by remember { mutableStateOf("") }
+    var houseFlat by remember { mutableStateOf("") }
+    var streetLandmark by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var pincode by remember { mutableStateOf("") }
+    var selectedType by remember { mutableStateOf("Home") }
+
+    val savedAddresses = remember {
+        mutableStateListOf(
+            UserAddress("1", "Home", "Flat 402, Sunshine Apartments, Jubilee Hills, Hyderabad, Telangana - 500033", "+91 98765 43210", true),
+            UserAddress("2", "Office", "Cyber Towers, Hitech City, Hyderabad, Telangana - 500081", "+91 98765 12345")
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -116,13 +127,13 @@ fun AddressManagementScreen(onBackClick: () -> Unit) {
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        AddressInputField("Full Name", Icons.Default.Person)
-                        AddressInputField("Mobile Number", Icons.Default.Phone)
-                        AddressInputField("House / Flat / Area", Icons.Default.Home)
-                        AddressInputField("Street / Landmark", Icons.Default.Map)
+                        AddressInputField("Full Name", Icons.Default.Person, value = fullName, onValueChange = { fullName = it })
+                        AddressInputField("Mobile Number", Icons.Default.Phone, value = mobileNumber, onValueChange = { mobileNumber = it })
+                        AddressInputField("House / Flat / Area", Icons.Default.Home, value = houseFlat, onValueChange = { houseFlat = it })
+                        AddressInputField("Street / Landmark", Icons.Default.Map, value = streetLandmark, onValueChange = { streetLandmark = it })
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            AddressInputField("City", Icons.Default.LocationCity, Modifier.weight(1f))
-                            AddressInputField("Pincode", Icons.Default.PinDrop, Modifier.weight(1f))
+                            AddressInputField("City", Icons.Default.LocationCity, modifier = Modifier.weight(1f), value = city, onValueChange = { city = it })
+                            AddressInputField("Pincode", Icons.Default.PinDrop, modifier = Modifier.weight(1f), value = pincode, onValueChange = { pincode = it })
                         }
                         
                         Spacer(modifier = Modifier.height(12.dp))
@@ -130,8 +141,8 @@ fun AddressManagementScreen(onBackClick: () -> Unit) {
                         Row(modifier = Modifier.padding(top = 8.dp)) {
                             listOf("Home", "Office", "Other").forEach { type ->
                                 FilterChip(
-                                    selected = type == "Home",
-                                    onClick = { },
+                                    selected = selectedType == type,
+                                    onClick = { selectedType = type },
                                     label = { Text(type) },
                                     modifier = Modifier.padding(end = 8.dp)
                                 )
@@ -144,11 +155,26 @@ fun AddressManagementScreen(onBackClick: () -> Unit) {
 
                 Button(
                     onClick = {
+                        if (fullName.isBlank() || mobileNumber.isBlank() || houseFlat.isBlank()) {
+                            Toast.makeText(context, "Please fill required fields", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
                         scope.launch {
                             isLoading = true
-                            delay(1500)
+                            delay(1000)
+                            
+                            val newAddress = UserAddress(
+                                id = (savedAddresses.size + 1).toString(),
+                                type = selectedType,
+                                fullAddress = "$houseFlat, $streetLandmark, $city - $pincode",
+                                contact = mobileNumber
+                            )
+                            savedAddresses.add(newAddress)
+
                             isLoading = false
                             Toast.makeText(context, "Address Saved Successfully!", Toast.LENGTH_SHORT).show()
+                            // Clear fields after saving
+                            fullName = ""; mobileNumber = ""; houseFlat = ""; streetLandmark = ""; city = ""; pincode = ""
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -214,9 +240,16 @@ fun AddressCard(address: UserAddress) {
 }
 
 @Composable
-fun AddressInputField(label: String, icon: ImageVector, modifier: Modifier = Modifier) {
+fun AddressInputField(
+    label: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
     OutlinedTextField(
-        value = "", onValueChange = {},
+        value = value,
+        onValueChange = onValueChange,
         label = { Text(label) },
         leadingIcon = { Icon(icon, null, tint = AccentBlue, modifier = Modifier.size(20.dp)) },
         modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Saved Recipes - CookSmart</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#3c3837",
+                    "tertiary-container": "#978f8a",
+                    "on-secondary": "#2f3131",
+                    "on-tertiary-fixed-variant": "#4b4641",
+                    "on-surface-variant": "#e2bfb2",
+                    "surface-container-low": "#1d1b1a",
+                    "background": "#151312",
+                    "secondary-container": "#454747",
+                    "secondary-fixed": "#e2e2e2",
+                    "outline": "#a98a7e",
+                    "inverse-surface": "#e8e1df",
+                    "surface": "#151312",
+                    "tertiary": "#cec5bf",
+                    "secondary": "#c6c6c7",
+                    "primary": "#ffb599",
+                    "on-background": "#e8e1df",
+                    "surface-variant": "#373433",
+                    "on-secondary-fixed-variant": "#454747",
+                    "surface-dim": "#151312",
+                    "on-primary-fixed-variant": "#7f2b00",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "on-primary-container": "#4f1700",
+                    "tertiary-fixed": "#eae1da",
+                    "error-container": "#93000a",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "primary-fixed": "#ffdbce",
+                    "primary-container": "#f66018",
+                    "on-tertiary": "#342f2b",
+                    "inverse-primary": "#a73a00",
+                    "surface-container-highest": "#373433",
+                    "surface-container-high": "#2c2928",
+                    "on-primary-fixed": "#370e00",
+                    "outline-variant": "#5a4138",
+                    "surface-container-lowest": "#100e0d",
+                    "on-error": "#690005",
+                    "on-primary": "#5a1c00",
+                    "on-tertiary-fixed": "#1f1b17",
+                    "primary-fixed-dim": "#ffb599",
+                    "on-secondary-container": "#b4b5b5",
+                    "inverse-on-surface": "#33302e",
+                    "tertiary-fixed-dim": "#cec5bf",
+                    "surface-container": "#221f1e",
+                    "on-surface": "#e8e1df",
+                    "on-tertiary-container": "#2e2925",
+                    "error": "#ffb4ab",
+                    "surface-tint": "#ffb599",
+                    "on-error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "md": "16px",
+                    "2xl": "48px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "margin-desktop": "40px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": [
+                            "Outfit"
+                    ],
+                    "body-lg": [
+                            "Outfit"
+                    ],
+                    "headline-lg": [
+                            "Outfit"
+                    ],
+                    "caption": [
+                            "Outfit"
+                    ],
+                    "label-md": [
+                            "Outfit"
+                    ],
+                    "headline-md": [
+                            "Outfit"
+                    ],
+                    "body-md": [
+                            "Outfit"
+                    ],
+                    "display-lg": [
+                            "Outfit"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "fontWeight": "600"
+                             }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "caption": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg": [
+                            "40px",
+                            {
+                                    "lineHeight": "48px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-20">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-margin-mobile w-full py-md bg-surface dark:bg-surface text-primary font-headline-md text-headline-md docked full-width top-0 flat no shadows sticky z-40 md:hidden">
+    <div class="flex items-center gap-sm">
+        <span class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity duration-200">menu</span>
+        <span class="text-headline-md font-headline-md font-bold text-primary">CookSmart</span>
+    </div>
+    <span class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity duration-200" data-icon="notifications">notifications</span>
+</header>
+<main class="max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop py-md">
+    <!-- Header -->
+    <div class="text-center mb-lg pt-sm">
+        <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background font-bold">Saved Recipes</h1>
+    </div>
+    <!-- Search Bar -->
+    <div class="relative mb-lg max-w-md mx-auto">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-tertiary-container">search</span>
+        <input class="w-full bg-surface-container-low border border-outline-variant/15 text-on-background rounded-full py-3 pl-12 pr-4 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors font-body-md placeholder:text-tertiary-container" placeholder="Search your saved recipes..." type="text"/>
+    </div>
+    <!-- Recipes Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter md:gap-lg">
+        <!-- Card 1 -->
+        <div class="bg-surface-container-low rounded-xl md:rounded-2xl border border-outline-variant/15 overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
+            <div class="relative aspect-square overflow-hidden">
+                <img alt="Garlic Butter Steak Bites" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida/AEtjO1UdVbPRb0aHzWJ5TU4-NITVLy2YBZKGjqL7AM3XSnLJy-kUG37VB4hsvI6qI7O8EZar1YoIpQk3sYwnd6GUcs7hcnn6WqZlO2CyJ-8pC_vrqlKl4flnTobbK3VTaqv0qAgls2n_HIsxsfComVIBBjUyiTTaSASz3j2ChIZ0alVZuwu-6zKfZ8SoHkVz-Gy5zQp3Nf6Qm9pzVj0V6JIIaq1-spknuQCx2LxxkOpwBsK3zJSwwgG9OdzVdRQA"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <button class="absolute top-2 right-2 p-1.5 bg-surface-container/80 backdrop-blur-sm rounded-full text-primary-container hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                </button>
+            </div>
+            <div class="p-sm md:p-md flex-1 flex flex-col justify-between">
+                <h3 class="font-label-md text-label-md md:font-body-lg md:text-body-lg text-on-surface font-semibold line-clamp-2 mb-2">Garlic Butter Steak Bites</h3>
+                <div class="flex items-center justify-between text-tertiary-container font-caption text-caption">
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">schedule</span>
+                        <span>25 min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span>4.9</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="bg-surface-container-low rounded-xl md:rounded-2xl border border-outline-variant/15 overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
+            <div class="relative aspect-square overflow-hidden">
+                <div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="A professional food photograph of Honey Glazed Salmon fillet resting on a bed of quinoa with grilled asparagus. Cinematic warm lighting emphasizing the glossy glaze. Rustic dark grey slate background, high contrast, appetizing mood, 8k resolution." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDnLQaqy0axmVZJrrStz9OzcZsPCBjw4ac-LSNDRSwcweA0F1oQbSd0DH1xTaNscRezXzLcOwh1QuZv7jdyIMrdDJ-zgu645fioO-SCzE1Gl59BEjbtruyNxymXQHMBglMMFoU1vC4jA5KMELF6lXwI5PdPNXjzWJFehc8ClMwykh3DextgpYZTlr93N5V4esHNwqn94CrI1bESss9ZSZRLPgJH8Af0VyUy5gduarqMbb-AXlVb5fztcKLE6l-LvYNGnPpKQYIxfMRC')"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <button class="absolute top-2 right-2 p-1.5 bg-surface-container/80 backdrop-blur-sm rounded-full text-primary-container hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                </button>
+            </div>
+            <div class="p-sm md:p-md flex-1 flex flex-col justify-between">
+                <h3 class="font-label-md text-label-md md:font-body-lg md:text-body-lg text-on-surface font-semibold line-clamp-2 mb-2">Honey Glazed Salmon</h3>
+                <div class="flex items-center justify-between text-tertiary-container font-caption text-caption">
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">schedule</span>
+                        <span>20 min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span>4.8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="bg-surface-container-low rounded-xl md:rounded-2xl border border-outline-variant/15 overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
+            <div class="relative aspect-square overflow-hidden">
+                <div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Close up food shot of Lemon Herb Chicken breast, perfectly seared with grill marks, garnished with fresh thyme and lemon wedges. Dark moody kitchen setting, directional lighting highlighting textures, premium culinary style, 8k." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBIrtOjUwtKRTmTkZ6pgG56heoVXNDdatRs7Yls7oKzZhHU3-WsQOjl9jmh27WiAppRD0gE8Ga27EyEs0X-fK5P7F7stPv6EC3Exs8KCDgrdThLdmt-L1VxEw1q5tI7uOUodOcDLj_gF8CpHATUNupOJs1R4b4DKygB_d2GLRLww7oV3qkRSCZ4-SGcBqjfSKbI8gBxyGG5m87oW94Ts4_rFlZuozvMyefmYf3rW-oBop07Ks8s-sKCwELxcG0HaLYnVsycKBt0yMlW')"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <button class="absolute top-2 right-2 p-1.5 bg-surface-container/80 backdrop-blur-sm rounded-full text-primary-container hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                </button>
+            </div>
+            <div class="p-sm md:p-md flex-1 flex flex-col justify-between">
+                <h3 class="font-label-md text-label-md md:font-body-lg md:text-body-lg text-on-surface font-semibold line-clamp-2 mb-2">Lemon Herb Chicken</h3>
+                <div class="flex items-center justify-between text-tertiary-container font-caption text-caption">
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">schedule</span>
+                        <span>35 min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span>4.7</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="bg-surface-container-low rounded-xl md:rounded-2xl border border-outline-variant/15 overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
+            <div class="relative aspect-square overflow-hidden">
+                <div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Vibrant overhead shot of creamy Avocado Pasta in a rustic ceramic bowl. Garnished with cherry tomatoes, fresh basil, and cracked black pepper. Deep charcoal background, soft diffused natural light, modern vegan cuisine aesthetic, high resolution." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBZ3S56IlMTA1PEeZ1N3ExGFWBmwJMdg15gVhwV8_90bNgunsd4ppxyckQ1A52VOHcJxUqZHwJ5TSp9BjBYnnM9H10sA2J6iXPs5Oady3NeiyCu5jl9JbrMvl_m3FbMUmeWWJNuoeoQ4FHMPkCs0pQs-byttve1-rY99JS9u2Q8iM9AzEABA633oKISEW_I6oFSP-MTZpdSn1-AnaR9I5wSaSAznWsHk_Z8xqyzOt5nZRixaU-mU9auNr2ddNlRehCeERk_AIDauktT')"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <button class="absolute top-2 right-2 p-1.5 bg-surface-container/80 backdrop-blur-sm rounded-full text-primary-container hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                </button>
+            </div>
+            <div class="p-sm md:p-md flex-1 flex flex-col justify-between">
+                <h3 class="font-label-md text-label-md md:font-body-lg md:text-body-lg text-on-surface font-semibold line-clamp-2 mb-2">Avocado Pasta</h3>
+                <div class="flex items-center justify-between text-tertiary-container font-caption text-caption">
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">schedule</span>
+                        <span>15 min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span>4.5</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface-container dark:bg-surface-container rounded-t-xl bg-surface-container border-t border-outline-variant/15 shadow-lg">
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors scale-95 active:scale-90 transition-transform" href="index.html">
+        <span class="material-symbols-outlined" data-icon="home">home</span>
+        <span class="font-label-md text-label-md mt-1">Home</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors scale-95 active:scale-90 transition-transform" href="ingredients.html">
+        <span class="material-symbols-outlined" data-icon="kitchen">kitchen</span>
+        <span class="font-label-md text-label-md mt-1">Ingredients</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-4 py-1 hover:text-primary transition-colors scale-95 active:scale-90 transition-transform" href="saved.html">
+        <span class="material-symbols-outlined" data-icon="bookmark" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+        <span class="font-label-md text-label-md mt-1 font-bold">Saved</span>
+    </a>
+</nav>
+</body>
+</html>

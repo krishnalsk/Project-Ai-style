@@ -11,15 +11,18 @@ import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
 object AiAssistantManager {
+    private const val TAG = "AiAssistant"
     private const val BASE_URL = "https://openrouter.ai/api/v1/"
     private val API_KEY = BuildConfig.OPENROUTER_API_KEY
-    
+
     // Input Validation Constants
     private const val MAX_PROMPT_LENGTH = 2000
     private const val MIN_PROMPT_LENGTH = 2
-    
+    private const val MAX_RETRIES = 3
+    private const val BASE_RETRY_DELAY_MS = 1000L
+
     private val MODELS = listOf(
-        "anthropic/claude-3.5-sonnet", 
+        "anthropic/claude-3.5-sonnet",
         "google/gemini-2.0-flash-exp:free",
         "meta-llama/llama-3.1-8b-instruct:free",
         "open-orchestra/free"
@@ -27,6 +30,8 @@ object AiAssistantManager {
 
     private val SYSTEM_PROMPT = """
         Act as a Senior AI Architect for "Style AI".
+        
+        USE THE PROVIDED CONTEXT TO ANSWER. If the context contains specific fabric details or products, prioritize them in your advice.
         
         You must process every user request using the following 4-Step Rule Algorithm:
         
@@ -41,17 +46,6 @@ object AiAssistantManager {
         
         STEP 4: [Output]
         You MUST start your response with a JSON block inside [LOGIC] tags, followed by your message inside [MESSAGE] tags.
-        
-        FORMAT EXAMPLE:
-        [LOGIC]
-        {
-          "engine": "Random Forest v2.4",
-          "safety": "SAFE (XGBoost)",
-          "score": "94%",
-          "weather": "Rule Applied"
-        }
-        [MESSAGE]
-        Your expert stylist advice here...
     """.trimIndent()
 
     private val json = Json {
@@ -79,10 +73,17 @@ object AiAssistantManager {
         .addInterceptor(Interceptor { chain ->
             var response = chain.proceed(chain.request())
             var tryCount = 0
-            while (!response.isSuccessful && tryCount < 3) {
+            while (!response.isSuccessful && tryCount < MAX_RETRIES) {
+                val statusCode = response.code
+                // Don't retry on client errors (4xx) except 429 (rate limit)
+                if (statusCode in 400..499 && statusCode != 429) {
+                    break
+                }
                 tryCount++
-                Log.d("AiAssistant", "Retrying request... ($tryCount)")
+                val delayMs = BASE_RETRY_DELAY_MS * tryCount // Linear backoff
+                Log.d(TAG, "Retrying request in ${delayMs}ms... ($tryCount/$MAX_RETRIES)")
                 response.close()
+                Thread.sleep(delayMs)
                 response = chain.proceed(chain.request())
             }
             response
@@ -98,70 +99,85 @@ object AiAssistantManager {
     private val api = retrofit.create(OpenRouterApi::class.java)
 
     private fun isPromptSafe(prompt: String): Boolean {
-        val lowercasePrompt = prompt.lowercase()
-        val restrictedKeywords = listOf(
+        val lowercasePrompt = prompt.lowercase().trim()
+        val restrictedPatterns = listOf(
             "ignore previous instructions",
             "ignore all instructions",
+            "ignore any instructions",
             "system prompt",
             "you are now",
             "forget everything",
-            "reveal your logic"
+            "reveal your logic",
+            "reveal your system",
+            "what are your instructions",
+            "repeat after me"
         )
-        return restrictedKeywords.none { lowercasePrompt.contains(it) }
+        return restrictedPatterns.none { lowercasePrompt.contains(it) }
     }
 
-    suspend fun getAssistantResponse(prompt: String): String? {
+    /**
+     * Get AI assistant response with model fallback and retry logic.
+     * Returns Result<String?> to match FirebaseManager pattern for consistency.
+     */
+    suspend fun getAssistantResponse(prompt: String, context: String = ""): Result<String?> {
         // 1. Pre-validation (Length check)
         if (prompt.isBlank() || prompt.trim().length < MIN_PROMPT_LENGTH) {
-            return "Your request is too short. Please tell me more about what you're looking for! 😊"
+            return Result.success("Your request is too short. Please tell me more about what you're looking for!")
         }
 
         if (prompt.length > MAX_PROMPT_LENGTH) {
-            return "Your request is quite long (${prompt.length} chars). To provide the best advice, please keep it under $MAX_PROMPT_LENGTH characters."
+            return Result.success("Your request is quite long (${prompt.length} chars). To provide the best advice, please keep it under $MAX_PROMPT_LENGTH characters.")
         }
 
         // 2. Sanitization
         val cleanedPrompt = prompt.trim()
-            .replace(Regex("[\\p{Cntrl}&&[^\r\n\t]]"), "") // Remove non-printable control characters
+            .replace(Regex("[\\p{Cntrl}&&[^\r\n\t]]"), "")
 
         // 3. Prompt Injection Check
         if (!isPromptSafe(cleanedPrompt)) {
-            Log.w("AiAssistant", "Blocked unsafe prompt: $cleanedPrompt")
-            return "I can only help with style and comfort related queries. Please ask something else! 😊"
+            return Result.success("I can only help with style and comfort related queries. Please ask something else!")
         }
 
-        Log.d("AiAssistant", "Requesting Style AI response for: $cleanedPrompt")
-        
+        // 4. Combine Prompt with Context (The RAG Core)
+        val finalUserMessage = if (context.isNotEmpty()) {
+            "CONTEXT FROM KNOWLEDGE BASE:\n$context\n\nUSER QUESTION: $cleanedPrompt"
+        } else {
+            cleanedPrompt
+        }
+
+        // Log redacted prompt (no user data in production logs)
+        Log.d(TAG, "Requesting Style AI response (${cleanedPrompt.length} chars)")
+
         var lastException: Exception? = null
-        
+
         for (modelId in MODELS) {
             try {
-                Log.d("AiAssistant", "Trying model: $modelId")
+                Log.d(TAG, "Trying model: $modelId")
                 val request = ChatRequest(
                     model = modelId,
                     messages = listOf(
                         Message(role = "system", content = SYSTEM_PROMPT),
-                        Message(role = "user", content = cleanedPrompt)
+                        Message(role = "user", content = finalUserMessage)
                     )
                 )
                 val response = api.getChatCompletion(request)
                 val content = response.choices.firstOrNull()?.message?.content
                 if (content != null) {
-                    return content
+                    return Result.success(content)
                 }
             } catch (e: retrofit2.HttpException) {
                 val errorCode = e.code()
-                val errorBody = e.response()?.errorBody()?.string()
-                Log.e("AiAssistant", "Model $modelId failed: $errorCode - $errorBody")
-                lastException = Exception("API Error ($modelId): $errorCode - $errorBody")
-                if (errorCode == 404 || errorCode == 400) continue else break
+                Log.e(TAG, "Model $modelId failed with HTTP $errorCode")
+                lastException = Exception("API Error ($modelId): $errorCode")
+                // Don't retry on 4xx except 429
+                if (errorCode in 400..499 && errorCode != 429) continue else break
             } catch (e: Exception) {
-                Log.e("AiAssistant", "Model $modelId failed", e)
+                Log.e(TAG, "Model $modelId failed", e)
                 lastException = e
                 continue
             }
         }
-        
-        throw lastException ?: Exception("Style AI Engine offline")
+
+        return Result.failure(lastException ?: Exception("Style AI Engine offline"))
     }
 }

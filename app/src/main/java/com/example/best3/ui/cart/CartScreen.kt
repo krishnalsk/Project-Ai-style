@@ -44,7 +44,7 @@ fun CartScreen(
                 title = { Text("My Cart", fontWeight = FontWeight.ExtraBold, color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Go back")
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = White)
@@ -69,7 +69,7 @@ fun CartScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.LocationOn, null, tint = AccentBlue)
+                    Icon(Icons.Default.LocationOn, "Delivery address", tint = AccentBlue)
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Delivery Address", color = Color.Gray, fontSize = 12.sp)
@@ -91,7 +91,7 @@ fun CartScreen(
                     modifier = Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.AutoAwesome, null, tint = AccentBlue, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.AutoAwesome, "AI compatibility", tint = AccentBlue, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         "AI: All fabrics in your cart are safe for your skin profile.",
@@ -103,22 +103,61 @@ fun CartScreen(
             }
 
             // Cart Items
-            Column(modifier = Modifier.padding(16.dp)) {
-                CartItemCard(
-                    name = "Azure Linen Shirt",
-                    fabric = "Breathable Linen",
-                    price = "₹4,399",
-                    score = "95",
-                    image = "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400"
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                CartItemCard(
-                    name = "Organic Cotton Hoodie",
-                    fabric = "GOTS Certified Cotton",
-                    price = "₹5,799",
-                    score = "98",
-                    image = "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400"
-                )
+            val cartItems = listOf(
+                Triple("Azure Linen Shirt", "₹4,399", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400"),
+                Triple("Organic Cotton Hoodie", "₹5,799", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400")
+            )
+
+            if (cartItems.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        tint = Color.LightGray,
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Your cart is empty",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color.Gray)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Add items to get started",
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.LightGray)
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = onBackClick,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentBlue)
+                    ) {
+                        Icon(Icons.Default.ShoppingBag, "Start shopping", tint = White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Start Shopping", fontWeight = FontWeight.Bold)
+                    }
+                }
+            } else {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    CartItemCard(
+                        name = "Azure Linen Shirt",
+                        fabric = "Breathable Linen",
+                        price = "₹4,399",
+                        score = "95",
+                        image = "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400"
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CartItemCard(
+                        name = "Organic Cotton Hoodie",
+                        fabric = "GOTS Certified Cotton",
+                        price = "₹5,799",
+                        score = "98",
+                        image = "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400"
+                    )
+                }
             }
 
             // Coupon Section
@@ -192,7 +231,7 @@ fun CartItemCard(name: String, fabric: String, price: String, score: String, ima
             Column(modifier = Modifier.weight(1f)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(name, fontWeight = FontWeight.ExtraBold, color = Color.Black)
-                    Icon(Icons.Default.Delete, null, tint = Color.LightGray, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Delete, "Remove $name", tint = Color.LightGray, modifier = Modifier.size(20.dp))
                 }
                 Text(fabric, color = Color.Gray, fontSize = 12.sp)
                 Spacer(modifier = Modifier.height(4.dp))
@@ -214,11 +253,11 @@ fun CartItemCard(name: String, fabric: String, price: String, score: String, ima
                     Text(price, fontWeight = FontWeight.Bold, color = AccentBlue)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(onClick = {}, shape = CircleShape, color = SoftGray) {
-                            Icon(Icons.Default.Remove, null, modifier = Modifier.size(16.dp).padding(4.dp))
+                            Icon(Icons.Default.Remove, "Decrease quantity", modifier = Modifier.size(16.dp).padding(4.dp))
                         }
                         Text("1", modifier = Modifier.padding(horizontal = 12.dp), fontWeight = FontWeight.Bold)
                         Surface(onClick = {}, shape = CircleShape, color = AccentBlue) {
-                            Icon(Icons.Default.Add, null, tint = White, modifier = Modifier.size(16.dp).padding(4.dp))
+                            Icon(Icons.Default.Add, "Increase quantity", tint = White, modifier = Modifier.size(16.dp).padding(4.dp))
                         }
                     }
                 }

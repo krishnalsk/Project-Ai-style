@@ -1,5 +1,8 @@
 package com.example.best3.ui.onboarding.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -36,6 +39,13 @@ fun PersonalInfoSetupScreen(onContinue: () -> Unit) {
     var location by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var size by remember { mutableStateOf("") }
+    var selectedPhotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+
+    val photoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        selectedPhotoUri = uri
+    }
 
     Column(
         modifier = Modifier
@@ -52,14 +62,14 @@ fun PersonalInfoSetupScreen(onContinue: () -> Unit) {
         // Profile Photo
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             AsyncImage(
-                model = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200",
+                model = selectedPhotoUri ?: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200",
                 contentDescription = "Profile Photo",
                 modifier = Modifier.size(100.dp).clip(CircleShape).background(SoftGray),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
             )
             IconButton(
-                onClick = {},
+                onClick = { photoLauncher.launch("image/*") },
                 modifier = Modifier.align(Alignment.BottomEnd).background(AccentBlue, CircleShape).size(32.dp)
             ) {
                 Icon(Icons.Default.CameraAlt, null, tint = White, modifier = Modifier.size(16.dp))
@@ -150,13 +160,19 @@ fun PersonalInfoSetupScreen(onContinue: () -> Unit) {
 
         Text("Favorite Fashion Style", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(12.dp))
+        var selectedStyle by remember { mutableStateOf("Casual") }
+        
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Casual", "Formal", "Activewear", "Streetwear").forEach { style ->
                 FilterChip(
-                    selected = style == "Casual",
-                    onClick = {},
+                    selected = selectedStyle == style,
+                    onClick = { selectedStyle = style },
                     label = { Text(style) },
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = LightBlue,
+                        selectedLabelColor = AccentBlue
+                    )
                 )
             }
         }
@@ -170,7 +186,8 @@ fun PersonalInfoSetupScreen(onContinue: () -> Unit) {
                     profession = profession,
                     location = location,
                     age = age,
-                    size = size
+                    size = size,
+                    fashionStyle = selectedStyle
                 )
                 onContinue()
             },

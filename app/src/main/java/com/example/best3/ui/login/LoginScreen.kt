@@ -63,6 +63,7 @@ fun LoginScreen(
     onForgotPasswordClick: () -> Unit
 ) {
     val context = LocalContext.current
+    val defaultWebClientId = stringResource(R.string.default_web_client_id)
     val scope = rememberCoroutineScope()
     
     var email by remember { mutableStateOf("") }
@@ -84,6 +85,7 @@ fun LoginScreen(
                 account?.idToken?.let { idToken ->
                     scope.launch {
                         isLoading = true
+                        errorMessage = null
                         val loginResult = FirebaseManager.signInWithGoogle(idToken)
                         isLoading = false
                         if (loginResult.isSuccess) {
@@ -92,14 +94,14 @@ fun LoginScreen(
                             errorMessage = loginResult.exceptionOrNull()?.message ?: "Google Sign-In failed"
                         }
                     }
+                } ?: run {
+                    errorMessage = "Google Sign-In failed: no ID token returned"
                 }
             } catch (e: ApiException) {
-                onGoogleClick("balamurali@gmail.com")
+                errorMessage = "Google Sign-In failed: ${e.localizedMessage ?: e.statusCode}"
             }
-        } else {
-            // Fallback for cancellation/unconfigured environments during testing
-            onGoogleClick("balamurali@gmail.com")
         }
+        // User cancelled the sign-in flow - do nothing
     }
     
     var visible by remember { mutableStateOf(false) }
@@ -250,10 +252,13 @@ fun LoginScreen(
                                                 } else {
                                                     isLoading = false
                                                     val exception = task.exception
-                                                    errorMessage = when {
-                                                        exception?.message?.contains("no user record") == true -> "Account not found. Please Sign Up first."
-                                                        exception?.message?.contains("password") == true -> "Incorrect password. Please try again."
-                                                        exception?.message?.contains("network") == true -> "Network error. Please check your connection."
+                                                    errorMessage = when (val errorCode = (exception as? com.google.firebase.auth.FirebaseAuthException)?.errorCode) {
+                                                        "ERROR_INVALID_EMAIL" -> "Please enter a valid email address."
+                                                        "ERROR_WRONG_PASSWORD", "ERROR_INVALID_CREDENTIAL" -> "Incorrect email or password. Please try again."
+                                                        "ERROR_USER_NOT_FOUND" -> "Account not found. Please Sign Up first."
+                                                        "ERROR_USER_DISABLED" -> "This account has been disabled."
+                                                        "ERROR_TOO_MANY_REQUESTS" -> "Too many failed attempts. Please try again later."
+                                                        "ERROR_OPERATION_NOT_ALLOWED" -> "Email/Password sign-in is not enabled. Please contact support."
                                                         else -> exception?.localizedMessage ?: "Sign in failed"
                                                     }
                                                 }
@@ -290,15 +295,16 @@ fun LoginScreen(
 
                             Surface(
                                 onClick = {
+                                    if (isLoading) return@Surface
                                     try {
                                         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                            .requestIdToken(context.getString(R.string.default_web_client_id))
+                                            .requestIdToken(defaultWebClientId)
                                             .requestEmail()
                                             .build()
                                         val googleSignInClient = GoogleSignIn.getClient(context, gso)
                                         googleSignInLauncher.launch(googleSignInClient.signInIntent)
                                     } catch (e: Exception) {
-                                        onGoogleClick("balamurali@gmail.com")
+                                        errorMessage = "Google Sign-In unavailable: ${e.localizedMessage}"
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth().height(56.dp),

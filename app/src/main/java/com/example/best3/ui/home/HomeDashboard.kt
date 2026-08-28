@@ -4,8 +4,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -138,10 +141,10 @@ fun HomeDashboard(
                 containerColor = White,
                 tonalElevation = 8.dp
             ) {
-                NavigationBarItem(icon = { Icon(Icons.Filled.Home, null) }, label = { Text("Home") }, selected = true, onClick = {})
-                NavigationBarItem(icon = { Icon(Icons.Outlined.Search, null) }, label = { Text("Search") }, selected = false, onClick = onSearchClick)
-                NavigationBarItem(icon = { Icon(Icons.Outlined.FavoriteBorder, null) }, label = { Text("Wishlist") }, selected = false, onClick = onWishlistClick)
-                NavigationBarItem(icon = { Icon(Icons.Outlined.Person, null) }, label = { Text("Profile") }, selected = false, onClick = onProfileClick)
+                NavigationBarItem(icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, selected = true, onClick = {})
+                NavigationBarItem(icon = { Icon(Icons.Outlined.Search, "Search") }, label = { Text("Search") }, selected = false, onClick = onSearchClick)
+                NavigationBarItem(icon = { Icon(Icons.Outlined.FavoriteBorder, "Wishlist") }, label = { Text("Wishlist") }, selected = false, onClick = onWishlistClick)
+                NavigationBarItem(icon = { Icon(Icons.Outlined.Person, "Profile") }, label = { Text("Profile") }, selected = false, onClick = onProfileClick)
             }
         },
         floatingActionButton = {
@@ -149,346 +152,372 @@ fun HomeDashboard(
                 onClick = onAiStylistClick,
                 containerColor = AccentBlue,
                 contentColor = White,
-                icon = { Icon(Icons.Default.AutoAwesome, null) },
+                icon = { Icon(Icons.Default.AutoAwesome, "AI Stylist") },
                 text = { Text("AI Stylist") },
                 shape = RoundedCornerShape(16.dp)
             )
         }
     ) { padding ->
-        Column(
+        val displayProducts = remember(searchQuery, allProducts) {
+            if (searchQuery.isNotEmpty()) filteredProducts else allProducts
+        }
+
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Brush.verticalGradient(listOf(White, LightBlue.copy(alpha = 0.3f), White)))
-                .verticalScroll(rememberScrollState())
+                .background(Brush.verticalGradient(listOf(White, LightBlue.copy(alpha = 0.3f), White))),
+            contentPadding = PaddingValues(bottom = 24.dp)
         ) {
             // Header
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.hello_user, userProfile?.fullName ?: "Balamurali"),
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
-                    )
-                    Text(
-                        text = stringResource(R.string.home_subtitle),
-                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray, fontWeight = FontWeight.Medium)
-                    )
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onNotificationClick) {
-                        Icon(Icons.Default.Notifications, null, tint = AccentBlue)
-                    }
-                    IconButton(onClick = onCartClick) {
-                        Icon(Icons.Default.ShoppingCart, null, tint = AccentBlue)
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    // Real User Image
-                    Surface(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, White, CircleShape)
-                            .background(SoftGray)
-                            .clickable { onProfileClick() },
-                        tonalElevation = 2.dp
-                    ) {
-                        AsyncImage(
-                            model = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=60",
-                            contentDescription = "Profile",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop,
-                            placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.hello_user, userProfile?.fullName ?: "Balamurali"),
+                            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
                         )
+                        Text(
+                            text = stringResource(R.string.home_subtitle),
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray, fontWeight = FontWeight.Medium)
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = onNotificationClick) {
+                            Icon(Icons.Default.Notifications, "Notifications", tint = AccentBlue)
+                        }
+                        IconButton(onClick = onCartClick) {
+                            Icon(Icons.Default.ShoppingCart, "Cart", tint = AccentBlue)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Surface(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, White, CircleShape)
+                                .background(SoftGray)
+                                .clickable { onProfileClick() },
+                            tonalElevation = 2.dp
+                        ) {
+                            AsyncImage(
+                                model = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=60",
+                                contentDescription = "Profile",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                            )
+                        }
                     }
                 }
             }
 
             // Search Bar
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text(stringResource(R.string.search_placeholder)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(16.dp),
-                leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
-                trailingIcon = {
-                    if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Close, null, tint = Color.Gray)
+            item {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text(stringResource(R.string.search_placeholder)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    leadingIcon = { Icon(Icons.Default.Search, "Search", tint = Color.Gray) },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(Icons.Default.Close, "Clear search", tint = Color.Gray)
+                            }
+                        } else {
+                            IconButton(onClick = { permissionLauncher.launch(android.Manifest.permission.CAMERA) }) {
+                                Icon(Icons.Default.CameraAlt, "Scan with camera", tint = AccentBlue)
+                            }
                         }
-                    } else {
-                        IconButton(onClick = { permissionLauncher.launch(android.Manifest.permission.CAMERA) }) {
-                            Icon(Icons.Default.CameraAlt, null, tint = AccentBlue)
-                        }
-                    }
-                },
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    imeAction = ImeAction.Search
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = { focusManager.clearFocus() }
-                ),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = White.copy(alpha = 0.5f),
-                    focusedContainerColor = White,
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedBorderColor = AccentBlue.copy(alpha = 0.5f)
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = { focusManager.clearFocus() }
+                    ),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = White.copy(alpha = 0.5f),
+                        focusedContainerColor = White,
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedBorderColor = AccentBlue.copy(alpha = 0.5f)
+                    )
                 )
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Track Order Card (New)
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Surface(
-                    modifier = Modifier.weight(1f).clickable { onTrackOrderClick() },
-                    shape = RoundedCornerShape(24.dp),
-                    color = White,
-                    shadowElevation = 2.dp,
-                    border = BorderStroke(1.dp, LightBlue.copy(alpha = 0.5f))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(LightBlue.copy(alpha = 0.2f), RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.LocalShipping, null, tint = AccentBlue)
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(stringResource(R.string.track_order), fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-                        Text(stringResource(R.string.arriving_today), fontSize = 11.sp, color = Color.Gray)
-                    }
-                }
-
-                Surface(
-                    modifier = Modifier.weight(1f).clickable { onCategoryClick("VirtualCloset") },
-                    shape = RoundedCornerShape(24.dp),
-                    color = White,
-                    shadowElevation = 2.dp,
-                    border = BorderStroke(1.dp, LightBlue.copy(alpha = 0.5f))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(AccentBlue.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.Checkroom, null, tint = AccentBlue)
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(stringResource(R.string.virtual_closet), fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-                        Text(stringResource(R.string.mix_match), fontSize = 11.sp, color = Color.Gray)
-                    }
-                }
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Weather & Comfort Score Row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Weather Card
-                Card(
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = AccentBlue)
-                ) {
-                    val weatherText = if (userProfile?.location?.contains("Dubai", ignoreCase = true) == true) "42°C Dubai" else "34°C Sunny"
-                    val fabricText = if (userProfile?.location?.contains("Dubai", ignoreCase = true) == true) "Ultra-Light Linen" else "Breathable Linen"
-                    
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Icon(Icons.Default.WbSunny, null, tint = Color.Yellow, modifier = Modifier.size(24.dp))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(weatherText, color = White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        Text(fabricText, color = White.copy(alpha = 0.8f), fontSize = 12.sp)
-                    }
-                }
-
-                // Comfort Score Card
-                Card(
-                    modifier = Modifier.weight(1f).clickable { onCategoryClick("SustainabilityDashboard") },
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = White),
-                    border = BorderStroke(1.dp, AccentBlue.copy(alpha = 0.1f))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Icon(Icons.Default.HealthAndSafety, null, tint = Color(0xFF4CAF50), modifier = Modifier.size(24.dp))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("${userProfile?.comfortScore ?: 92}% Comfort", color = AccentBlue, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        Text("Daily Score", color = Color.Gray, fontSize = 12.sp)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Live Skin Forecast Section
-            Text(
-                text = stringResource(R.string.live_skin_forecast),
-                modifier = Modifier.padding(horizontal = 24.dp),
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(32.dp),
-                color = Color(0xFFFFF9C4).copy(alpha = 0.5f),
-                border = BorderStroke(1.dp, Color(0xFFFBC02D).copy(alpha = 0.2f))
-            ) {
+            // Track Order & Closet
+            item {
                 Row(
-                    modifier = Modifier.padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Waves, null, tint = Color(0xFFFBC02D), modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Humidity: 65%", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.WbSunny, null, tint = Color(0xFFFBC02D), modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("UV Index: High (7)", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            "Recommendation: Avoid synthetics. Wear Bamboo or Silk to prevent sweat-rash.",
-                            color = Color.DarkGray,
-                            fontSize = 12.sp,
-                            lineHeight = 18.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .background(Color(0xFFFBC02D).copy(alpha = 0.1f), CircleShape),
-                        contentAlignment = Alignment.Center
+                    Surface(
+                        modifier = Modifier.weight(1f).clickable { onTrackOrderClick() },
+                        shape = RoundedCornerShape(24.dp),
+                        color = White,
+                        shadowElevation = 2.dp,
+                        border = BorderStroke(1.dp, LightBlue.copy(alpha = 0.5f))
                     ) {
-                        Icon(Icons.Default.ShieldMoon, null, tint = Color(0xFFFBC02D), modifier = Modifier.size(32.dp))
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(LightBlue.copy(alpha = 0.2f), RoundedCornerShape(12.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.LocalShipping, "Track order", tint = AccentBlue)
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(stringResource(R.string.track_order), fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                            Text(stringResource(R.string.arriving_today), fontSize = 11.sp, color = Color.Gray)
+                        }
+                    }
+
+                    Surface(
+                        modifier = Modifier.weight(1f).clickable { onCategoryClick("VirtualCloset") },
+                        shape = RoundedCornerShape(24.dp),
+                        color = White,
+                        shadowElevation = 2.dp,
+                        border = BorderStroke(1.dp, LightBlue.copy(alpha = 0.5f))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(AccentBlue.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.Checkroom, "Virtual closet", tint = AccentBlue)
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(stringResource(R.string.virtual_closet), fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                            Text(stringResource(R.string.mix_match), fontSize = 11.sp, color = Color.Gray)
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // Weather & Comfort
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(containerColor = AccentBlue)
+                    ) {
+                        val weatherText = if (userProfile?.location?.contains("Dubai", ignoreCase = true) == true) "42°C Dubai" else "34°C Sunny"
+                        val fabricText = if (userProfile?.location?.contains("Dubai", ignoreCase = true) == true) "Ultra-Light Linen" else "Breathable Linen"
+                        
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Icon(Icons.Default.WbSunny, "Weather", tint = Color.Yellow, modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(weatherText, color = White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(fabricText, color = White.copy(alpha = 0.8f), fontSize = 12.sp)
+                        }
+                    }
 
-            // Categories
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+                    Card(
+                        modifier = Modifier.weight(1f).clickable { onCategoryClick("SustainabilityDashboard") },
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(containerColor = White),
+                        border = BorderStroke(1.dp, AccentBlue.copy(alpha = 0.1f))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Icon(Icons.Default.HealthAndSafety, "Comfort score", tint = Color(0xFF4CAF50), modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("${userProfile?.comfortScore ?: 92}% Comfort", color = AccentBlue, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text("Daily Score", color = Color.Gray, fontSize = 12.sp)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            // Live Skin Forecast
+            item {
                 Text(
-                    text = stringResource(R.string.categories),
+                    text = stringResource(R.string.live_skin_forecast),
+                    modifier = Modifier.padding(horizontal = 24.dp),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
                 )
-                Row {
-                    TextButton(onClick = { onCategoryClick("FabricEncyclopedia") }) {
-                        Text(stringResource(R.string.fabric_guide), color = AccentBlue, fontWeight = FontWeight.Bold)
-                    }
-                    TextButton(onClick = onWashCareClick) {
-                        Text(stringResource(R.string.wash_care), color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(16.dp))
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    shape = RoundedCornerShape(32.dp),
+                    color = Color(0xFFFFF9C4).copy(alpha = 0.5f),
+                    border = BorderStroke(1.dp, Color(0xFFFBC02D).copy(alpha = 0.2f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Waves, "Humidity", tint = Color(0xFFFBC02D), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Humidity: 65%", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.WbSunny, "UV index", tint = Color(0xFFFBC02D), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("UV Index: High (7)", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                "Recommendation: Avoid synthetics. Wear Bamboo or Silk to prevent sweat-rash.",
+                                color = Color.DarkGray,
+                                fontSize = 12.sp,
+                                lineHeight = 18.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .background(Color(0xFFFBC02D).copy(alpha = 0.1f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.ShieldMoon, "UV protection", tint = Color(0xFFFBC02D), modifier = Modifier.size(32.dp))
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.height(24.dp))
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val categories = listOf(
-                    "Summer" to Icons.Default.WbSunny,
-                    "Winter" to Icons.Default.AcUnit,
-                    "Casual" to Icons.Default.Coffee,
-                    "Formal" to Icons.Default.BusinessCenter,
-                    "GymWear" to Icons.Default.FitnessCenter,
-                    "EcoFriendly" to Icons.Default.Eco,
-                    "SensitiveSkin" to Icons.Default.HealthAndSafety
-                )
-                items(categories) { (category, icon) ->
-                    val displayName = when(category) {
-                        "GymWear" -> "Gym Wear"
-                        "EcoFriendly" -> "Eco-Friendly"
-                        "SensitiveSkin" -> "Sensitive Skin"
-                        else -> category
+
+            // Categories Header
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.categories),
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
+                    )
+                    Row {
+                        TextButton(onClick = { onCategoryClick("FabricEncyclopedia") }) {
+                            Text(stringResource(R.string.fabric_guide), color = AccentBlue, fontWeight = FontWeight.Bold)
+                        }
+                        TextButton(onClick = onWashCareClick) {
+                            Text(stringResource(R.string.wash_care), color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold)
+                        }
                     }
-                    Surface(
-                        onClick = { onCategoryClick(category) },
-                        shape = RoundedCornerShape(20.dp),
-                        color = White,
-                        border = BorderStroke(1.dp, LightBlue.copy(alpha = 0.3f)),
-                        shadowElevation = 4.dp
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    val categories = listOf(
+                        "Summer" to Icons.Default.WbSunny,
+                        "Winter" to Icons.Default.AcUnit,
+                        "Casual" to Icons.Default.Coffee,
+                        "Formal" to Icons.Default.BusinessCenter,
+                        "GymWear" to Icons.Default.FitnessCenter,
+                        "EcoFriendly" to Icons.Default.Eco,
+                        "SensitiveSkin" to Icons.Default.HealthAndSafety
+                    )
+                    items(categories) { (category, icon) ->
+                        val displayName = when(category) {
+                            "GymWear" -> "Gym Wear"
+                            "EcoFriendly" -> "Eco-Friendly"
+                            "SensitiveSkin" -> "Sensitive Skin"
+                            else -> category
+                        }
+                        Surface(
+                            onClick = { onCategoryClick(category) },
+                            shape = RoundedCornerShape(20.dp),
+                            color = White,
+                            border = BorderStroke(1.dp, LightBlue.copy(alpha = 0.3f)),
+                            shadowElevation = 4.dp
                         ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                             Icon(
                                 imageVector = icon,
-                                contentDescription = null,
+                                contentDescription = displayName,
                                 tint = AccentBlue,
                                 modifier = Modifier.size(20.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = displayName,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = displayName,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // Product List Header
+            item {
+                Text(
+                    text = if (searchQuery.isNotEmpty()) stringResource(R.string.search_results) else stringResource(R.string.new_arrivals),
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
-            // Trending Outfits (New Section)
-            Text(
-                text = if (searchQuery.isNotEmpty()) stringResource(R.string.search_results) else stringResource(R.string.new_arrivals),
-                modifier = Modifier.padding(horizontal = 24.dp),
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold, color = Color.Black)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                val displayProducts = if (searchQuery.isNotEmpty()) filteredProducts else allProducts
-                
-                if (displayProducts.isEmpty()) {
-                    Box(
+            // Dynamic Product List
+            if (displayProducts.isEmpty()) {
+                item {
+                    Column(
                         modifier = Modifier.fillMaxWidth().padding(32.dp),
-                        contentAlignment = Alignment.Center
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("No outfits found matching '$searchQuery'", color = Color.Gray)
-                    }
-                } else {
-                    displayProducts.forEach { product ->
-                        ProductItem(product) { onProductClick(product.name) }
+                        Icon(
+                            imageVector = if (searchQuery.isNotEmpty()) Icons.Default.SearchOff else Icons.Default.Checkroom,
+                            contentDescription = null,
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(64.dp)
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = if (searchQuery.isNotEmpty()) "No results found" else "No products available",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color.Gray)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = if (searchQuery.isNotEmpty()) "Try a different search term" else "Check back soon for new arrivals",
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.LightGray)
+                        )
                     }
+                }
+            } else {
+                items(displayProducts, key = { it.name }) { product ->
+                    Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+                        ProductItem(product) { onProductClick(product.name) }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
@@ -558,7 +587,7 @@ fun ProductItem(product: Product, onClick: () -> Unit) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 Icons.Default.Add, 
-                                null, 
+                                "Add to cart", 
                                 modifier = Modifier.size(20.dp),
                                 tint = AccentBlue
                             )

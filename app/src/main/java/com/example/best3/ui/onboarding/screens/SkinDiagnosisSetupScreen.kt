@@ -39,13 +39,22 @@ fun SkinDiagnosisSetupScreenPreview() {
 @Composable
 fun SkinDiagnosisSetupScreen(onAnalyze: () -> Unit) {
     val context = LocalContext.current
-    var bodySize by remember { mutableStateOf("") }
+    var bodySize by remember { mutableStateOf(FirebaseManager.tempProfile.size ?: "") }
     var height by remember { mutableStateOf("") }
     var capturedImage by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+    
+    var selectedSkinType by remember { mutableStateOf(FirebaseManager.tempProfile.skinType ?: "Sensitive") }
+    var selectedComfort by remember { mutableStateOf(FirebaseManager.tempProfile.preferredFabric ?: "Breathable Material") }
+    var selectedStyle by remember { mutableStateOf(FirebaseManager.tempProfile.fashionStyle ?: "Summer") }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
         if (bitmap != null) {
             capturedImage = bitmap
+            FirebaseManager.tempProfile = FirebaseManager.tempProfile.copy(
+                // In a real app, you'd upload the image and save the URL. 
+                // For now, we just mark that a photo exists in state.
+                profession = "Photo Uploaded" 
+            )
             Toast.makeText(context, "Skin image captured!", Toast.LENGTH_SHORT).show()
         }
     }
@@ -109,10 +118,14 @@ fun SkinDiagnosisSetupScreen(onAnalyze: () -> Unit) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Normal", "Oily", "Dry", "Combination", "Sensitive", "Acne Prone").forEach { condition ->
                 FilterChip(
-                    selected = condition == "Sensitive",
-                    onClick = {},
+                    selected = selectedSkinType == condition,
+                    onClick = { selectedSkinType = condition },
                     label = { Text(condition) },
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = LightBlue,
+                        selectedLabelColor = AccentBlue
+                    )
                 )
             }
         }
@@ -123,10 +136,14 @@ fun SkinDiagnosisSetupScreen(onAnalyze: () -> Unit) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Loose Fit", "Soft Fabric", "Breathable Material").forEach { pref ->
                 FilterChip(
-                    selected = pref == "Breathable Material",
-                    onClick = {},
+                    selected = selectedComfort == pref,
+                    onClick = { selectedComfort = pref },
                     label = { Text(pref) },
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = LightBlue,
+                        selectedLabelColor = AccentBlue
+                    )
                 )
             }
         }
@@ -170,10 +187,14 @@ fun SkinDiagnosisSetupScreen(onAnalyze: () -> Unit) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Casual", "Summer", "Formal", "Activewear").forEach { style ->
                 FilterChip(
-                    selected = style == "Summer",
-                    onClick = {},
+                    selected = selectedStyle == style,
+                    onClick = { selectedStyle = style },
                     label = { Text(style) },
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = LightBlue,
+                        selectedLabelColor = AccentBlue
+                    )
                 )
             }
         }
@@ -184,7 +205,9 @@ fun SkinDiagnosisSetupScreen(onAnalyze: () -> Unit) {
             onClick = {
                 FirebaseManager.tempProfile = FirebaseManager.tempProfile.copy(
                     size = bodySize,
-                    skinType = "Sensitive" // Simplified for now
+                    skinType = selectedSkinType,
+                    preferredFabric = selectedComfort,
+                    fashionStyle = selectedStyle
                 )
                 onAnalyze()
             },

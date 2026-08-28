@@ -25,12 +25,10 @@ fun GoogleCredentialScreenPreview() {
         GoogleCredentialScreen(selectedEmail = "balamurali@gmail.com", onBackClick = {}, onNext = {})
     }
 }
-
 @Composable
 fun GoogleCredentialScreen(selectedEmail: String, onBackClick: () -> Unit, onNext: () -> Unit) {
     var email by remember { mutableStateOf(selectedEmail) }
     var password by remember { mutableStateOf("") }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -84,7 +82,6 @@ fun GoogleCredentialScreen(selectedEmail: String, onBackClick: () -> Unit, onNex
             TextButton(onClick = {}, modifier = Modifier.padding(top = 4.dp)) {
                 Text("Forgot email?", color = Color(0xFF1A73E8), fontWeight = FontWeight.Bold)
             }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
@@ -97,7 +94,6 @@ fun GoogleCredentialScreen(selectedEmail: String, onBackClick: () -> Unit, onNex
             )
 
             Spacer(modifier = Modifier.height(48.dp))
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -117,4 +113,3 @@ fun GoogleCredentialScreen(selectedEmail: String, onBackClick: () -> Unit, onNex
             }
         }
     }
-}

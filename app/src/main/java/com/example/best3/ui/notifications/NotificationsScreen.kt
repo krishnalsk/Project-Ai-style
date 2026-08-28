@@ -63,7 +63,7 @@ fun NotificationsScreen(onBackClick: () -> Unit) {
                 title = { Text("Notification Center", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Go back")
                     }
                 },
                 actions = {
@@ -101,8 +101,34 @@ fun NotificationsScreen(onBackClick: () -> Unit) {
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(notifications) { notification ->
-                    NotificationCard(notification)
+                if (notifications.isEmpty()) {
+                    item {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.NotificationsNone,
+                                contentDescription = null,
+                                tint = Color.LightGray,
+                                modifier = Modifier.size(80.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "No notifications yet",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color.Gray)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "We'll let you know when something happens",
+                                style = MaterialTheme.typography.bodyMedium.copy(color = Color.LightGray)
+                            )
+                        }
+                    }
+                } else {
+                    items(notifications) { notification ->
+                        NotificationCard(notification)
+                    }
                 }
                 
                 item {
@@ -154,7 +180,7 @@ fun NotificationCard(item: NotificationItem) {
                         "Offers" -> Icons.Default.LocalOffer
                         else -> Icons.Default.Person
                     },
-                    contentDescription = null,
+                    contentDescription = item.category,
                     tint = when(item.category) {
                         "Orders" -> Color(0xFF1976D2)
                         "AI Styles" -> Color(0xFF7B1FA2)

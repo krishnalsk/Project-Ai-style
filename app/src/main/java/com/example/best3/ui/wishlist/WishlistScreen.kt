@@ -88,19 +88,19 @@ fun WishlistScreen(
                 NavigationBarItem(
                     selected = false,
                     onClick = onHomeClick,
-                    icon = { Icon(Icons.Outlined.Home, null) },
+                    icon = { Icon(Icons.Outlined.Home, "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
                     selected = false,
                     onClick = onSearchClick,
-                    icon = { Icon(Icons.Outlined.Search, null) },
+                    icon = { Icon(Icons.Outlined.Search, "Search") },
                     label = { Text("Search") }
                 )
                 NavigationBarItem(
                     selected = true,
                     onClick = { },
-                    icon = { Icon(Icons.Filled.Favorite, null) },
+                    icon = { Icon(Icons.Filled.Favorite, "Wishlist") },
                     label = { Text("Wishlist") },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = AccentBlue,
@@ -111,7 +111,7 @@ fun WishlistScreen(
                 NavigationBarItem(
                     selected = false,
                     onClick = onProfileClick,
-                    icon = { Icon(Icons.Outlined.Person, null) },
+                    icon = { Icon(Icons.Outlined.Person, "Profile") },
                     label = { Text("Profile") }
                 )
             }
@@ -142,7 +142,7 @@ fun WishlistScreen(
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Icon(Icons.Filled.Favorite, null, tint = AccentBlue, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Filled.Favorite, "Wishlist", tint = AccentBlue, modifier = Modifier.size(24.dp))
                     }
                     Text(
                         text = "Saved Comfort Styles",
@@ -164,7 +164,7 @@ fun WishlistScreen(
                     placeholder = { Text("Search saved outfits...", color = Color.Gray) },
                     modifier = Modifier.weight(1f).height(56.dp),
                     shape = RoundedCornerShape(16.dp),
-                    leadingIcon = { Icon(Icons.Default.Search, null, tint = AccentBlue) },
+                    leadingIcon = { Icon(Icons.Default.Search, "Search", tint = AccentBlue) },
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = AccentBlue,
@@ -180,29 +180,53 @@ fun WishlistScreen(
                     color = SoftGray.copy(alpha = 0.5f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Tune, null, tint = AccentBlue)
+                        Icon(Icons.Default.Tune, "Filter", tint = AccentBlue)
                     }
                 }
             }
 
             // Wishlist Items
-            Column(modifier = Modifier.padding(24.dp)) {
-                WishlistCategoryHeader("Boys - Tops")
-                items.subList(0, 4).forEach { item ->
-                    WishlistCard(item, onProductClick)
-                    Spacer(modifier = Modifier.height(20.dp))
+            if (items.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        tint = Color.LightGray,
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Your wishlist is empty",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color.Gray)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Save styles you love for later",
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.LightGray)
+                    )
                 }
-                
-                WishlistCategoryHeader("Boys - Bottoms")
-                items.subList(4, 8).forEach { item ->
-                    WishlistCard(item, onProductClick)
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
+            } else {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    WishlistCategoryHeader("Boys - Tops")
+                    items.subList(0, 4).forEach { item ->
+                        WishlistCard(item, onProductClick)
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+                    
+                    WishlistCategoryHeader("Boys - Bottoms")
+                    items.subList(4, 8).forEach { item ->
+                        WishlistCard(item, onProductClick)
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
 
-                WishlistCategoryHeader("Girls - Tops & Bottoms")
-                items.subList(8, 12).forEach { item ->
-                    WishlistCard(item, onProductClick)
-                    Spacer(modifier = Modifier.height(20.dp))
+                    WishlistCategoryHeader("Girls - Tops & Bottoms")
+                    items.subList(8, 12).forEach { item ->
+                        WishlistCard(item, onProductClick)
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
                 }
             }
 
@@ -233,7 +257,7 @@ fun WishlistScreen(
                                 Box {
                                     AsyncImage(
                                         model = image,
-                                        contentDescription = null,
+                                        contentDescription = name,
                                         modifier = Modifier.height(180.dp).fillMaxWidth(),
                                         contentScale = ContentScale.Crop,
                                         placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
@@ -292,7 +316,7 @@ fun WishlistCard(item: WishlistItem, onClick: (String) -> Unit) {
             Box {
                 AsyncImage(
                     model = item.image,
-                    contentDescription = null,
+                    contentDescription = item.name,
                     modifier = Modifier.fillMaxWidth().height(220.dp),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
@@ -301,7 +325,7 @@ fun WishlistCard(item: WishlistItem, onClick: (String) -> Unit) {
                     onClick = { },
                     modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).background(White, CircleShape)
                 ) {
-                    Icon(Icons.Filled.Favorite, null, tint = Color.Red, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Filled.Favorite, "Remove from wishlist", tint = Color.Red, modifier = Modifier.size(24.dp))
                 }
                 Surface(
                     modifier = Modifier.align(Alignment.BottomStart).padding(16.dp),
@@ -312,7 +336,7 @@ fun WishlistCard(item: WishlistItem, onClick: (String) -> Unit) {
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.AutoAwesome, null, tint = AccentBlue, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.AutoAwesome, "AI comfort score", tint = AccentBlue, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(text = "${item.score}% Comfort", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = AccentBlue)
                     }
@@ -368,7 +392,7 @@ fun WishlistCard(item: WishlistItem, onClick: (String) -> Unit) {
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = AccentBlue)
                     ) {
-                        Icon(Icons.Default.ShoppingBag, null, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.ShoppingBag, "Add to cart", modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Add to Cart")
                     }

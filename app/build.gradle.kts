@@ -32,7 +32,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -68,8 +69,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.google.signin)
     implementation(libs.kotlinx.coroutines.play.services)
-    
-    // OpenRouter Integration11111111
+
+    // OpenRouter Integration
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.okhttp.logging)

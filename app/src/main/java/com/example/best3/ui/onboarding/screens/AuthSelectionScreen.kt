@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,17 +30,16 @@ import com.example.best3.R
 import com.example.best3.data.FirebaseManager
 import com.example.best3.ui.theme.*
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
-
-@Preview(showBackground = true)
+@Preview(showBackghround = true)
 @Composable
 fun AuthSelectionScreenPreview() {
     StyleAiTheme {
         AuthSelectionScreen(onLoginClick = {}, onSignUpClick = {}, onGoogleClick = {})
     }
 }
-
 @Composable
 fun AuthSelectionScreen(
     onLoginClick: () -> Unit,
@@ -47,8 +47,11 @@ fun AuthSelectionScreen(
     onGoogleClick: (String) -> Unit
 ) {
     val context = LocalContext.current
+    val defaultWebClientId = stringResource(R.string.default_web_client_id)
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
+
+    var googleError by remember { mutableStateOf<String?>(null) }
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -64,11 +67,30 @@ fun AuthSelectionScreen(
                         isLoading = false
                         if (loginResult.isSuccess) {
                             onGoogleClick(account.email ?: "")
+                        } else {
+                            googleError = loginResult.exceptionOrNull()?.message ?: "Google Sign-In failed"
                         }
                     }
+                } ?: run {
+                    googleError = "Google Sign-In failed: no ID token returned"
                 }
             } catch (e: ApiException) {
-                Toast.makeText(context, "Google Sign-In failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                googleError = "Google Sign-In failed: ${e.localizedMessage ?: e.statusCode}"
+            }
+        }
+        // User cancelled the sign-in flow - do nothing
+    }
+
+    val launchGoogleSignIn = {
+        if (!isLoading) {
+            try {
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(defaultWebClientId)
+                    .requestEmail()
+                    .build()
+                googleSignInLauncher.launch(GoogleSignIn.getClient(context, gso).signInIntent)
+            } catch (e: Exception) {
+                googleError = "Google Sign-In unavailable: ${e.localizedMessage}"
             }
         }
     }

@@ -222,7 +222,14 @@ fun SignUpScreen(
                                                         }
                                                 } else {
                                                     isLoading = false
-                                                    errorMessage = task.exception?.message ?: "Sign up failed"
+                                                    val exception = task.exception
+                                                    errorMessage = when (val errorCode = (exception as? com.google.firebase.auth.FirebaseAuthException)?.errorCode) {
+                                                        "ERROR_INVALID_EMAIL" -> "Please enter a valid email address."
+                                                        "ERROR_EMAIL_ALREADY_IN_USE" -> "This email is already registered. Please login."
+                                                        "ERROR_WEAK_PASSWORD" -> "Password is too weak. Use at least 6 characters."
+                                                        "ERROR_OPERATION_NOT_ALLOWED" -> "Email/Password sign-up is not enabled."
+                                                        else -> exception?.localizedMessage ?: "Sign up failed"
+                                                    }
                                                 }
                                             }
                                     } else {

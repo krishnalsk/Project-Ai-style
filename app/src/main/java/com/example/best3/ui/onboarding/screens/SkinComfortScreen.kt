@@ -19,6 +19,16 @@ import com.example.best3.data.FirebaseManager
 import com.example.best3.ui.theme.*
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FlowRow(modifier: Modifier = Modifier, horizontalArrangement: Arrangement.Horizontal, content: @Composable () -> Unit) {
+    androidx.compose.foundation.layout.FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = horizontalArrangement,
+        content = { content() }
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun SkinComfortScreenPreview() {
@@ -67,19 +77,65 @@ fun SkinComfortScreen(onContinue: () -> Unit) {
 
         Text("Select Skin Type & Conditions", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(12.dp))
-        listOf("Sensitive Skin", "Sweat Prone", "Fabric Allergy", "Eczema", "Dry Skin").forEach { condition ->
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
-                Checkbox(checked = condition == "Sensitive Skin", onCheckedChange = {})
-                Text(condition)
+        
+        val skinConditions = listOf("Sensitive Skin", "Sweat Prone", "Fabric Allergy", "Eczema", "Dry Skin")
+        var selectedConditions by remember { mutableStateOf(setOf("Sensitive Skin")) }
+        
+        skinConditions.forEach { condition ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically, 
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { 
+                        selectedConditions = if (selectedConditions.contains(condition)) {
+                            selectedConditions - condition
+                        } else {
+                            selectedConditions + condition
+                        }
+                    }
+                    .padding(vertical = 4.dp)
+            ) {
+                Checkbox(
+                    checked = selectedConditions.contains(condition),
+                    onCheckedChange = { isChecked ->
+                        selectedConditions = if (isChecked) {
+                            selectedConditions + condition
+                        } else {
+                            selectedConditions - condition
+                        }
+                    },
+                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF006064))
+                )
+                Text(condition, color = Color.Black, fontWeight = FontWeight.Medium)
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text("Preferred Fabrics", fontWeight = FontWeight.Bold)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        var selectedFabrics by remember { mutableStateOf(setOf("Cotton")) }
+        
+        FlowRow(
+            modifier = Modifier.padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             listOf("Cotton", "Silk", "Linen", "Bamboo").forEach { fabric ->
-                SuggestionChip(onClick = {}, label = { Text(fabric) }, colors = SuggestionChipDefaults.suggestionChipColors(containerColor = White))
+                FilterChip(
+                    selected = selectedFabrics.contains(fabric),
+                    onClick = {
+                        selectedFabrics = if (selectedFabrics.contains(fabric)) {
+                            selectedFabrics - fabric
+                        } else {
+                            selectedFabrics + fabric
+                        }
+                    },
+                    label = { Text(fabric) },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = LightBlue,
+                        selectedLabelColor = AccentBlue
+                    )
+                )
             }
         }
 
@@ -90,7 +146,8 @@ fun SkinComfortScreen(onContinue: () -> Unit) {
                 isLoading = true
                 FirebaseManager.tempProfile = FirebaseManager.tempProfile.copy(
                     email = FirebaseManager.currentUser?.email,
-                    preferredFabric = "Cotton, Silk, Linen" // Simplified
+                    preferredFabric = selectedFabrics.joinToString(", "),
+                    skinType = selectedConditions.joinToString(", ")
                 )
                 scope.launch {
                     val result = FirebaseManager.saveUserProfile(FirebaseManager.tempProfile)
@@ -102,12 +159,13 @@ fun SkinComfortScreen(onContinue: () -> Unit) {
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006064)),
             enabled = !isLoading
         ) {
             if (isLoading) {
                 CircularProgressIndicator(color = White, modifier = Modifier.size(24.dp))
             } else {
-                Text("Finish Setup", fontWeight = FontWeight.Bold)
+                Text("Finish Setup", fontWeight = FontWeight.Bold, color = White)
             }
         }
     }

@@ -21,14 +21,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
+import com.example.best3.data.FirebaseManager
 import com.example.best3.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @Composable
@@ -39,32 +42,57 @@ fun VirtualClosetScreenPreview() {
 }
 
 data class ClosetItem(
+    val id: String = "",
     val name: String,
     val category: String,
-    val imageUrl: Any // Supports both URL strings and Bitmaps
+    val imageUrl: String
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VirtualClosetScreen(onBackClick: () -> Unit) {
-    var closetItems by remember { 
-        mutableStateOf(listOf(
-            ClosetItem("White Cotton Tee", "Tops", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400"),
-            ClosetItem("Blue Denim", "Bottoms", "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400"),
-            ClosetItem("Black Blazer", "Outwear", "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400"),
-            ClosetItem("Beige Chinos", "Bottoms", "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400")
-        ))
-    }
-    
+    var closetItems by remember { mutableStateOf<List<ClosetItem>>(emptyList()) }
+    var isLoadingItems by remember { mutableStateOf(true) }
     var isStoring by remember { mutableStateOf(false) }
+    
+    val scope = rememberCoroutineScope()
+    // val context = LocalContext.current // Removed unused context line causing error earlier if not careful
+
+    // Load items on start
+    LaunchedEffect(Unit) {
+        val result = FirebaseManager.getClosetItems()
+        if (result.isSuccess) {
+            closetItems = result.getOrNull()?.map { map ->
+                ClosetItem(
+                    id = map["id"] as? String ?: "",
+                    name = map["name"] as? String ?: "Unknown",
+                    category = map["category"] as? String ?: "Tops",
+                    imageUrl = map["imageUrl"] as? String ?: ""
+                )
+            } ?: emptyList()
+        }
+        isLoadingItems = false
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
         if (bitmap != null) {
-            isStoring = true
-            // In a real app, you would upload this to a server/storage
-            // Here we simulate AI processing and adding to local list
+            scope.launch {
+                isStoring = true
+                // In a real production app, we would upload the bitmap to Firebase Storage first.
+                // For this project phase, we use a placeholder high-quality image URL to simulate the result.
+                val placeholderUrl = "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=800"
+                val name = "Item #${closetItems.size + 1}"
+                val category = "Scanned"
+                
+                val result = FirebaseManager.addClosetItem(name, category, placeholderUrl)
+                if (result.isSuccess) {
+                    val newId = result.getOrNull() ?: ""
+                    closetItems = listOf(ClosetItem(newId, name, category, placeholderUrl)) + closetItems
+                }
+                isStoring = false
+            }
         }
     }
 
@@ -73,19 +101,6 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
     ) { isGranted ->
         if (isGranted) {
             cameraLauncher.launch(null)
-        }
-    }
-
-    LaunchedEffect(isStoring) {
-        if (isStoring) {
-            delay(2000) // Simulate AI Syncing time
-            val newItem = ClosetItem(
-                name = "Scanned Item #${closetItems.size + 1}",
-                category = "Uncategorized",
-                imageUrl = "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400" // Fallback image for demo
-            )
-            closetItems = listOf(newItem) + closetItems
-            isStoring = false
         }
     }
 
@@ -99,7 +114,7 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Search closet */ }) {
+                    IconButton(onClick = { /* Search */ }) {
                         Icon(Icons.Default.Search, null)
                     }
                 },
@@ -124,23 +139,25 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
                     .background(Brush.verticalGradient(listOf(White, LightBlue.copy(alpha = 0.05f))))
             ) {
                 // Recommendation Bar
-                Surface(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    color = AccentBlue.copy(alpha = 0.1f)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                if (closetItems.isNotEmpty()) {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        color = AccentBlue.copy(alpha = 0.1f)
                     ) {
-                        Icon(Icons.Default.AutoAwesome, null, tint = AccentBlue)
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            "AI: You have ${closetItems.size} items. Mix your '${closetItems.first().name}' for a smart skin-safe outfit.",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = AccentBlue
-                        )
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.AutoAwesome, null, tint = AccentBlue)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                "AI: You have ${closetItems.size} items. Mix your '${closetItems.first().name}' for a smart skin-safe outfit.",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = AccentBlue
+                            )
+                        }
                     }
                 }
 
@@ -150,14 +167,41 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
                 )
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(closetItems) { item ->
-                        ClosetGridItem(item)
+                if (isLoadingItems) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = AccentBlue)
+                    }
+                } else if (closetItems.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Default.Inventory2, null, modifier = Modifier.size(80.dp), tint = Color.LightGray)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Your closet is empty", fontWeight = FontWeight.Bold, color = Color.Gray)
+                        Text("Scan your clothes to get AI outfit tips", color = Color.LightGray, fontSize = 14.sp)
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(closetItems) { item ->
+                            ClosetGridItem(
+                                item = item,
+                                onDelete = {
+                                    scope.launch {
+                                        val deleteResult = FirebaseManager.deleteClosetItem(item.id)
+                                        if (deleteResult.isSuccess) {
+                                            closetItems = closetItems.filter { it.id != item.id }
+                                        }
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -173,17 +217,8 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
                     ) {
                         CircularProgressIndicator(color = White, strokeWidth = 6.dp)
                         Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            "Syncing to Cloud Closet...", 
-                            color = White, 
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 18.sp
-                        )
-                        Text(
-                            "AI is analyzing fabric profile", 
-                            color = White.copy(alpha = 0.8f),
-                            fontSize = 14.sp
-                        )
+                        Text("Syncing to Cloud Closet...", color = White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                        Text("AI is analyzing fabric profile", color = White.copy(alpha = 0.8f), fontSize = 14.sp)
                     }
                 }
             }
@@ -192,7 +227,7 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
 }
 
 @Composable
-fun ClosetGridItem(item: ClosetItem) {
+fun ClosetGridItem(item: ClosetItem, onDelete: () -> Unit) {
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = White),
@@ -200,14 +235,26 @@ fun ClosetGridItem(item: ClosetItem) {
         border = BorderStroke(1.dp, SoftGray)
     ) {
         Column {
-            AsyncImage(
-                model = item.imageUrl,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth().height(160.dp),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                error = painterResource(id = android.R.drawable.stat_notify_error)
-            )
+            Box {
+                AsyncImage(
+                    model = item.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth().height(160.dp),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
+                    error = painterResource(id = android.R.drawable.stat_notify_error)
+                )
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(32.dp)
+                        .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(Icons.Default.Delete, null, tint = White, modifier = Modifier.size(16.dp))
+                }
+            }
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(item.name, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1)
                 Text(item.category, color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)

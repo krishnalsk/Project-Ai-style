@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CookSmart - Ingredients Input</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#221f1e",
+                    "tertiary-fixed": "#eae1da",
+                    "surface-dim": "#151312",
+                    "error": "#ffb4ab",
+                    "secondary-fixed": "#e2e2e2",
+                    "secondary-container": "#454747",
+                    "background": "#151312",
+                    "on-tertiary": "#342f2b",
+                    "on-background": "#e8e1df",
+                    "surface-container-lowest": "#100e0d",
+                    "surface": "#151312",
+                    "outline-variant": "#5a4138",
+                    "on-tertiary-fixed-variant": "#4b4641",
+                    "on-surface-variant": "#e2bfb2",
+                    "on-error": "#690005",
+                    "surface-container-high": "#2c2928",
+                    "on-secondary-fixed-variant": "#454747",
+                    "tertiary": "#cec5bf",
+                    "on-secondary-container": "#b4b5b5",
+                    "on-primary": "#5a1c00",
+                    "tertiary-fixed-dim": "#cec5bf",
+                    "error-container": "#93000a",
+                    "surface-tint": "#ffb599",
+                    "on-tertiary-container": "#2e2925",
+                    "outline": "#a98a7e",
+                    "on-tertiary-fixed": "#1f1b17",
+                    "inverse-on-surface": "#33302e",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "surface-bright": "#3c3837",
+                    "primary-fixed": "#ffdbce",
+                    "inverse-surface": "#e8e1df",
+                    "surface-container-low": "#1d1b1a",
+                    "primary-container": "#f66018",
+                    "on-secondary": "#2f3131",
+                    "surface-variant": "#373433",
+                    "on-primary-fixed": "#370e00",
+                    "inverse-primary": "#a73a00",
+                    "on-primary-fixed-variant": "#7f2b00",
+                    "tertiary-container": "#978f8a",
+                    "surface-container-highest": "#373433",
+                    "secondary": "#c6c6c7",
+                    "primary-fixed-dim": "#ffb599",
+                    "primary": "#ffb599",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "on-surface": "#e8e1df",
+                    "on-primary-container": "#4f1700"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "margin-desktop": "40px",
+                    "2xl": "48px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "gutter": "16px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "caption": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"],
+                    "headline-lg": ["Outfit"],
+                    "body-md": ["Outfit"],
+                    "headline-md": ["Outfit"],
+                    "display-lg": ["Outfit"],
+                    "label-md": ["Outfit"],
+                    "body-lg": ["Outfit"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { background-color: #0C0A09; color: #FFFFFF; font-family: 'Outfit', sans-serif; }
+        .bg-surface-card { background-color: #1C1917; }
+        .faint-border { border: 1px solid rgba(120, 113, 108, 0.15); }
+        .text-muted-sage { color: #78716C; }
+        .bg-warm-orange { background-color: #EA580C; }
+        .text-warm-orange { color: #EA580C; }
+        .border-warm-orange { border-color: #EA580C; }
+        .bg-stone-800 { background-color: #292524; }
+        body { min-height: 100dvh; }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center font-body-md antialiased pb-24">
+    <div class="w-full max-w-[480px] bg-background min-h-screen relative overflow-hidden faint-border flex flex-col">
+        <!-- Top AppBar -->
+        <header class="bg-surface flex justify-between items-center px-margin-mobile w-full py-md sticky top-0 z-40 shadow-sm border-b faint-border border-b-0">
+            <a href="index.html" aria-label="Back" class="w-10 h-10 flex items-center justify-center text-on-surface hover:opacity-80 transition-opacity duration-200">
+                <span class="material-symbols-outlined font-light text-[24px]" style="font-variation-settings: 'wght' 200;">arrow_back_ios</span>
+            </a>
+            <h1 class="font-headline-md text-headline-md font-bold text-on-surface">Pantry Ingredients</h1>
+            <div class="w-10"></div> <!-- Spacer for centering -->
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow px-margin-mobile pt-lg flex flex-col gap-lg pb-32">
+            <!-- Hero Section -->
+            <section class="flex flex-col gap-sm">
+                <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">What's in your kitchen?</h2>
+                <p class="font-body-md text-body-md text-muted-sage">Type what ingredients you have, and we'll craft a custom recipe.</p>
+            </section>
+
+            <!-- Input Section -->
+            <section class="flex flex-col gap-md">
+                <form id="ingredient-form" class="flex gap-sm items-center">
+                    <div class="relative flex-grow">
+                        <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-muted-sage ml-2">kitchen</span>
+                        <input id="ingredient-input" class="w-full bg-surface-card faint-border rounded-xl py-3 pl-12 pr-4 font-body-md text-body-md text-on-surface placeholder-muted-sage focus:outline-none focus:border-warm-orange focus:ring-1 focus:ring-warm-orange transition-colors" placeholder="e.g., Chicken, Spinach, Onion" type="text" autocomplete="off"/>
+                    </div>
+                    <button type="submit" class="bg-warm-orange text-white px-md py-3 rounded-xl font-label-md text-label-md font-medium whitespace-nowrap hover:bg-opacity-90 active:scale-95 transition-all flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-[18px]">add</span> Add
+                    </button>
+                </form>
+            </section>
+
+            <!-- Ingredients List -->
+            <section class="flex flex-col gap-md mt-md flex-grow">
+                <div class="flex justify-between items-center">
+                    <h3 id="ingredients-count" class="font-label-md text-label-md font-semibold text-on-surface">My Ingredients (0)</h3>
+                    <button id="clear-all-btn" class="font-caption text-caption text-muted-sage hover:text-on-surface transition-colors">Clear All</button>
+                </div>
+                
+                <div id="chips-container" class="flex flex-wrap gap-sm">
+                    <!-- Dynamic chips will go here -->
+                </div>
+
+                <!-- Empty State Illustration -->
+                <div id="empty-state" class="flex-grow flex flex-col items-center justify-center gap-4 py-8 mt-4 transition-all">
+                    <span class="material-symbols-outlined text-[80px] text-muted-sage/30 animate-pulse" style="font-variation-settings: 'wght' 100;">blender</span>
+                    <p class="text-muted-sage font-label-md text-sm text-center">Your pantry is empty. Add ingredients above to start generating recipes!</p>
+                </div>
+            </section>
+
+            <!-- Fixed Bottom CTA -->
+            <div class="absolute bottom-[90px] left-0 w-full px-margin-mobile pb-sm z-30">
+                <button id="generate-recipe-btn" class="w-full bg-warm-orange text-white py-4 rounded-full font-label-md text-label-md font-semibold shadow-[0_8px_16px_rgba(234,88,12,0.3)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-sm">
+                    Generate Recipe
+                    <span class="material-symbols-outlined text-[20px]">magic_button</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- BottomNavBar (Shared Component) -->
+        <nav class="bg-surface-container dark:bg-surface-container font-label-md text-label-md absolute bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/15 shadow-lg flex justify-around items-center px-4 py-2 left-0 max-w-[480px]">
+            <a href="index.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform w-20">
+                <span class="material-symbols-outlined">home</span>
+                <span class="font-label-md text-label-md text-[10px] mt-1">Home</span>
+            </a>
+            <a href="ingredients.html" class="flex flex-col items-center justify-center text-warm-orange bg-primary-container/10 rounded-xl px-4 py-1 hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform w-20">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">kitchen</span>
+                <span class="font-label-md text-label-md text-[10px] mt-1 font-bold">Ingredients</span>
+            </a>
+            <a href="saved.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform w-20">
+                <span class="material-symbols-outlined">bookmark</span>
+                <span class="font-label-md text-label-md text-[10px] mt-1">Saved</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Load Shared Recipe Database -->
+    <script src="recipes.js"></script>
+    <script>
+        // State
+        let ingredients = ["Chicken breast", "Garlic cloves", "Cherry tomatoes"];
+
+        // DOM elements
+        const form = document.getElementById("ingredient-form");
+        const input = document.getElementById("ingredient-input");
+        const chipsContainer = document.getElementById("chips-container");
+        const countHeader = document.getElementById("ingredients-count");
+        const clearAllBtn = document.getElementById("clear-all-btn");
+        const emptyState = document.getElementById("empty-state");
+        const generateBtn = document.getElementById("generate-recipe-btn");
+
+        // Initialize view
+        renderChips();
+
+        // Form submission
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const val = input.value.trim();
+            if (val) {
+                // Prevent duplicates case-insensitively
+                const exists = ingredients.some(i => i.toLowerCase() === val.toLowerCase());
+                if (!exists) {
+                    ingredients.push(val);
+                    renderChips();
+                }
+                input.value = "";
+                input.focus();
+            }
+        });
+
+        // Render chips list
+        function renderChips() {
+            chipsContainer.innerHTML = "";
+            countHeader.textContent = `My Ingredients (${ingredients.length})`;
+
+            if (ingredients.length === 0) {
+                emptyState.style.display = "flex";
+                chipsContainer.style.display = "none";
+            } else {
+                emptyState.style.display = "none";
+                chipsContainer.style.display = "flex";
+
+                ingredients.forEach((ing, index) => {
+                    const chip = document.createElement("div");
+                    chip.className = "bg-stone-800 rounded-lg py-2 px-3 flex items-center gap-xs group border faint-border";
+                    chip.innerHTML = `
+                        <span class="font-label-md text-label-md text-on-surface">${ing}</span>
+                        <button type="button" class="text-muted-sage hover:text-warm-orange transition-colors ml-1 focus:outline-none">
+                            <span class="material-symbols-outlined text-[16px]">close</span>
+                        </button>
+                    `;
+                    
+                    // Wire delete button
+                    chip.querySelector("button").addEventListener("click", () => {
+                        ingredients.splice(index, 1);
+                        renderChips();
+                    });
+
+                    chipsContainer.appendChild(chip);
+                });
+            }
+        }
+
+        // Clear all button
+        clearAllBtn.addEventListener("click", () => {
+            ingredients = [];
+            renderChips();
+        });
+
+        // Generate recipe action
+        generateBtn.addEventListener("click", () => {
+            if (ingredients.length === 0) {
+                alert("Please add at least one ingredient to generate a recipe!");
+                return;
+            }
+
+            // Run matching algorithm
+            const matches = matchRecipes(ingredients);
+            if (matches.length > 0) {
+                // Found a matched recipe from the database
+                window.location.href = `recipe.html?recipeId=${matches[0].id}`;
+            } else {
+                // AI simulation: generate a dynamic custom recipe based on input ingredients
+                const customRecipe = generateCustomRecipe(ingredients);
+                // Save it to localStorage so recipe.html can read it
+                localStorage.setItem(`custom-recipe-${customRecipe.id}`, JSON.stringify(customRecipe));
+                window.location.href = `recipe.html?recipeId=${customRecipe.id}&custom=true`;
+            }
+        });
+
+        // Simulate AI Recipe Generation for custom inputs
+        function generateCustomRecipe(ings) {
+            const id = "custom_" + Date.now();
+            const mainIng = ings[0];
+            const name = `Pantry ${mainIng.charAt(0).toUpperCase() + mainIng.slice(1)} Stir Fry`;
+            
+            // Build ingredients list
+            const recipeIngredients = ings.map(i => `1 cup ${i} (prepped)`);
+            recipeIngredients.push("2 tbsp Soy sauce");
+            recipeIngredients.push("1 tbsp Cooking oil");
+            recipeIngredients.push("Pinch of Salt & Pepper");
+
+            // Build steps list
+            const steps = [
+                `Prep all your primary ingredients: ${ings.join(", ")}.`,
+                "Heat cooking oil in a pan over medium-high heat.",
+                `Add the ${mainIng} and cook until lightly browned.`,
+                `Stir in the remaining pantry ingredients (${ings.slice(1).join(", ") || 'seasonings'}) and stir fry for 3-4 minutes.`,
+                "Season with soy sauce, salt, and pepper. Garnish and serve warm."
+            ];
+
+            return {
+                id,
+                name,
+                image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=800", // generic stir fry image
+                time: "20 min",
+                rating: "4.7",
+                difficulty: "Easy",
+                servings: 2,
+                ingredients: recipeIngredients,
+                steps
+            };
+        }
+    </script>
+</body>
+</html>

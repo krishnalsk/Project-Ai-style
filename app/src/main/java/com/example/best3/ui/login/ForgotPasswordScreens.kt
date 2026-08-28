@@ -136,19 +136,14 @@ fun ForgotPasswordScreen(
     }
 }
 
-// --- SCREEN 2: OTP VERIFICATION (6 DIGITS) ---
+// --- SCREEN 2: CHECK EMAIL (NO OTP) ---
 @Composable
 fun ResetOtpScreen(
     email: String,
-    onBackClick: () -> Unit,
-    onOtpVerified: () -> Unit
+    onBackClick: () -> Unit
 ) {
-    val otpValues = remember { mutableStateListOf("", "", "", "", "", "") }
-    var timer by remember { mutableIntStateOf(599) } // 10 minutes
-    var attempts by remember { mutableIntStateOf(5) }
-    var isLoading by remember { mutableStateOf(false) }
+    var timer by remember { mutableIntStateOf(59) } 
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         while (timer > 0) {
@@ -161,102 +156,67 @@ fun ResetOtpScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(White)
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            IconButton(onClick = onBackClick, modifier = Modifier.background(SoftGray, CircleShape)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Text(
-            "Verification",
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black)
-        )
-        Text(
-            "Link sent to $email. Please check your inbox and Spam folder.",
-            color = Color.Gray,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+        Surface(
+            modifier = Modifier.size(100.dp),
+            shape = CircleShape,
+            color = Color(0xFFE3F2FD)
         ) {
-            otpValues.forEachIndexed { index, value ->
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = {
-                        if (it.length <= 1) otpValues[index] = it
-                    },
-                    modifier = Modifier.size(width = 50.dp, height = 64.dp),
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, fontSize = 20.sp),
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = CoralPrimary)
-                )
-            }
+            Icon(
+                Icons.Default.MarkEmailRead,
+                null,
+                tint = AccentBlue,
+                modifier = Modifier.padding(24.dp).size(48.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = if (timer > 0) "Resend code in ${timer / 60}:${(timer % 60).toString().padStart(2, '0')}" else "I didn't receive a code",
-            color = if (timer > 0) Color.Gray else CoralPrimary,
-            fontWeight = FontWeight.Bold
+            "Check Your Email",
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black)
         )
-        
-        if (timer == 0) {
-            TextButton(onClick = { 
-                timer = 599 
-                FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                Toast.makeText(context, "Reset link resent! Check your email inbox.", Toast.LENGTH_SHORT).show()
-            }) {
-                Text("Resend Reset Link", color = CoralPrimary, fontWeight = FontWeight.Black, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline)
-            }
-        }
+        Text(
+            "We've sent a secure password reset link to $email. Please check your inbox and follow the instructions to reset your password.",
+            textAlign = TextAlign.Center,
+            color = Color.Gray,
+            modifier = Modifier.padding(top = 16.dp).padding(horizontal = 24.dp)
+        )
 
         Spacer(modifier = Modifier.height(48.dp))
 
         Button(
-            onClick = {
-                if (otpValues.any { it.isEmpty() }) {
-                    Toast.makeText(context, "Enter all 6 digits", Toast.LENGTH_SHORT).show()
-                } else {
-                    scope.launch {
-                        isLoading = true
-                        delay(1500)
-                        isLoading = false
-                        // Mock verification "123456"
-                        if (otpValues.joinToString("") == "123456") {
-                            onOtpVerified()
-                        } else {
-                            attempts--
-                            if (attempts <= 0) {
-                                Toast.makeText(context, "Too many failed attempts. Try again later.", Toast.LENGTH_LONG).show()
-                                onBackClick()
-                            } else {
-                                Toast.makeText(context, "Invalid OTP. $attempts attempts left.", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                }
-            },
+            onClick = onBackClick, // Goes back to Login
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = CoralPrimary),
-            enabled = !isLoading
+            colors = ButtonDefaults.buttonColors(containerColor = CoralPrimary)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(color = White, modifier = Modifier.size(24.dp))
-            } else {
-                Text("Verify OTP", fontWeight = FontWeight.Bold)
+            Text("Back to Login", fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        if (timer > 0) {
+            Text(
+                text = "Resend link in 0:${timer.toString().padStart(2, '0')}",
+                color = Color.Gray,
+                fontWeight = FontWeight.Bold
+            )
+        } else {
+            TextButton(onClick = { 
+                timer = 59 
+                FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                Toast.makeText(context, "Reset link resent! Check your email inbox.", Toast.LENGTH_SHORT).show()
+            }) {
+                Text(
+                    "Resend Reset Link", 
+                    color = CoralPrimary, 
+                    fontWeight = FontWeight.Black, 
+                    textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                )
             }
         }
     }

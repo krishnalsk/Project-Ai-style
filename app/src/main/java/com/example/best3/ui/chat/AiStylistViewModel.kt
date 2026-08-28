@@ -32,8 +32,12 @@ class AiStylistViewModel : ViewModel() {
                     messages.remove(loadingMessage)
                     messages.add(ChatMessage(ruleResponse, true))
                 } else {
-                    // 2. Fallback to Real AI Assistant (OpenRouter/Claude/Gemini)
-                    val aiResponse = AiAssistantManager.getAssistantResponse(text)
+                    // 2. Perform RAG Retrieval (New Retrieval Step)
+                    val retrievedContext = retrieveKnowledgeBaseContext(text)
+                    
+                    // 3. Fallback to Real AI Assistant with Retrieved Context
+                    val aiResponseResult = AiAssistantManager.getAssistantResponse(text, retrievedContext)
+                    val aiResponse = aiResponseResult.getOrNull()
                     messages.remove(loadingMessage)
                     
                     if (aiResponse != null) {
@@ -68,6 +72,36 @@ class AiStylistViewModel : ViewModel() {
                 messages.add(ChatMessage("I'm having trouble connecting right now. Please try again! 😊", true))
             }
         }
+    }
+
+    private fun retrieveKnowledgeBaseContext(query: String): String {
+        val input = query.lowercase()
+        val contextBuilder = StringBuilder()
+
+        // Fabric Knowledge Retrieval
+        val fabrics = mapOf(
+            "linen" to "Organic Linen: Ultra breathable, wicks moisture, anti-bacterial. Best for hot climates.",
+            "bamboo" to "Bamboo Viscose: Hypoallergenic, soft like silk, thermal regulating. Best for highly sensitive skin.",
+            "silk" to "Mulberry Silk: Skin hydrating, friction-free, premium comfort. Contains proteins for skin health.",
+            "cotton" to "Organic Cotton: GOTS certified, hypoallergenic, soft and breathable for everyday use."
+        )
+
+        fabrics.forEach { (key, info) ->
+            if (input.contains(key)) {
+                contextBuilder.append("FABRIC INFO: $info\n")
+            }
+        }
+
+        // Product Knowledge Retrieval
+        if (input.contains("shirt") || input.contains("top")) {
+            contextBuilder.append("AVAILABLE PRODUCTS: Cooling Linen Shirt (₹4,399), Bamboo Polo Shirt (₹2,199), Premium Silk Blouse (₹6,499).\n")
+        }
+        
+        if (input.contains("skin") || input.contains("safe") || input.contains("sensitive")) {
+            contextBuilder.append("SKIN SAFETY ADVICE: Avoid rough wool and heavy synthetics. Recommend Bamboo or Silk for sensitive conditions.\n")
+        }
+
+        return contextBuilder.toString()
     }
 
     private fun getAssistantRuleResponse(input: String): String? {

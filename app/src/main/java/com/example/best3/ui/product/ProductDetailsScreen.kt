@@ -20,6 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,13 +105,13 @@ fun ProductDetailsScreen(
                         onClick = onBackClick,
                         modifier = Modifier.background(White.copy(alpha = 0.9f), CircleShape)
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.Black)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Go back", tint = Color.Black)
                     }
                     IconButton(
                         onClick = { },
                         modifier = Modifier.background(White.copy(alpha = 0.9f), CircleShape)
                     ) {
-                        Icon(Icons.Default.Favorite, null, tint = Color.Red)
+                        Icon(Icons.Default.Favorite, "Add to wishlist", tint = Color.Red)
                     }
                 }
 
@@ -130,7 +133,7 @@ fun ProductDetailsScreen(
                         ) {
                             AsyncImage(
                                 model = img, 
-                                contentDescription = null, 
+                                contentDescription = "Product thumbnail", 
                                 contentScale = ContentScale.Crop,
                                 placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
                             )
@@ -192,7 +195,7 @@ fun ProductDetailsScreen(
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.AutoAwesome, null, tint = Color.Yellow, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Default.AutoAwesome, "AI styling", tint = Color.Yellow, modifier = Modifier.size(24.dp))
                             Spacer(modifier = Modifier.width(12.dp))
                             Text("AI Style Intelligence", fontWeight = FontWeight.Black, color = White, fontSize = 16.sp)
                         }
@@ -225,7 +228,10 @@ fun ProductDetailsScreen(
                             onClick = { selectedSize = size },
                             shape = RoundedCornerShape(12.dp),
                             color = if (selectedSize == size) AccentBlue else SoftGray,
-                            modifier = Modifier.size(50.dp)
+                            modifier = Modifier.size(50.dp).semantics {
+                                contentDescription = if (selectedSize == size) "Size $size selected" else "Size $size"
+                                stateDescription = if (selectedSize == size) "Selected" else "Not selected"
+                            }
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(size, color = if (selectedSize == size) White else Color.Black, fontWeight = FontWeight.Bold)
@@ -240,12 +246,17 @@ fun ProductDetailsScreen(
                 Text("Color Options", fontWeight = FontWeight.ExtraBold, color = Color.Black)
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    listOf(AccentBlue, Color(0xFF81D4FA), Color(0xFFE1F5FE)).forEach { color ->
+                    listOf(AccentBlue, Color(0xFF81D4FA), Color(0xFFE1F5FE)).forEachIndexed { index, color ->
+                        val colorName = when(index) { 0 -> "Blue"; 1 -> "Light blue"; else -> "Pale blue" }
                         Surface(
                             onClick = { selectedColor = color },
                             shape = CircleShape,
                             color = color,
                             modifier = Modifier.size(36.dp).border(2.dp, if (selectedColor == color) Color.Gray else Color.Transparent, CircleShape)
+                                .semantics {
+                                    contentDescription = "$colorName color"
+                                    stateDescription = if (selectedColor == color) "Selected" else "Not selected"
+                                }
                         ) {}
                     }
                 }
@@ -283,7 +294,7 @@ fun ProductDetailsScreen(
                                 modifier = Modifier.size(50.dp).background(White, RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.CameraAlt, null, tint = AccentBlue)
+                                Icon(Icons.Default.CameraAlt, "Virtual try-on", tint = AccentBlue)
                             }
                         }
                         Spacer(modifier = Modifier.width(16.dp))
@@ -301,9 +312,9 @@ fun ProductDetailsScreen(
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         if (tryOnImage != null) {
-                            Icon(Icons.Default.CheckCircle, null, tint = Color(0xFF4CAF50))
+                            Icon(Icons.Default.CheckCircle, "Try-on active", tint = Color(0xFF4CAF50))
                         } else {
-                            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = AccentBlue)
+                            Icon(Icons.AutoMirrored.Filled.ArrowForward, "Start virtual try-on", tint = AccentBlue)
                         }
                     }
                 }
@@ -318,7 +329,7 @@ fun ProductDetailsScreen(
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, AccentBlue)
                     ) {
-                        Icon(Icons.Default.ShoppingBag, null, tint = AccentBlue)
+                        Icon(Icons.Default.ShoppingBag, "Add to cart", tint = AccentBlue)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Add to Cart", color = AccentBlue)
                     }
@@ -353,7 +364,7 @@ fun SmartLabel(text: String, icon: ImageVector) {
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, modifier = Modifier.size(14.dp), tint = Color.Gray)
+            Icon(icon, text, modifier = Modifier.size(14.dp), tint = Color.Gray)
             Spacer(modifier = Modifier.width(4.dp))
             Text(text, fontSize = 11.sp, color = Color.Gray)
         }

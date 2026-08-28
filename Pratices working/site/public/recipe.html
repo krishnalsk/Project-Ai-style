@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CookSmart - Recipe Details</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#221f1e",
+                    "surface-bright": "#3c3837",
+                    "on-primary-fixed": "#370e00",
+                    "error": "#ffb4ab",
+                    "primary": "#ffb599",
+                    "on-surface-variant": "#e2bfb2",
+                    "surface-container-highest": "#373433",
+                    "on-primary-fixed-variant": "#7f2b00",
+                    "outline-variant": "#5a4138",
+                    "on-tertiary-fixed-variant": "#4b4641",
+                    "primary-container": "#f66018",
+                    "surface-dim": "#151312",
+                    "on-tertiary-fixed": "#1f1b17",
+                    "primary-fixed-dim": "#ffb599",
+                    "surface-tint": "#ffb599",
+                    "secondary-container": "#454747",
+                    "error-container": "#93000a",
+                    "surface-container-high": "#2c2928",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "surface-container-lowest": "#100e0d",
+                    "outline": "#a98a7e",
+                    "tertiary": "#cec5bf",
+                    "surface-variant": "#373433",
+                    "surface-container-low": "#1d1b1a",
+                    "on-error": "#690005",
+                    "on-secondary-container": "#b4b5b5",
+                    "on-tertiary-container": "#2e2925",
+                    "on-tertiary": "#342f2b",
+                    "on-surface": "#e8e1df",
+                    "secondary": "#c6c6c7",
+                    "primary-fixed": "#ffdbce",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary": "#2f3131",
+                    "on-background": "#e8e1df",
+                    "background": "#151312",
+                    "tertiary-container": "#978f8a",
+                    "on-primary": "#5a1c00",
+                    "inverse-primary": "#a73a00",
+                    "tertiary-fixed-dim": "#cec5bf",
+                    "secondary-fixed": "#e2e2e2",
+                    "tertiary-fixed": "#eae1da",
+                    "on-secondary-fixed-variant": "#454747",
+                    "inverse-surface": "#e8e1df",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "on-primary-container": "#4f1700",
+                    "inverse-on-surface": "#33302e",
+                    "surface": "#151312"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "2xl": "48px",
+                "md": "16px",
+                "margin-mobile": "20px",
+                "gutter": "16px",
+                "xs": "4px",
+                "xl": "32px",
+                "sm": "8px",
+                "lg": "24px",
+                "margin-desktop": "40px",
+                "base": "4px"
+            },
+            "fontFamily": {
+                "body-lg": ["Outfit"],
+                "display-lg": ["Outfit"],
+                "headline-lg-mobile": ["Outfit"],
+                "caption": ["Outfit"],
+                "body-md": ["Outfit"],
+                "label-md": ["Outfit"],
+                "headline-md": ["Outfit"],
+                "headline-lg": ["Outfit"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { background-color: #0C0A09; color: #e8e1df; font-family: 'Outfit', sans-serif; }
+        .surface-card { background-color: #1C1917; }
+        .faint-border { border: 1px solid rgba(120, 113, 108, 0.15); }
+        .bg-warm-orange { background-color: #EA580C; }
+        .text-warm-orange { color: #EA580C; }
+        .border-warm-orange { border-color: #EA580C; }
+        .ingredient-item.checked span { opacity: 0.5; text-decoration: line-through; }
+        body { min-height: 100dvh; }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center font-body-md antialiased pb-24">
+    <div class="w-full max-w-[480px] bg-background min-h-screen relative overflow-hidden faint-border flex flex-col">
+        <!-- TopAppBar -->
+        <header class="bg-surface-dim/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/15 flex justify-between items-center px-margin-mobile h-16 w-full">
+            <a href="javascript:history.back()" aria-label="Go back" class="text-on-surface hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+                <span class="material-symbols-outlined text-headline-md font-bold">chevron_left</span>
+            </a>
+            <h1 class="font-headline-md text-headline-md font-bold text-on-surface">Recipe details</h1>
+            <button id="header-save-btn" aria-label="Bookmark" class="text-on-surface hover:text-warm-orange transition-colors active:scale-95 transition-transform">
+                <span class="material-symbols-outlined text-headline-md font-bold" id="bookmark-icon">bookmark_border</span>
+            </button>
+        </header>
+
+        <!-- Main Content (Scrollable Container) -->
+        <main class="flex-grow overflow-y-auto px-margin-mobile pt-md pb-32">
+            <!-- Hero Image -->
+            <section class="mb-lg">
+                <div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-lg">
+                    <img id="recipe-img" alt="Recipe Image" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0C0A09] via-transparent to-transparent"></div>
+                </div>
+                <!-- Title & Metadata -->
+                <div class="mb-xl">
+                    <h2 id="recipe-title" class="font-headline-lg text-headline-lg text-on-surface mb-2 leading-tight">Recipe Title</h2>
+                    <div class="flex flex-wrap items-center gap-md text-tertiary font-label-md text-label-md">
+                        <div class="flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-[18px]">schedule</span>
+                            <span id="recipe-time">-- min</span>
+                        </div>
+                        <div class="flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-[18px]">restaurant</span>
+                            <span id="recipe-servings">-- servings</span>
+                        </div>
+                        <div class="flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-[18px]">bar_chart</span>
+                            <span id="recipe-difficulty">--</span>
+                        </div>
+                        <div class="flex items-center gap-xs text-warm-orange">
+                            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span id="recipe-rating">--</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ingredients checklist -->
+            <section class="mb-xl">
+                <h3 class="font-headline-md text-headline-md text-on-surface mb-md">Ingredients</h3>
+                <div id="ingredients-container" class="surface-card rounded-xl p-md border border-outline-variant/15 flex flex-col gap-sm">
+                    <!-- Dynamic Checklist will go here -->
+                </div>
+            </section>
+
+            <!-- Preparation steps -->
+            <section class="mb-xl">
+                <h3 class="font-headline-md text-headline-md text-on-surface mb-md">Preparation</h3>
+                <div id="steps-container" class="flex flex-col gap-lg">
+                    <!-- Dynamic Steps will go here -->
+                </div>
+            </section>
+
+            <!-- Save Recipe Floating Button (Fixed width inside container scroll) -->
+            <div class="mt-8 mb-4">
+                <button id="save-recipe-btn" class="w-full bg-[#EA580C] text-white py-4 rounded-full font-label-md text-label-md font-bold shadow-[0_8px_16px_rgba(234,88,12,0.3)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-sm">
+                    <span class="material-symbols-outlined" id="btn-save-icon">favorite_border</span>
+                    <span id="btn-save-text">Save Recipe</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- BottomNavBar (Shared Component) -->
+        <nav class="bg-surface-container dark:bg-surface-container font-label-md text-label-md absolute bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/15 shadow-lg flex justify-around items-center px-4 py-2 left-0 max-w-[480px]">
+            <a href="index.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform w-20">
+                <span class="material-symbols-outlined">home</span>
+                <span class="font-label-md text-label-md text-[10px] mt-1">Home</span>
+            </a>
+            <a href="ingredients.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform w-20">
+                <span class="material-symbols-outlined">kitchen</span>
+                <span class="font-label-md text-label-md text-[10px] mt-1">Ingredients</span>
+            </a>
+            <a href="saved.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-warm-orange transition-colors scale-95 active:scale-90 transition-transform w-20">
+                <span class="material-symbols-outlined">bookmark</span>
+                <span class="font-label-md text-label-md text-[10px] mt-1">Saved</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Load Recipes Database -->
+    <script src="recipes.js"></script>
+    <script>
+        // Parse Query String to retrieve recipeId
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get("recipeId") || urlParams.get("recipe"); // fallback to ?recipe=
+        
+        let currentRecipe = null;
+
+        // Load Recipe
+        if (recipeId) {
+            // Check static database first
+            currentRecipe = recipesDb.find(r => r.id === recipeId);
+            
+            // If not found in static, check if it's a dynamic custom recipe in localStorage
+            if (!currentRecipe) {
+                const storedCustom = localStorage.getItem(`custom-recipe-${recipeId}`);
+                if (storedCustom) {
+                    currentRecipe = JSON.parse(storedCustom);
+                }
+            }
+        }
+
+        // If no recipe matches, default to steak
+        if (!currentRecipe) {
+            currentRecipe = recipesDb.find(r => r.id === "steak") || recipesDb[0];
+        }
+
+        // Render Recipe Data
+        document.getElementById("recipe-title").textContent = currentRecipe.name;
+        document.getElementById("recipe-img").src = currentRecipe.image;
+        document.getElementById("recipe-img").alt = currentRecipe.name;
+        document.getElementById("recipe-time").textContent = currentRecipe.time;
+        document.getElementById("recipe-servings").textContent = `${currentRecipe.servings} Servings`;
+        document.getElementById("recipe-difficulty").textContent = currentRecipe.difficulty;
+        document.getElementById("recipe-rating").textContent = currentRecipe.rating;
+
+        // Render Ingredients
+        const ingredientsContainer = document.getElementById("ingredients-container");
+        ingredientsContainer.innerHTML = "";
+        currentRecipe.ingredients.forEach((ing, index) => {
+            const label = document.createElement("label");
+            label.className = "ingredient-item flex items-center gap-md cursor-pointer group py-1";
+            label.innerHTML = `
+                <input class="form-checkbox h-5 w-5 text-[#EA580C] rounded border-outline bg-transparent focus:ring-[#EA580C] focus:ring-offset-0 focus:ring-offset-surface-dim" type="checkbox"/>
+                <span class="font-body-md text-body-md text-on-surface group-hover:text-[#EA580C] transition-colors">${ing}</span>
+            `;
+
+            // checkbox interaction
+            label.querySelector("input").addEventListener("change", function() {
+                if (this.checked) {
+                    label.classList.add("checked");
+                } else {
+                    label.classList.remove("checked");
+                }
+            });
+
+            ingredientsContainer.appendChild(label);
+            
+            // Add custom divider except last item
+            if (index < currentRecipe.ingredients.length - 1) {
+                const hr = document.createElement("hr");
+                hr.className = "border-outline-variant/15 border-t my-1";
+                ingredientsContainer.appendChild(hr);
+            }
+        });
+
+        // Render Steps
+        const stepsContainer = document.getElementById("steps-container");
+        stepsContainer.innerHTML = "";
+        currentRecipe.steps.forEach((step, index) => {
+            const stepDiv = document.createElement("div");
+            stepDiv.className = "flex gap-md";
+            stepDiv.innerHTML = `
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-container flex items-center justify-center font-label-md text-warm-orange font-bold border border-outline-variant/15">${index + 1}</div>
+                <div class="flex-grow pt-1">
+                    <p class="font-body-md text-body-md text-on-surface">${step}</p>
+                </div>
+            `;
+            stepsContainer.appendChild(stepDiv);
+        });
+
+        // LocalStorage Saved Recipe Management
+        const saveBtn = document.getElementById("save-recipe-btn");
+        const headerSaveBtn = document.getElementById("header-save-btn");
+        const bookmarkIcon = document.getElementById("bookmark-icon");
+        const btnSaveText = document.getElementById("btn-save-text");
+        const btnSaveIcon = document.getElementById("btn-save-icon");
+
+        // Helper to check if recipe is saved
+        function isRecipeSaved(id) {
+            let saved = getSavedRecipes();
+            return saved.some(r => r.id === id);
+        }
+
+        function getSavedRecipes() {
+            try {
+                return JSON.parse(localStorage.getItem("cooksmart_saved")) || [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function updateSaveUI() {
+            const saved = isRecipeSaved(currentRecipe.id);
+            if (saved) {
+                bookmarkIcon.textContent = "bookmark";
+                bookmarkIcon.classList.add("text-warm-orange");
+                btnSaveText.textContent = "Saved";
+                btnSaveIcon.textContent = "favorite";
+                saveBtn.classList.remove("bg-[#EA580C]");
+                saveBtn.classList.add("bg-stone-800", "border", "faint-border");
+            } else {
+                bookmarkIcon.textContent = "bookmark_border";
+                bookmarkIcon.classList.remove("text-warm-orange");
+                btnSaveText.textContent = "Save Recipe";
+                btnSaveIcon.textContent = "favorite_border";
+                saveBtn.classList.add("bg-[#EA580C]");
+                saveBtn.classList.remove("bg-stone-800", "border", "faint-border");
+            }
+        }
+
+        // Toggle Save status
+        function toggleSave() {
+            let saved = getSavedRecipes();
+            const exists = saved.some(r => r.id === currentRecipe.id);
+
+            if (exists) {
+                // Remove
+                saved = saved.filter(r => r.id !== currentRecipe.id);
+                // Also clean custom recipe in storage if applicable
+                if (currentRecipe.id.startsWith("custom_")) {
+                    localStorage.removeItem(`custom-recipe-${currentRecipe.id}`);
+                }
+            } else {
+                // Add
+                saved.push(currentRecipe);
+                // Keep custom recipe in local storage so saved page can read it too
+                if (currentRecipe.id.startsWith("custom_")) {
+                    localStorage.setItem(`custom-recipe-${currentRecipe.id}`, JSON.stringify(currentRecipe));
+                }
+            }
+
+            localStorage.setItem("cooksmart_saved", JSON.stringify(saved));
+            updateSaveUI();
+        }
+
+        // Initialize UI
+        updateSaveUI();
+
+        // Event listeners
+        saveBtn.addEventListener("click", toggleSave);
+        headerSaveBtn.addEventListener("click", toggleSave);
+    </script>
+</body>
+</html>

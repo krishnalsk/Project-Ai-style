@@ -1,0 +1,21 @@
+{
+  "name": "projects/11269082295761255451",
+  "projectId": "11269082295761255451",
+  "title": "CookSmart Mobile App",
+  "visibility": "PRIVATE",
+  "createTime": "2026-08-26T04:25:08.026331Z",
+  "updateTime": "2026-08-26T04:25:08.026331Z",
+  "projectType": "PROJECT_DESIGN",
+  "origin": "STITCH",
+  "deviceType": "MOBILE",
+  "designTheme": {
+    "colorMode": "DARK",
+    "font": "OUTFIT",
+    "roundness": "ROUND_SIXTEEN",
+    "customColor": "#EA580C"
+  },
+  "screens": {},
+  "metadata": {
+    "userRole": "OWNER"
+  }
+}
