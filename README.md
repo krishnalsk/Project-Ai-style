@@ -73,6 +73,11 @@ Best3/
 │   ├── package.json                  # Web package configuration
 │   └── tsconfig.json                 # Web TypeScript configuration
 │
+├── appium-tests/                     # Appium Mobile E2E Testing Framework (Node.js)
+│   ├── package.json                  # Test runner package settings & dependencies
+│   ├── run-tests.js                  # Appium driver capabilities, test cases & Excel generator
+│   └── README.md                     # Android emulator connection and appium command guide
+│
 ├── Project_Summary.md                # Core AI algorithms and summary document
 └── README.md                         # Project documentation and file structure
 ```

@@ -1,0 +1,23 @@
+{
+  "name": "style-ai-appium-tests",
+  "version": "1.0.0",
+  "description": "Appium E2E Automation Testing Suite with Excel Report Generation for Style AI Android App",
+  "main": "run-tests.js",
+  "scripts": {
+    "test": "node run-tests.js"
+  },
+  "dependencies": {
+    "webdriverio": "^8.24.12",
+    "exceljs": "^4.4.0"
+  },
+  "keywords": [
+    "appium",
+    "webdriverio",
+    "android",
+    "testing",
+    "e2e",
+    "exceljs"
+  ],
+  "author": "Antigravity",
+  "license": "ISC"
+}
