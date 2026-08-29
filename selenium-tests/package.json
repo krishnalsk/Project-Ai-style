@@ -1,0 +1,14 @@
+{
+  "name": "selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium E2E Test Suite for Style AI Web App",
+  "main": "run-tests.js",
+  "scripts": {
+    "test": "node run-tests.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "exceljs": "^4.4.0",
+    "selenium-webdriver": "^4.23.0"
+  }
+}

@@ -1,0 +1,10 @@
+# Generated test report files (do not track)
+**/node_modules/
+selenium-tests/selenium_test_report.xlsx
+selenium-tests/execution-report.html
+appium-tests/appium_test_report.xlsx
+appium-tests/execution-report.html
+load-tests/load_test_report.xlsx
+dast-tests/dast_security_report.xlsx
+dast-tests/security_findings.xlsx
+dast-tests/executive-summary.md
