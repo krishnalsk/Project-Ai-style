@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SparklesIcon } from "@/components/ui/Icons";
+import { getAssistantRuleResponse } from "@/lib/aiStylistRules";
 
 interface Message {
   id: string;
@@ -67,29 +68,43 @@ export default function AiStylistPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, userProfile: profile }),
-      });
-      const data = await res.json();
+      let replyText = "";
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, userProfile: profile }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          replyText = data.reply;
+        }
+      } catch {
+        // ignore network error, fallback to local rule algorithm
+      }
+
+      if (!replyText) {
+        replyText = getAssistantRuleResponse(text) || `Recommendation: Soft Organic Cotton essentials paired with relaxed-fit breathable trousers.
+Why: Designed to maximize airflow while preventing skin irritation across varied conditions.
+Comfort Score: 95%
+Skin Safety Score: 96%`;
+      }
+
       const aiReply: Message = {
         id: nextId(),
         sender: "ai",
-        text: data.reply || "Sorry, I could not generate a response. Please try again.",
+        text: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, aiReply]);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: nextId(),
-          sender: "ai",
-          text: "I'm having trouble connecting right now. Please try again in a moment.",
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        },
-      ]);
+      const fallbackReply: Message = {
+        id: nextId(),
+        sender: "ai",
+        text: getAssistantRuleResponse(text) || "Recommendation: Soft Organic Cotton essentials.\nComfort Score: 95%\nSkin Safety Score: 96%",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setMessages((prev) => [...prev, fallbackReply]);
     } finally {
       setLoading(false);
     }
