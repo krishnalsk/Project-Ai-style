@@ -193,7 +193,7 @@ jobs:
     - name: Build Next.js Production Release
       run: |
         cd style-ai-web
-        npm install
+        npm install --legacy-peer-deps
         npm run build
 
     - name: Deployment Summary
