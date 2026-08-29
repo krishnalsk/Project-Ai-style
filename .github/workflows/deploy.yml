@@ -210,12 +210,15 @@ jobs:
         cp style-ai-web/out/index.html style-ai-web/out/404.html 2>/dev/null || true
 
     - name: Deploy to GitHub Pages (gh-pages branch)
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./style-ai-web/out
-        publish_branch: gh-pages
-        force_orphan: true
+      run: |
+        cd style-ai-web/out
+        git init
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add -A
+        git commit -m "deploy: update live website and test reports"
+        git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages
+
 
 
 
