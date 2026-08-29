@@ -1,6 +1,11 @@
 # Style AI - Smart Comfort Meets Style
 
-Style AI is a premium Android application built with Jetpack Compose and Firebase. It leverages AI to provide personalized fashion recommendations while prioritizing user comfort and skin safety.
+[![Enterprise CI/CD Pipeline](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/deploy.yml/badge.svg)](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/deploy.yml)
+[![Android CI](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/android.yml/badge.svg)](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/android.yml)
+
+> 🌐 **Live Application & Testing Portal:** [https://krishnalsk.github.io/Project-Ai-style/](https://krishnalsk.github.io/Project-Ai-style/)
+
+Style AI is a premium fashion & lifestyle application featuring an Android client built with Jetpack Compose & Firebase, alongside a Next.js web application and enterprise CI/CD testing suite. It leverages AI to provide personalized fashion recommendations while prioritizing user comfort and skin safety.
 
 ## 🚀 Key Features
 
