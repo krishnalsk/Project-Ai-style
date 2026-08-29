@@ -161,10 +161,6 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: bundle-reports
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: https://krishnalsk.github.io/Project-Ai-style/
@@ -194,31 +190,11 @@ jobs:
         NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID || '1:354741162304:android:8aec986a11739c8a5b6aa5' }}
         EOF
 
-    - name: Build Next.js Production Static Website
-      env:
-        NEXT_PUBLIC_BASE_PATH: '/Project-Ai-style'
+    - name: Build Next.js Production Release
       run: |
         cd style-ai-web
         npm install
         npm run build
-
-    - name: Inject Quality Reports Hub & GitHub Pages Routing Fixes
-      run: |
-        mkdir -p style-ai-web/out/reports
-        cp -r bundled-reports/* style-ai-web/out/reports/ 2>/dev/null || true
-        touch style-ai-web/out/.nojekyll
-        cp style-ai-web/out/index.html style-ai-web/out/404.html 2>/dev/null || true
-
-    - name: Upload Pages Artifact
-      continue-on-error: true
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: style-ai-web/out
-
-    - name: Deploy to GitHub Pages
-      continue-on-error: true
-      id: deployment
-      uses: actions/deploy-pages@v4
 
     - name: Deployment Summary
       run: |
@@ -228,6 +204,7 @@ jobs:
         echo "  Status: SUCCESSFUL"
         echo "  URL: https://krishnalsk.github.io/Project-Ai-style/"
         echo "========================================================="
+
 
 
 
