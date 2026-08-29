@@ -173,12 +173,6 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Download All Bundled Reports
-      uses: actions/download-artifact@v4
-      with:
-        name: Test-Execution-Reports-Bundle
-        path: bundled-reports/
-
     - name: Inject Firebase Env Config
       run: |
         cat <<EOF > style-ai-web/.env.local
@@ -191,13 +185,10 @@ jobs:
         EOF
 
     - name: Build Next.js Production Release
-      continue-on-error: true
       run: |
         cd style-ai-web
         npm install --legacy-peer-deps
         npm run build || true
-
-
 
     - name: Deployment Summary
       run: |
@@ -207,10 +198,3 @@ jobs:
         echo "  Status: SUCCESSFUL"
         echo "  URL: https://krishnalsk.github.io/Project-Ai-style/"
         echo "========================================================="
-
-
-
-
-
-
-
