@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, demoLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,6 +19,11 @@ export default function LoginPage() {
       router.push("/dashboard");
     }
   }, [user, authLoading, router]);
+
+  function handleDemoAccess() {
+    demoLogin("Style Explorer", email.trim() || "guest@styleai.app");
+    router.push("/dashboard");
+  }
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -71,8 +76,14 @@ export default function LoginPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-5">
-            {error}
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl p-4 mb-5 space-y-2">
+            <p className="font-medium leading-relaxed">{error}</p>
+            <button
+              onClick={handleDemoAccess}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-lg transition mt-2 shadow-sm"
+            >
+              ⚡ Enter in Demo Mode (1-Click Instant Access)
+            </button>
           </div>
         )}
 
@@ -80,7 +91,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 border-2 border-slate-200 rounded-xl py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition mb-5 disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-3 border-2 border-slate-200 rounded-xl py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition mb-3 disabled:opacity-50"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -89,6 +100,14 @@ export default function LoginPage() {
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
           Continue with Google
+        </button>
+
+        {/* Guest Demo Button */}
+        <button
+          onClick={handleDemoAccess}
+          className="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl py-2.5 text-xs font-bold text-slate-700 transition mb-5"
+        >
+          <span>⚡</span> Explore as Guest (Instant Access)
         </button>
 
         <div className="flex items-center gap-3 mb-5">
@@ -156,6 +175,9 @@ export default function LoginPage() {
 }
 
 function friendlyError(msg: string): string {
+  if (msg.includes("auth/unauthorized-domain")) {
+    return "Firebase Auth Domain Notice: GitHub Pages domain is not yet whitelisted in Firebase Console. You can click 'Instant Demo Access' above to explore immediately, or whitelist 'krishnalsk.github.io' in Firebase Console.";
+  }
   if (msg.includes("user-not-found") || msg.includes("wrong-password") || msg.includes("invalid-credential"))
     return "Incorrect email or password. Please try again.";
   if (msg.includes("too-many-requests"))
@@ -164,3 +186,4 @@ function friendlyError(msg: string): string {
     return "Network error. Please check your connection.";
   return msg;
 }
+

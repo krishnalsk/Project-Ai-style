@@ -10,6 +10,7 @@ interface AuthContextValue {
   profile: UserProfile | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
+  demoLogin: (name?: string, email?: string) => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextValue>({
   profile: null,
   loading: true,
   refreshProfile: async () => {},
+  demoLogin: () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -24,12 +26,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const demoLogin = (name = "Demo Stylist", email = "demo@styleai.app") => {
+    const mockUser = {
+      uid: "demo-user-123",
+      email,
+      displayName: name,
+      emailVerified: true,
+    } as unknown as User;
+    setUser(mockUser);
+    const mockProfile: UserProfile = {
+      ...defaultProfile,
+      email,
+      fullName: name,
+      skinType: "Sensitive",
+      preferredFabric: "Organic Cotton",
+      comfortScore: 96,
+    };
+    setProfile(mockProfile);
+    try {
+      localStorage.setItem("style_ai_demo_user", JSON.stringify(mockUser));
+      localStorage.setItem("style_ai_demo_profile", JSON.stringify(mockProfile));
+    } catch {}
+  };
+
   const refreshProfile = async () => {
     if (auth.currentUser) {
       const p = await getUserProfile(auth.currentUser.uid);
       setProfile(p);
     }
   };
+
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem("style_ai_demo_user");
+      const savedProfile = localStorage.getItem("style_ai_demo_profile");
+      if (savedUser && savedProfile) {
+        setUser(JSON.parse(savedUser));
+        setProfile(JSON.parse(savedProfile));
+        setLoading(false);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     let active = true;
