@@ -36,3 +36,11 @@ build/
 # VS Code settings
 .vscode/
 
+# Node.js & Testing artifacts
+node_modules/
+*/node_modules/
+*.xlsx
+execution-report.html
+*/execution-report.html
+executive-summary.md
+*/executive-summary.md
