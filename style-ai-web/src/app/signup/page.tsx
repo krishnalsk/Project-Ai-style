@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, demoLogin } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,7 +56,7 @@ export default function SignupPage() {
   }
 
   async function handleGoogleSignup() {
-    setError(null);
+    setError("");
     setLoading(true);
     try {
       await loginWithGoogle();
