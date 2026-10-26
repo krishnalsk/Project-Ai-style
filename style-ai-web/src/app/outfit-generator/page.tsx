@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { addFirestoreClosetItem } from "@/lib/firestoreService";
 
 interface OutfitCombo {
   title: string;
@@ -53,8 +55,10 @@ function getClothingImage(text: string, type: "top" | "bottom" | "shoes" | "acce
 }
 
 export default function OutfitGeneratorPage() {
+  const { user } = useAuth();
   const [occasion, setOccasion] = useState("Casual Everyday");
   const [generating, setGenerating] = useState(false);
+  const [savedToCloset, setSavedToCloset] = useState(false);
   const [outfit, setOutfit] = useState<OutfitCombo | null>({
     title: "Minimalist Linen & Cotton Everyday Combo",
     top: "Azure Blue 100% French Linen Shirt",
@@ -72,6 +76,41 @@ export default function OutfitGeneratorPage() {
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute("content", "AI-powered outfit suggestions");
   }, []);
+
+  async function handleSaveToCloset() {
+    if (!outfit) return;
+
+    if (user?.uid) {
+      try {
+        await addFirestoreClosetItem(user.uid, {
+          name: outfit.top,
+          category: occasion,
+          fabric: "Skin-Safe Certified Blend",
+          wearCount: 1,
+          lastWorn: "Planned",
+          comfortRating: Math.min(5, Math.max(1, Math.round(outfit.comfortScore / 20))),
+        });
+      } catch {}
+    }
+
+    try {
+      const existing = JSON.parse(localStorage.getItem("style_ai_virtual_closet") || "[]");
+      const newItem = {
+        id: `gen-${Date.now()}`,
+        name: outfit.top,
+        fabric: "Skin-Safe Certified Blend",
+        category: occasion,
+        image: getClothingImage(outfit.top, "top"),
+        wearCount: 1,
+        lastWorn: "Planned",
+        comfortRating: Math.min(5, Math.max(1, Math.round(outfit.comfortScore / 20))),
+      };
+      localStorage.setItem("style_ai_virtual_closet", JSON.stringify([newItem, ...existing]));
+    } catch {}
+
+    setSavedToCloset(true);
+    setTimeout(() => setSavedToCloset(false), 3000);
+  }
 
   function generateOutfit(selectedOccasion: string) {
     setOccasion(selectedOccasion);
@@ -247,6 +286,13 @@ export default function OutfitGeneratorPage() {
 
               {/* CTAs */}
               <div className="flex flex-wrap gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveToCloset}
+                  className="bg-emerald-600 text-white font-bold text-xs px-6 py-3 rounded-2xl hover:bg-emerald-700 transition shadow-xs"
+                >
+                  {savedToCloset ? "✓ Added to Closet!" : "+ Save Look to Virtual Closet"}
+                </button>
                 <Link
                   href="/shop"
                   className="bg-blue-600 text-white font-bold text-xs px-6 py-3 rounded-2xl hover:bg-blue-700 transition"
@@ -263,6 +309,12 @@ export default function OutfitGeneratorPage() {
             </div>
           )
         )}
+
+        <div className="text-center mt-6">
+          <p className="text-[11px] text-slate-400 max-w-xl mx-auto leading-relaxed">
+            ⚕️ <strong>Informational Guidance:</strong> Outfit combinations are generated using our textile sensitivity heuristic matrix and local climate rules. Always verify personal fabric allergies before wearing.
+          </p>
+        </div>
       </main>
     </div>
   );

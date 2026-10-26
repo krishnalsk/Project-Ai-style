@@ -21,6 +21,26 @@ Provide concise, elegant styling advice with fabric details, Comfort Score (e.g.
 `;
 
 const MAX_MESSAGE_LENGTH = 2000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 20;
+
+// In-memory sliding window rate limiter
+const ipRequestCounts = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = ipRequestCounts.get(ip) || [];
+  const validTimestamps = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+
+  if (validTimestamps.length >= MAX_REQUESTS_PER_WINDOW) {
+    ipRequestCounts.set(ip, validTimestamps);
+    return true;
+  }
+
+  validTimestamps.push(now);
+  ipRequestCounts.set(ip, validTimestamps);
+  return false;
+}
 
 function sanitizeInput(input: string): string {
   return input
@@ -31,6 +51,17 @@ function sanitizeInput(input: string): string {
 
 export async function POST(req: Request) {
   try {
+    // 1. IP extraction & rate limiting check
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
+
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment before sending another message." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const message = typeof body.message === "string" ? sanitizeInput(body.message) : "";
     const userProfile = body.userProfile && typeof body.userProfile === "object" ? body.userProfile : null;
@@ -101,7 +132,10 @@ Tip: You can ask about "sensitive skin wear", "best fabric for dermatitis", "sum
 
     return NextResponse.json({ reply: fallbackReply, source: "fallback" });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : "Internal error";
-    return NextResponse.json({ error: errorMsg }, { status: 500 });
+    console.error("Chat API internal error:", err instanceof Error ? err.message : err);
+    return NextResponse.json(
+      { error: "Unable to process styling request. Please try again shortly." },
+      { status: 500 }
+    );
   }
 }

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { onAuthStateChanged, User, getRedirectResult } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { getUserProfile, UserProfile, saveUserProfile, defaultProfile } from "@/lib/firebaseAuth";
+import { getUserProfile, UserProfile, saveUserProfile, defaultProfile, logout as firebaseLogout } from "@/lib/firebaseAuth";
 
 interface AuthContextValue {
   user: User | null;
@@ -11,6 +11,7 @@ interface AuthContextValue {
   loading: boolean;
   refreshProfile: () => Promise<void>;
   demoLogin: (name?: string, email?: string) => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextValue>({
   loading: true,
   refreshProfile: async () => {},
   demoLogin: () => {},
+  logout: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -49,6 +51,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {}
   };
 
+  const logoutUser = async () => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("style_ai_demo_user");
+        localStorage.removeItem("style_ai_demo_profile");
+      }
+      setUser(null);
+      setProfile(null);
+      await firebaseLogout();
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+
   const refreshProfile = async () => {
     if (auth.currentUser) {
       const p = await getUserProfile(auth.currentUser.uid);
@@ -61,9 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const savedUser = localStorage.getItem("style_ai_demo_user");
       const savedProfile = localStorage.getItem("style_ai_demo_profile");
       if (savedUser && savedProfile) {
-        setUser(JSON.parse(savedUser));
-        setProfile(JSON.parse(savedProfile));
-        setLoading(false);
+        const parsedUser = JSON.parse(savedUser);
+        const parsedProfile = JSON.parse(savedProfile);
+        queueMicrotask(() => {
+          setUser(parsedUser);
+          setProfile(parsedProfile);
+          setLoading(false);
+        });
       }
     } catch {}
   }, []);
@@ -98,8 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!active) return;
-      setUser(firebaseUser);
       if (firebaseUser) {
+        setUser(firebaseUser);
         try {
           const p = await getUserProfile(firebaseUser.uid);
           setProfile(p);
@@ -107,7 +127,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(null);
         }
       } else {
-        setProfile(null);
+        // If not a firebase user, check if we have demo session in localStorage
+        try {
+          const savedUser = localStorage.getItem("style_ai_demo_user");
+          const savedProfile = localStorage.getItem("style_ai_demo_profile");
+          if (savedUser && savedProfile) {
+            setUser(JSON.parse(savedUser));
+            setProfile(JSON.parse(savedProfile));
+          } else {
+            setUser(null);
+            setProfile(null);
+          }
+        } catch {
+          setUser(null);
+          setProfile(null);
+        }
       }
       setLoading(false);
     });
@@ -118,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, refreshProfile, demoLogin }}>
+    <AuthContext.Provider value={{ user, profile, loading, refreshProfile, demoLogin, logout: logoutUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -127,3 +161,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth(): AuthContextValue {
   return useContext(AuthContext);
 }
+

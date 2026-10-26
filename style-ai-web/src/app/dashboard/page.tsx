@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { logout } from "@/lib/firebaseAuth";
 import Link from "next/link";
 import { SearchIcon, BellIcon, HeartIcon, ShoppingBagIcon, UserIcon, SparklesIcon, ShieldCheckIcon, LeafIcon, SunIcon, ScanIcon, BookOpenIcon, AwardIcon, ShirtIcon, BarChartIcon } from "@/components/ui/Icons";
 
@@ -30,7 +29,7 @@ const QUICK_ACTIONS = [
 ];
 
 export default function DashboardPage() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {

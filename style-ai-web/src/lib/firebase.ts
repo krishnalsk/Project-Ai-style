@@ -3,7 +3,12 @@
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,24 +19,49 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-  throw new Error(
-    "Missing Firebase environment variables. Copy .env.example to .env.local and fill in your Firebase config."
+const isConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+
+if (!isConfigured && typeof window !== "undefined") {
+  console.warn(
+    "Notice: Missing Firebase environment variables. Using offline/demo capability. To connect real Firebase, configure .env.local."
   );
 }
 
+// Ensure non-empty config object to avoid Firebase SDK crash during static builds
+const resolvedConfig = isConfigured
+  ? firebaseConfig
+  : {
+      apiKey: "AIzaMockApiKeyForDemoAndStaticBuildOnly000",
+      authDomain: "style-ai-demo.firebaseapp.com",
+      projectId: "style-ai-demo",
+      storageBucket: "style-ai-demo.firebasestorage.app",
+      messagingSenderId: "000000000000",
+      appId: "1:000000000000:web:mockappid000",
+    };
+
 // Singleton initialization safe for Next.js hot-reloads
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const app = getApps().length === 0 ? initializeApp(resolvedConfig) : getApp();
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
 
-// Enable offline persistence for Firestore
-if (typeof window !== "undefined") {
-  enableIndexedDbPersistence(db).catch(() => {
-    // Persistence may fail if another tab already has it enabled — this is fine
-  });
+// Modern Firestore initialization with multi-tab offline cache support
+function initializeFirestoreDb() {
+  if (typeof window !== "undefined") {
+    try {
+      return initializeFirestore(app, {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager(),
+        }),
+      });
+    } catch {
+      // If already initialized (e.g. during fast refresh / hot reload), fallback to existing instance
+      return getFirestore(app);
+    }
+  }
+  return getFirestore(app);
 }
+
+export const db = initializeFirestoreDb();
 
 // Create GoogleAuthProvider on-demand to avoid shared singleton mutation
 export function createGoogleProvider(): GoogleAuthProvider {

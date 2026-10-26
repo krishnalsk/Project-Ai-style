@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
+const isStaticExport = process.env.STATIC_EXPORT === "true";
+
 const nextConfig: NextConfig = {
-  output: "export",
+  ...(isStaticExport ? { output: "export" } : {}),
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
   trailingSlash: true,
   reactStrictMode: true,
@@ -31,7 +33,7 @@ const nextConfig: NextConfig = {
           { key: "X-XSS-Protection", value: "1; mode=block" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(self), microphone=(), geolocation=(self)",
           },
         ],
       },

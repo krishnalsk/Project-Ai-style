@@ -66,9 +66,9 @@ fun ProductDetailsScreen(
     }
 
     val productImages = listOf(
-        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600",
-        "https://images.unsplash.com/photo-1596755389378-7fd0c1c58f21?w=600",
-        "https://images.unsplash.com/photo-1596755093590-7210c1a56bca?w=600"
+        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=800&auto=format&fit=crop"
     )
 
     Box(
@@ -82,10 +82,8 @@ fun ProductDetailsScreen(
                 AsyncImage(
                     model = productImages[0],
                     contentDescription = productName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                    error = painterResource(id = android.R.drawable.stat_notify_error)
+                    modifier = Modifier.fillMaxSize().background(SoftGray),
+                    contentScale = ContentScale.Crop
                 )
                 
                 // Top Gradient Overlay for readability
@@ -135,7 +133,7 @@ fun ProductDetailsScreen(
                                 model = img, 
                                 contentDescription = "Product thumbnail", 
                                 contentScale = ContentScale.Crop,
-                                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                                modifier = Modifier.background(SoftGray)
                             )
                         }
                     }

@@ -11,6 +11,7 @@ interface Message {
   sender: "user" | "ai";
   text: string;
   timestamp: string;
+  source?: "rule-engine" | "openrouter" | "fallback" | "system";
 }
 
 const SUGGESTIONS = [
@@ -28,8 +29,9 @@ export default function AiStylistPage() {
     {
       id: "welcome",
       sender: "ai",
-      text: "Hello! I'm your Style AI advisor — trained on skin safety, comfort science and sustainability. Ask me about fabrics, weather-ready outfits or your capsule wardrobe.",
+      text: "Hello! I'm your Style AI advisor — powered by our 4-Step Dermatological Rule Engine and AI styling logic. Ask me about fabrics, weather-ready outfits or your capsule wardrobe.",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      source: "system",
     },
   ]);
   const [input, setInput] = useState("");
@@ -69,25 +71,42 @@ export default function AiStylistPage() {
 
     try {
       let replyText = "";
+      let replySource: Message["source"] = "fallback";
+
       try {
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text, userProfile: profile }),
         });
-        if (res.ok) {
+
+        if (res.status === 429) {
+          const errData = await res.json().catch(() => ({}));
+          replyText = `⏳ ${errData.error || "Rate limit reached. Please wait a moment before sending another query."}`;
+          replySource = "system";
+        } else if (res.ok) {
           const data = await res.json();
           replyText = data.reply;
+          replySource = data.source || "openrouter";
         }
       } catch {
-        // ignore network error, fallback to local rule algorithm
+        // Fallback to local rule engine if network/API fails
       }
 
       if (!replyText) {
-        replyText = getAssistantRuleResponse(text) || `Recommendation: Soft Organic Cotton essentials paired with relaxed-fit breathable trousers.
+        const ruleMatch = getAssistantRuleResponse(text);
+        if (ruleMatch) {
+          replyText = ruleMatch;
+          replySource = "rule-engine";
+        } else {
+          replyText = `Recommendation: Soft Organic Cotton essentials paired with relaxed-fit breathable trousers.
 Why: Designed to maximize airflow while preventing skin irritation across varied conditions.
 Comfort Score: 95%
-Skin Safety Score: 96%`;
+Skin Safety Score: 96%
+
+Tip: You can ask about "sensitive skin wear", "best fabric for dermatitis", or "summer outfit" for specific guidance!`;
+          replySource = "fallback";
+        }
       }
 
       const aiReply: Message = {
@@ -95,6 +114,7 @@ Skin Safety Score: 96%`;
         sender: "ai",
         text: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        source: replySource,
       };
       setMessages((prev) => [...prev, aiReply]);
     } catch {
@@ -103,6 +123,7 @@ Skin Safety Score: 96%`;
         sender: "ai",
         text: getAssistantRuleResponse(text) || "Recommendation: Soft Organic Cotton essentials.\nComfort Score: 95%\nSkin Safety Score: 96%",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        source: "rule-engine",
       };
       setMessages((prev) => [...prev, fallbackReply]);
     } finally {
@@ -139,13 +160,25 @@ Skin Safety Score: 96%`;
           {messages.map((m) => (
             <div key={m.id} className={`flex flex-col ${m.sender === "user" ? "items-end" : "items-start"}`}>
               <div
-                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-5 py-3.5 shadow-sm text-sm leading-relaxed whitespace-pre-line ${
-                  m.sender === "user" ? "bg-[#4A90E2] text-white rounded-br-sm" : "bg-white text-slate-800 border border-slate-100 rounded-bl-sm"
-                }`}
+                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-5 py-3.5 shadow-sm text-sm leading-relaxed whitespace-pre-line ${m.sender === "user" ? "bg-[#4A90E2] text-white rounded-br-sm" : "bg-white text-slate-800 border border-slate-100 rounded-bl-sm"
+                  }`}
               >
                 {m.text}
               </div>
-              <span className="text-[11px] text-slate-400 mt-1 px-1">{m.timestamp}</span>
+              <div className="flex items-center gap-2 mt-1 px-1">
+                <span className="text-[11px] text-slate-400">{m.timestamp}</span>
+                {m.sender === "ai" && m.source && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                    {m.source === "rule-engine"
+                      ? "🔬 4-Step Derm Rule Engine"
+                      : m.source === "openrouter"
+                        ? "🤖 Claude 3.5 Sonnet"
+                        : m.source === "system"
+                          ? "ℹ️ System Notice"
+                          : "🌿 Reference Guide"}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
 

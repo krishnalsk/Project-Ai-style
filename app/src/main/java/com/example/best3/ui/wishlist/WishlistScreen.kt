@@ -40,7 +40,9 @@ fun WishlistScreenPreview() {
 }
 
 data class WishlistItem(
+    val id: String = java.util.UUID.randomUUID().toString(),
     val name: String,
+    val category: String,
     val fabric: String,
     val price: String,
     val score: String,
@@ -48,6 +50,7 @@ data class WishlistItem(
     val badge: String = "Skin Safe"
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WishlistScreen(
     onBackClick: () -> Unit,
@@ -58,32 +61,48 @@ fun WishlistScreen(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     
-    val items = listOf(
-        WishlistItem("Merino Wool Sweatshirt", "Merino Wool • Temperature Control", "₹7,299", "98", "https://images.unsplash.com/photo-1574201635302-388dd92a4c3f?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Organic Cotton T-Shirt", "Organic Cotton • Hypoallergenic", "₹1,499", "99", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Bamboo Polo Shirt", "Bamboo Fiber • Sweat Absorption", "₹2,199", "96", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Linen Casual Shirt", "Pure Linen • Breathable & Cool", "₹2,899", "97", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Organic Cotton Joggers", "Soft Cotton • All-Day Comfort", "₹1,899", "98", "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Linen Pants", "Summer Friendly • Breathable", "₹2,499", "95", "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Bamboo Trousers", "Anti-Irritation • Moisture Wicking", "₹2,799", "97", "https://images.unsplash.com/photo-1594932224010-70f90e549171?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Stretch Chinos", "Comfort Fit • Easy Movement", "₹2,299", "96", "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Organic Cotton Tee", "Gentle on Sensitive Skin", "₹1,399", "99", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Bamboo Comfort Top", "Moisture Wicking • Lightweight", "₹1,899", "97", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80"),
-        WishlistItem("Merino Wool Sweater", "Smart Temperature Control", "₹6,999", "99", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=500"),
-        WishlistItem("Cotton Palazzo", "All-Day Comfort • Breathable", "₹1,999", "94", "https://images.unsplash.com/photo-1574201635302-388dd92a4c3f?auto=format&fit=crop&q=80&w=500")
-    )
+    val wishlistItems = remember {
+        mutableStateListOf(
+            WishlistItem(name = "Cooling Linen Shirt", category = "Tops", fabric = "100% Organic Linen", price = "₹4,399", score = "98", image = "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Organic Cotton T-Shirt", category = "Tops", fabric = "Organic Cotton • Hypoallergenic", price = "₹1,499", score = "99", image = "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Bamboo Polo Shirt", category = "Tops", fabric = "Bamboo Fiber • Sweat Absorption", price = "₹2,199", score = "96", image = "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Silk Satin Blouse", category = "Tops", fabric = "Mulberry Silk • Frictionless", price = "₹5,299", score = "99", image = "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800&auto=format&fit=crop"),
+            
+            WishlistItem(name = "Linen Wide-Leg Pants", category = "Bottoms", fabric = "Pure Linen • Breathable & Cool", price = "₹2,499", score = "95", image = "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Bamboo Viscose Trousers", category = "Bottoms", fabric = "Anti-Irritation • Moisture Wicking", price = "₹2,799", score = "97", image = "https://images.unsplash.com/photo-1594932224010-70f90e549171?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Stretch Cotton Chinos", category = "Bottoms", fabric = "Comfort Fit • Easy Movement", price = "₹2,299", score = "96", image = "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Cotton Summer Shorts", category = "Bottoms", fabric = "GOTS Cotton • Lightweight", price = "₹1,899", score = "95", image = "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=800&auto=format&fit=crop"),
+            
+            WishlistItem(name = "Mulberry Silk Evening Dress", category = "Dresses & Outerwear", fabric = "Pure Silk • Elegant Flow", price = "₹6,999", score = "99", image = "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Pastel Pink Wool Knit", category = "Dresses & Outerwear", fabric = "Smart Temperature Control", price = "₹3,499", score = "98", image = "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Classic Denim Jacket", category = "Dresses & Outerwear", fabric = "Cotton Twill • Smart Fabric", price = "₹4,299", score = "94", image = "https://images.unsplash.com/photo-1544441893-675973e31985?w=800&auto=format&fit=crop"),
+            WishlistItem(name = "Breathable Ethnic Kurta Set", category = "Dresses & Outerwear", fabric = "Pure Linen • Festive Soft", price = "₹4,599", score = "97", image = "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop")
+        )
+    }
+
+    val filteredItems = remember(searchQuery, wishlistItems.size) {
+        if (searchQuery.isBlank()) {
+            wishlistItems
+        } else {
+            wishlistItems.filter { 
+                it.name.contains(searchQuery, ignoreCase = true) || 
+                it.fabric.contains(searchQuery, ignoreCase = true) ||
+                it.category.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     val recommendations = listOf(
-        "Soft Silk Blouse" to "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&q=80&w=500",
-        "Linen Summer Shorts" to "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&q=80&w=500",
-        "Eco-Friendly Cotton Dress" to "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=500"
+        "Lavender Knit Cardigan" to "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800",
+        "Cooling Activewear Top" to "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800",
+        "Organic Fleece Hoodie" to "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800"
     )
 
     Scaffold(
         bottomBar = {
             NavigationBar(
                 containerColor = White,
-                tonalElevation = 0.dp
+                tonalElevation = 8.dp
             ) {
                 NavigationBarItem(
                     selected = false,
@@ -145,7 +164,7 @@ fun WishlistScreen(
                         Icon(Icons.Filled.Favorite, "Wishlist", tint = AccentBlue, modifier = Modifier.size(24.dp))
                     }
                     Text(
-                        text = "Saved Comfort Styles",
+                        text = "${wishlistItems.size} Saved Comfort Styles",
                         style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                     )
                 }
@@ -172,21 +191,12 @@ fun WishlistScreen(
                         focusedContainerColor = White
                     )
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                Surface(
-                    onClick = { },
-                    modifier = Modifier.size(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    color = SoftGray.copy(alpha = 0.5f)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Tune, "Filter", tint = AccentBlue)
-                    }
-                }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Wishlist Items
-            if (items.isEmpty()) {
+            if (filteredItems.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -199,7 +209,7 @@ fun WishlistScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Your wishlist is empty",
+                        text = if (searchQuery.isNotEmpty()) "No matching outfits found" else "Your wishlist is empty",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color.Gray)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -207,25 +217,28 @@ fun WishlistScreen(
                         text = "Save styles you love for later",
                         style = MaterialTheme.typography.bodyMedium.copy(color = Color.LightGray)
                     )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = onHomeClick,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentBlue)
+                    ) {
+                        Text("Explore Products", fontWeight = FontWeight.Bold)
+                    }
                 }
             } else {
                 Column(modifier = Modifier.padding(24.dp)) {
-                    WishlistCategoryHeader("Boys - Tops")
-                    items.subList(0, 4).forEach { item ->
-                        WishlistCard(item, onProductClick)
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-                    
-                    WishlistCategoryHeader("Boys - Bottoms")
-                    items.subList(4, 8).forEach { item ->
-                        WishlistCard(item, onProductClick)
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-
-                    WishlistCategoryHeader("Girls - Tops & Bottoms")
-                    items.subList(8, 12).forEach { item ->
-                        WishlistCard(item, onProductClick)
-                        Spacer(modifier = Modifier.height(20.dp))
+                    val categories = filteredItems.groupBy { it.category }
+                    categories.forEach { (categoryName, categoryItems) ->
+                        WishlistCategoryHeader(categoryName)
+                        categoryItems.forEach { item ->
+                            WishlistCard(
+                                item = item,
+                                onClick = { onProductClick(item.name) },
+                                onRemove = { wishlistItems.remove(item) }
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
                     }
                 }
             }
@@ -249,6 +262,7 @@ fun WishlistScreen(
                 ) {
                     items(recommendations) { (name, image) ->
                         Card(
+                            onClick = { onProductClick(name) },
                             modifier = Modifier.width(160.dp),
                             shape = RoundedCornerShape(24.dp),
                             colors = CardDefaults.cardColors(containerColor = White)
@@ -258,9 +272,8 @@ fun WishlistScreen(
                                     AsyncImage(
                                         model = image,
                                         contentDescription = name,
-                                        modifier = Modifier.height(180.dp).fillMaxWidth(),
-                                        contentScale = ContentScale.Crop,
-                                        placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                                        modifier = Modifier.height(180.dp).fillMaxWidth().background(SoftGray),
+                                        contentScale = ContentScale.Crop
                                     )
                                     Surface(
                                         modifier = Modifier.padding(8.dp).align(Alignment.TopStart),
@@ -298,15 +311,19 @@ fun WishlistCategoryHeader(title: String) {
         modifier = Modifier.padding(bottom = 16.dp),
         style = MaterialTheme.typography.titleMedium.copy(
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A237E) // Dark blue matching reference
+            color = Color(0xFF1A237E)
         )
     )
 }
 
 @Composable
-fun WishlistCard(item: WishlistItem, onClick: (String) -> Unit) {
+fun WishlistCard(
+    item: WishlistItem,
+    onClick: () -> Unit,
+    onRemove: () -> Unit
+) {
     Card(
-        onClick = { onClick(item.name) },
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = White),
@@ -317,12 +334,11 @@ fun WishlistCard(item: WishlistItem, onClick: (String) -> Unit) {
                 AsyncImage(
                     model = item.image,
                     contentDescription = item.name,
-                    modifier = Modifier.fillMaxWidth().height(220.dp),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                    modifier = Modifier.fillMaxWidth().height(220.dp).background(SoftGray),
+                    contentScale = ContentScale.Crop
                 )
                 IconButton(
-                    onClick = { },
+                    onClick = onRemove,
                     modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).background(White, CircleShape)
                 ) {
                     Icon(Icons.Filled.Favorite, "Remove from wishlist", tint = Color.Red, modifier = Modifier.size(24.dp))
@@ -333,68 +349,30 @@ fun WishlistCard(item: WishlistItem, onClick: (String) -> Unit) {
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.AutoAwesome, "AI comfort score", tint = AccentBlue, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Verified, "Skin Safe", tint = AccentBlue, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "${item.score}% Comfort", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = AccentBlue)
+                        Text(item.badge, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = AccentBlue)
                     }
                 }
             }
-            
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(item.name, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = Color.Black)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(item.fabric, color = Color.Gray, fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = item.name,
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black, color = Color.Black),
-                            maxLines = 1
-                        )
-                        Text(text = item.fabric, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Black)
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = item.price,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black, color = Color.Black),
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Surface(
-                        color = Color.Black,
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = item.badge,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                            color = White,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Black
-                        )
-                    }
-                    
-                    Button(
-                        onClick = { },
-                        modifier = Modifier.height(44.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AccentBlue)
-                    ) {
-                        Icon(Icons.Default.ShoppingBag, "Add to cart", modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Add to Cart")
+                    Text(item.price, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = AccentBlue)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Star, "Score", tint = Color(0xFFFFB300), modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("${item.score}% Comfort", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                     }
                 }
             }

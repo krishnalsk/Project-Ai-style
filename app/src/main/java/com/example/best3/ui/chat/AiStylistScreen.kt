@@ -210,9 +210,8 @@ fun ChatBubble(message: ChatMessage) {
                             AsyncImage(
                                 model = outfit.image,
                                 contentDescription = null,
-                                modifier = Modifier.height(140.dp).fillMaxWidth(),
-                                contentScale = ContentScale.Crop,
-                                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                                modifier = Modifier.height(140.dp).fillMaxWidth().background(SoftGray),
+                                contentScale = ContentScale.Crop
                             )
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(outfit.name, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)

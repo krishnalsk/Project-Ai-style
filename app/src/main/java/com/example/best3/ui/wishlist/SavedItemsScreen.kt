@@ -68,7 +68,7 @@ fun SavedItemsScreen(
                         Icon(Icons.Default.Edit, null, tint = AccentBlue)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
             )
         }
     ) { padding ->
@@ -110,9 +110,9 @@ fun SavedItemCard(item: SavedItem, onClick: (String) -> Unit) {
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                        .height(180.dp)
+                        .background(SoftGray),
+                    contentScale = ContentScale.Crop
                 )
                 IconButton(
                     onClick = { /* Remove from saved */ },

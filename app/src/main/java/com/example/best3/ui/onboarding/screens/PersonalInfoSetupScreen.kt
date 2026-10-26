@@ -65,8 +65,7 @@ fun PersonalInfoSetupScreen(onContinue: () -> Unit) {
                 model = selectedPhotoUri ?: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200",
                 contentDescription = "Profile Photo",
                 modifier = Modifier.size(100.dp).clip(CircleShape).background(SoftGray),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                contentScale = ContentScale.Crop
             )
             IconButton(
                 onClick = { photoLauncher.launch("image/*") },

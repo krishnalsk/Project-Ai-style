@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { logout, saveUserProfile } from "@/lib/firebaseAuth";
+import { saveUserProfile } from "@/lib/firebaseAuth";
 
 export default function ProfilePage() {
-  const { user, profile, loading, refreshProfile } = useAuth();
+  const { user, profile, loading, refreshProfile, logout } = useAuth();
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -31,6 +31,20 @@ export default function ProfilePage() {
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute("content", "Manage your profile");
   }, []);
+
+  useEffect(() => {
+    if (profile) {
+      queueMicrotask(() => {
+        setFormData({
+          fullName: profile.fullName || "",
+          location: profile.location || "",
+          skinType: profile.skinType || "",
+          preferredFabric: profile.preferredFabric || "",
+          size: profile.size || "",
+        });
+      });
+    }
+  }, [profile]);
 
   if (loading || !user) return null;
 

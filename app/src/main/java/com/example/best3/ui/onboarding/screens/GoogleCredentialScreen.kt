@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import com.example.best3.ui.theme.*
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun GoogleCredentialScreenPreview() {
     StyleAiTheme {

@@ -109,7 +109,8 @@ enum class StyleCategory(
         accentColor = Color(0xFF1A237E),
         products = listOf(
             ProductData("Cooling Activewear Tee", "Anti-Sweat • Mesh", "₹3,199", "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop"),
-            ProductData("Dry-Fit Jacket", "Breathable • Lightweight", "₹6,299", "https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=600&auto=format&fit=crop")
+            ProductData("Dry-Fit Training Jacket", "Breathable • Lightweight", "₹6,299", "https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=600&auto=format&fit=crop"),
+            ProductData("Flexible Motion Shorts", "Stretch Fabric • Moisture Control", "₹2,799", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=600&auto=format&fit=crop")
         )
     ),
     EcoFriendly(
@@ -123,8 +124,8 @@ enum class StyleCategory(
         accentColor = Color(0xFF2E7D32),
         products = listOf(
             ProductData("Organic Cotton Shirt", "Sustainable • Soft", "₹4,999", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=600&auto=format&fit=crop"),
-
-            ProductData("Recycled Fabric Hoodie", "Carbon Neutral • Cozy", "₹6,099", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600&auto=format&fit=crop")
+            ProductData("Recycled Fabric Hoodie", "Carbon Neutral • Cozy", "₹6,099", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600&auto=format&fit=crop"),
+            ProductData("Bamboo Eco Dress", "Biodegradable • Silky Touch", "₹5,299", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=600&auto=format&fit=crop")
         )
     ),
     SensitiveSkin(
@@ -376,9 +377,9 @@ fun CategoryProductItem(product: ProductData, accentColor: Color, onClick: () ->
                 contentDescription = product.name,
                 modifier = Modifier
                     .size(130.dp)
-                    .clip(RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp)),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                    .clip(RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp))
+                    .background(SoftGray),
+                contentScale = ContentScale.Crop
             )
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(

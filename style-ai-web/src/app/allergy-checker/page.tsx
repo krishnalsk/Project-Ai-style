@@ -72,7 +72,7 @@ export default function AllergyCheckerPage() {
       <header className="sticky top-0 z-40 bg-white border-b border-slate-100 px-4 py-4 shadow-xs">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition">
+            <Link href="/dashboard" aria-label="Back to dashboard" className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition">
               ←
             </Link>
             <div>
@@ -222,6 +222,12 @@ export default function AllergyCheckerPage() {
               Ask AI Stylist for Advice
             </Link>
           </div>
+        </div>
+
+        <div className="text-center mt-6">
+          <p className="text-[11px] text-slate-400 max-w-xl mx-auto leading-relaxed">
+            ⚕️ <strong>Informational Guidance:</strong> The Allergy & Flare-up Index estimates friction and perspiration retention risks based on textile composition. This tool is not a substitute for clinical patch testing or medical diagnosis by a certified dermatologist.
+          </p>
         </div>
       </main>
     </div>

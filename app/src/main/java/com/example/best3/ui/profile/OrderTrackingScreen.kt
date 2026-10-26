@@ -49,7 +49,7 @@ fun OrderTrackingScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
             )
         }
     ) { padding ->
@@ -71,9 +71,8 @@ fun OrderTrackingScreen(
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = null,
-                        modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop,
-                        placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                        modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp)).background(SoftGray),
+                        contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
@@ -135,9 +134,8 @@ fun OrderTrackingScreen(
                     AsyncImage(
                         model = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200",
                         contentDescription = null,
-                        modifier = Modifier.size(50.dp).clip(CircleShape),
-                        contentScale = ContentScale.Crop,
-                        placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                        modifier = Modifier.size(50.dp).clip(CircleShape).background(SoftGray),
+                        contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {

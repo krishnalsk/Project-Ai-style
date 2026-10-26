@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import {
+  fetchFirestoreDiaryEntries,
+  addFirestoreDiaryEntry,
+  removeFirestoreDiaryEntry,
+} from "@/lib/firestoreService";
 
 interface DiaryEntry {
   id: string;
@@ -13,28 +19,30 @@ interface DiaryEntry {
   notes: string;
 }
 
-export default function SkinDiaryPage() {
-  const [entries, setEntries] = useState<DiaryEntry[]>([
-    {
-      id: "1",
-      date: "Today, 2:30 PM",
-      fabric: "100% Organic Cotton",
-      garment: "Azure Linen-Blend Shirt",
-      reaction: "None - Perfectly Comfortable",
-      comfortRating: 5,
-      notes: "Wore all day in hot weather. Zero flare-ups or redness.",
-    },
-    {
-      id: "2",
-      date: "Yesterday",
-      fabric: "Bamboo Viscose",
-      garment: "Activewear Training Tee",
-      reaction: "None - Perfectly Comfortable",
-      comfortRating: 5,
-      notes: "Extremely breathable during workout, no sweat rash.",
-    },
-  ]);
+const DEFAULT_ENTRIES: DiaryEntry[] = [
+  {
+    id: "1",
+    date: "Today, 2:30 PM",
+    fabric: "100% Organic Cotton",
+    garment: "Azure Linen-Blend Shirt",
+    reaction: "None - Perfectly Comfortable",
+    comfortRating: 5,
+    notes: "Wore all day in hot weather. Zero flare-ups or redness.",
+  },
+  {
+    id: "2",
+    date: "Yesterday",
+    fabric: "Bamboo Viscose",
+    garment: "Activewear Training Tee",
+    reaction: "None - Perfectly Comfortable",
+    comfortRating: 5,
+    notes: "Extremely breathable during workout, no sweat rash.",
+  },
+];
 
+export default function SkinDiaryPage() {
+  const { user } = useAuth();
+  const [entries, setEntries] = useState<DiaryEntry[]>(DEFAULT_ENTRIES);
   const [garment, setGarment] = useState("");
   const [fabric, setFabric] = useState("100% Organic Cotton");
   const [reaction, setReaction] = useState<DiaryEntry["reaction"]>("None - Perfectly Comfortable");
@@ -44,28 +52,101 @@ export default function SkinDiaryPage() {
 
   useEffect(() => {
     document.title = "Skin Diary | Style AI";
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Track your skin reactions to fabrics");
-  }, []);
+    let active = true;
 
-  function handleAddEntry(e: React.FormEvent) {
+    async function loadDiary() {
+      const loaded: DiaryEntry[] = [];
+
+      if (user?.uid) {
+        try {
+          const remoteList = await fetchFirestoreDiaryEntries(user.uid);
+          for (const item of remoteList) {
+            loaded.push({
+              id: item.id || `entry-${Date.now()}`,
+              date: item.date,
+              fabric: item.fabric,
+              garment: item.garment,
+              reaction: (item.reaction as DiaryEntry["reaction"]) || "None - Perfectly Comfortable",
+              comfortRating: item.comfortRating,
+              notes: item.notes,
+            });
+          }
+        } catch {}
+      }
+
+      try {
+        const saved = localStorage.getItem("style_ai_skin_diary");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            loaded.push(...parsed);
+          }
+        }
+      } catch {}
+
+      if (active) {
+        setEntries(loaded.length > 0 ? loaded : DEFAULT_ENTRIES);
+      }
+    }
+
+    loadDiary();
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  async function handleAddEntry(e: React.FormEvent) {
     e.preventDefault();
     if (!garment.trim()) return;
 
     const newEntry: DiaryEntry = {
       id: Date.now().toString(),
       date: "Just now",
-      garment,
+      garment: garment.trim(),
       fabric,
       reaction,
       comfortRating,
-      notes: notes || "No specific notes recorded.",
+      notes: notes.trim() || "No specific notes recorded.",
     };
 
-    setEntries([newEntry, ...entries]);
+    if (user?.uid) {
+      try {
+        await addFirestoreDiaryEntry(user.uid, {
+          date: newEntry.date,
+          garment: newEntry.garment,
+          fabric: newEntry.fabric,
+          reaction: newEntry.reaction,
+          comfortRating: newEntry.comfortRating,
+          notes: newEntry.notes,
+        });
+      } catch {}
+    }
+
+    setEntries((prev) => {
+      const updated = [newEntry, ...prev];
+      try {
+        localStorage.setItem("style_ai_skin_diary", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
     setGarment("");
     setNotes("");
     setFormOpen(false);
+  }
+
+  async function handleDeleteEntry(id: string) {
+    if (user?.uid) {
+      removeFirestoreDiaryEntry(user.uid, id).catch(() => {});
+    }
+
+    setEntries((prev) => {
+      const updated = prev.filter((e) => e.id !== id);
+      try {
+        localStorage.setItem("style_ai_skin_diary", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
   }
 
   return (
@@ -221,10 +302,19 @@ export default function SkinDiaryPage() {
                 >
                   {entry.reaction}
                 </span>
-                <span className="text-xs text-amber-400 font-bold">
-                  {"★".repeat(entry.comfortRating)}
-                  <span className="text-slate-200">{"★".repeat(5 - entry.comfortRating)}</span>
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-amber-400 font-bold">
+                    {"★".repeat(entry.comfortRating)}
+                    <span className="text-slate-200">{"★".repeat(5 - entry.comfortRating)}</span>
+                  </span>
+                  <button
+                    onClick={() => handleDeleteEntry(entry.id)}
+                    aria-label={`Delete diary entry for ${entry.garment}`}
+                    className="text-slate-300 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
           ))}

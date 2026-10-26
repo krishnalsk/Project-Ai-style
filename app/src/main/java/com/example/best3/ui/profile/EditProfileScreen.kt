@@ -129,9 +129,9 @@ fun EditProfileScreen(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
                                 modifier = Modifier
                                     .size(120.dp)
                                     .clip(CircleShape)
-                                    .border(4.dp, White, CircleShape),
-                                contentScale = ContentScale.Crop,
-                                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                                    .border(4.dp, White, CircleShape)
+                                    .background(SoftGray),
+                                contentScale = ContentScale.Crop
                             )
                             Surface(
                                 modifier = Modifier

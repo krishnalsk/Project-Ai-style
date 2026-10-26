@@ -142,9 +142,9 @@ fun AuthSelectionScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .clip(RoundedCornerShape(32.dp)),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(SoftGray),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(64.dp))

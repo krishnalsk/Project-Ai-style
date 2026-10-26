@@ -4,104 +4,84 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.best3.data.remote.AiAssistantManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AiStylistViewModel : ViewModel() {
     val messages = mutableStateListOf(
         ChatMessage(
             text = "Hello! 👋 Welcome to Style AI. How can I help you with fashion, comfort, or clothing recommendations today?",
-            isAi = true
+            isAi = true,
         )
     )
 
     fun sendMessage(text: String) {
         if (text.isBlank()) return
         
-        messages.add(ChatMessage(text, false))
+        messages.add(ChatMessage(text, isAi = false))
         
-        val loadingMessage = ChatMessage("Style AI is thinking...", true, isLoading = true)
+        val loadingMessage = ChatMessage("Style AI Rule Engine processing...", isAi = true, isLoading = true)
         messages.add(loadingMessage)
         
         viewModelScope.launch {
             try {
-                // 1. Try Precise Rule-Based Logic first for instant response
-                val ruleResponse = getAssistantRuleResponse(text)
+                // Simulate fast local rule-engine processing (100ms)
+                delay(100)
                 
-                if (ruleResponse != null) {
-                    messages.remove(loadingMessage)
-                    messages.add(ChatMessage(ruleResponse, true))
-                } else {
-                    // 2. Perform RAG Retrieval (New Retrieval Step)
-                    val retrievedContext = retrieveKnowledgeBaseContext(text)
-                    
-                    // 3. Fallback to Real AI Assistant with Retrieved Context
-                    val aiResponseResult = AiAssistantManager.getAssistantResponse(text, retrievedContext)
-                    val aiResponse = aiResponseResult.getOrNull()
-                    messages.remove(loadingMessage)
-                    
-                    if (aiResponse != null) {
-                        // Extract message from [LOGIC]...[MESSAGE] format if present
-                        val cleanResponse = if (aiResponse.contains("[MESSAGE]")) {
-                            aiResponse.substringAfter("[MESSAGE]").trim()
-                        } else {
-                            aiResponse
-                        }
-                        messages.add(ChatMessage(cleanResponse, true))
-                    } else {
-                        // Final Fallback for unknown questions
-                        val fallbackResponse = """
-                            I'd be happy to help. 😊
-    
-                            Please provide:
-                            • Skin Condition
-                            • Height and Weight
-                            • Clothing Size
-                            • Preferred Style
-                            • Occasion
-                            • Weather or Location
-    
-                            Once I have this information, I'll provide personalized recommendations with comfort score, skin safety score, and outfit suggestions.
-                        """.trimIndent()
-                        messages.add(ChatMessage(fallbackResponse, true))
-                    }
+                // 1. Try Direct Rule Matching
+                var ruleResponse = getAssistantRuleResponse(text)
+                
+                // 2. If no direct rule match, run Dynamic 4-Step Rule Engine
+                if (ruleResponse == null) {
+                    ruleResponse = processDynamicRuleEngine(text)
                 }
+
+                messages.remove(loadingMessage)
+                messages.add(ChatMessage(ruleResponse, true))
             } catch (e: Exception) {
                 Log.e("AiStylistVM", "Error", e)
                 messages.remove(loadingMessage)
-                messages.add(ChatMessage("I'm having trouble connecting right now. Please try again! 😊", true))
+                messages.add(ChatMessage("I'm having trouble processing right now. Please try again! 😊", true))
             }
         }
     }
 
-    private fun retrieveKnowledgeBaseContext(query: String): String {
-        val input = query.lowercase()
-        val contextBuilder = StringBuilder()
-
-        // Fabric Knowledge Retrieval
-        val fabrics = mapOf(
-            "linen" to "Organic Linen: Ultra breathable, wicks moisture, anti-bacterial. Best for hot climates.",
-            "bamboo" to "Bamboo Viscose: Hypoallergenic, soft like silk, thermal regulating. Best for highly sensitive skin.",
-            "silk" to "Mulberry Silk: Skin hydrating, friction-free, premium comfort. Contains proteins for skin health.",
-            "cotton" to "Organic Cotton: GOTS certified, hypoallergenic, soft and breathable for everyday use."
-        )
-
-        fabrics.forEach { (key, info) ->
-            if (input.contains(key)) {
-                contextBuilder.append("FABRIC INFO: $info\n")
-            }
-        }
-
-        // Product Knowledge Retrieval
-        if (input.contains("shirt") || input.contains("top")) {
-            contextBuilder.append("AVAILABLE PRODUCTS: Cooling Linen Shirt (₹4,399), Bamboo Polo Shirt (₹2,199), Premium Silk Blouse (₹6,499).\n")
-        }
+    private fun processDynamicRuleEngine(query: String): String {
+        val input = query.lowercase().trim()
         
-        if (input.contains("skin") || input.contains("safe") || input.contains("sensitive")) {
-            contextBuilder.append("SKIN SAFETY ADVICE: Avoid rough wool and heavy synthetics. Recommend Bamboo or Silk for sensitive conditions.\n")
+        // STEP 1: Skin Safety Check
+        val isSensitive = input.contains("skin") || input.contains("dermatitis") || input.contains("allergy") || input.contains("rash") || input.contains("itch")
+        val skinSafetyScore = if (isSensitive) "98%" else "95%"
+        val skinLevel = if (isSensitive) "SAFE (Hypoallergenic)" else "SAFE"
+
+        // STEP 2 & 3: Clothing Weighting & Weather Adaptation
+        val fabric = when {
+            input.contains("hot") || input.contains("summer") || input.contains("sweat") -> "100% Organic Linen or Bamboo Viscose"
+            input.contains("cold") || input.contains("winter") -> "Merino Wool Blend with Soft Cotton Lining"
+            input.contains("rain") || input.contains("monsoon") -> "Quick-Dry Moisture-Wicking Cotton Synthetic"
+            isSensitive -> "GOTS Certified Pure Organic Cotton or Mulberry Silk"
+            else -> "Soft Breathable Organic Cotton"
         }
 
-        return contextBuilder.toString()
+        val style = when {
+            input.contains("formal") || input.contains("office") || input.contains("interview") -> "Structured Tailored Fit"
+            input.contains("party") || input.contains("night") -> "Modern Slim Silhouette"
+            input.contains("casual") || input.contains("college") || input.contains("street") -> "Relaxed Oversized Fit"
+            else -> "Comfortable Regular Fit"
+        }
+
+        // STEP 4: Output Synthesis
+        return """
+            [4-Step Rule Engine Evaluation]
+            • Skin Safety Level: $skinLevel ($skinSafetyScore)
+            • Recommended Fabric: $fabric
+            • Recommended Fit: $style
+            
+            Recommendation: Pair $fabric in $style with relaxed bottoms and breathable footwear.
+            Why: Optimized for maximum skin comfort, airflow, and durability.
+            Comfort Score: 96%
+            Skin Safety Score: $skinSafetyScore
+        """.trimIndent()
     }
 
     private fun getAssistantRuleResponse(input: String): String? {
@@ -235,7 +215,7 @@ class AiStylistViewModel : ViewModel() {
                 Skin Safety Score: 96%
             """.trimIndent()
 
-            query == "what should i wear today?" || query == "wear today" -> """
+            (query == "what should i wear today?") || (query == "wear today") -> """
                 Recommendation: Cotton T-shirt, relaxed-fit pants, breathable footwear.
                 Why: A versatile outfit suitable for everyday comfort.
                 Comfort Score: 95%
@@ -310,10 +290,10 @@ class AiStylistViewModel : ViewModel() {
                 • Shopping recommendations
             """.trimIndent()
 
-            query.contains("thank you") || query == "thanks" -> 
+            (query.contains("thank you")) || (query == "thanks") -> 
                 "You're welcome! 😊 Feel free to ask me anything about fashion, comfort, fabrics, or styling."
             
-            query == "bye" || query == "goodbye" -> 
+            (query == "bye") || (query == "goodbye") ->
                 "Goodbye! 👋 Have a wonderful day and enjoy your fashion journey with Style AI."
 
             else -> null // Unknown question triggers fallback

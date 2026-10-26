@@ -298,10 +298,8 @@ fun ProfileHeader(
             AsyncImage(
                 model = profileImage ?: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200",
                 contentDescription = "Profile",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                error = painterResource(id = android.R.drawable.ic_menu_report_image)
+                modifier = Modifier.fillMaxSize().background(SoftGray),
+                contentScale = ContentScale.Crop
             )
             
             // Camera Overlay Icon - always visible now but more subtle

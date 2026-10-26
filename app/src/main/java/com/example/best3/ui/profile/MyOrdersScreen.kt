@@ -67,7 +67,7 @@ fun MyOrdersScreen(onBackClick: () -> Unit, onOrderClick: (String) -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
             )
         }
     ) { padding ->
@@ -127,9 +127,8 @@ fun OrderCard(order: OrderItem, onClick: () -> Unit) {
                     AsyncImage(
                         model = image,
                         contentDescription = null,
-                        modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop,
-                        placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                        modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)).background(SoftGray),
+                        contentScale = ContentScale.Crop
                     )
                 }
             }

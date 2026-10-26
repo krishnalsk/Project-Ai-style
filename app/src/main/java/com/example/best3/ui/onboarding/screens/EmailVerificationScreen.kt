@@ -86,9 +86,8 @@ fun EmailVerificationScreen(onVerifySuccess: () -> Unit) {
             AsyncImage(
                 model = "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&auto=format&fit=crop",
                 contentDescription = "Secure Verification",
-                modifier = Modifier.fillMaxSize().padding(20.dp).clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                modifier = Modifier.fillMaxSize().padding(20.dp).clip(CircleShape).background(SoftGray),
+                contentScale = ContentScale.Crop
             )
         }
         

@@ -157,9 +157,8 @@ fun LoginScreen(
                     AsyncImage(
                         model = "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&auto=format&fit=crop",
                         contentDescription = "Login Illustration",
-                        modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(24.dp)),
-                        contentScale = ContentScale.Crop,
-                        placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                        modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(24.dp)).background(SoftGray),
+                        contentScale = ContentScale.Crop
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))

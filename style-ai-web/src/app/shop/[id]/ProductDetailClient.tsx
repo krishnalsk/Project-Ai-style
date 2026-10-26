@@ -8,22 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useToast } from "@/components/ui/Toast";
 import { PageHeader } from "@/components/ui/PageHeader";
-import {
-  HeartIcon,
-  ShoppingBagIcon,
-  ShieldCheckIcon,
-  StarIcon,
-  SlidersIcon,
-  SparklesIcon,
-  TruckIcon
-} from "@/components/ui/Icons";
-
-const TRYON_MODELS = [
-  { id: "model1", name: "Maya (5'7\", Size S)", size: "S", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80", skinTone: "Fair", fitFeedback: "Ideal fit. Slightly relaxed in shoulders." },
-  { id: "model2", name: "Raj (6'0\", Size L)", size: "L", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80", skinTone: "Warm Wheatish", fitFeedback: "Regular fit. Sleeves align perfectly at the wrist." },
-  { id: "model3", name: "Asha (5'9\", Size XL)", size: "XL", image: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=500&auto=format&fit=crop&q=80", skinTone: "Dusky", fitFeedback: "Cozy oversized drape. Comfortable chest fit." },
-  { id: "model4", name: "Li (5'6\", Size XS)", size: "XS", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80", skinTone: "Light", fitFeedback: "Slightly loose fit. Perfect for a breezy, casual style." }
-];
+import { HeartIcon, ShoppingBagIcon } from "@/components/ui/Icons";
 
 export default function ProductDetailClient({ id }: { id: string }) {
   const router = useRouter();
@@ -39,23 +24,6 @@ export default function ProductDetailClient({ id }: { id: string }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [zoomActive, setZoomActive] = useState(false);
   const [zoomCoords, setZoomCoords] = useState({ x: 0, y: 0 });
-  const [isHdQuality, setIsHdQuality] = useState(false);
-
-  // Virtual Try-on states
-  const [showTryOn, setShowTryOn] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<string>("none");
-  const [userPhoto, setUserPhoto] = useState<string | null>(null);
-  const [overlayScale, setOverlayScale] = useState<number>(1);
-  const [overlayX, setOverlayX] = useState<number>(0);
-  const [overlayY, setOverlayY] = useState<number>(20);
-  const [overlayOpacity, setOverlayOpacity] = useState<number>(0.85);
-  const [tryOnBlendMode, setTryOnBlendMode] = useState<boolean>(true);
-  const [tryOnFitMode, setTryOnFitMode] = useState<"slim" | "regular" | "loose">("regular");
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-
-  // Delivery states
-  const [pincode, setPincode] = useState("");
-  const [pincodeCheckResult, setPincodeCheckResult] = useState<{ checked: boolean; success: boolean; msg: string } | null>(null);
 
   useEffect(() => {
     if (product) {
@@ -95,14 +63,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
       ];
 
   const getImageUrl = (url: string) => {
-    if (!url) return "";
-    if (url.includes("unsplash.com")) {
-      if (isHdQuality) {
-        return url.replace("w=800", "w=1600").replace("q=80", "q=95");
-      }
-      return url.replace("w=1600", "w=800").replace("q=95", "q=80");
-    }
-    return url;
+    return url || "";
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -179,14 +140,12 @@ export default function ProductDetailClient({ id }: { id: string }) {
                   {imagesList.map((img, idx) => (
                     <button
                       key={idx}
-                      onClick={() => {
-                        setActiveImageIndex(idx);
-                        setShowTryOn(false);
-                      }}
+                      onClick={() => setActiveImageIndex(idx)}
                       className={`w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 shrink-0 transition ${
-                        activeImageIndex === idx && !showTryOn ? "border-[#4A90E2] shadow-sm scale-102" : "border-slate-200 opacity-70 hover:opacity-100"
+                        activeImageIndex === idx ? "border-[#4A90E2] shadow-sm scale-102" : "border-slate-200 opacity-70 hover:opacity-100"
                       }`}
                     >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={img} alt={`${product.name} angle ${idx + 1}`} className="w-full h-full object-cover" />
                     </button>
                   ))}
@@ -198,6 +157,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
                   onMouseLeave={() => setZoomActive(false)}
                   onMouseMove={handleMouseMove}
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={getImageUrl(imagesList[activeImageIndex])}
                     alt={product.name}
@@ -294,6 +254,52 @@ export default function ProductDetailClient({ id }: { id: string }) {
             </div>
           </div>
         </div>
+
+        {/* Similar Skin-Safe Garments */}
+        {related && related.length > 0 && (
+          <div className="border-t border-slate-200 pt-8 mt-10">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-900">🌿 Similar Skin-Safe Garments</h2>
+                <p className="text-xs text-slate-500">Curated alternatives with comparable hypoallergenic ratings</p>
+              </div>
+              <Link href="/shop" className="text-xs font-bold text-[#4A90E2] hover:underline">
+                View All →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {related.map((rel) => (
+                <Link
+                  key={rel.id}
+                  href={`/shop/${rel.id}`}
+                  className="card card-hover p-4 group transition block"
+                >
+                  <div className="aspect-3/4 rounded-xl overflow-hidden bg-slate-100 mb-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={rel.images[0]}
+                      alt={rel.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition"
+                    />
+                  </div>
+                  <span className="text-[11px] font-bold text-[#4A90E2] uppercase tracking-wider block">
+                    {rel.category}
+                  </span>
+                  <h3 className="font-extrabold text-slate-900 text-sm mt-0.5 truncate">{rel.name}</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">{rel.fabric}</p>
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+                    <span className="font-black text-slate-900 text-sm">
+                      ₹{rel.price.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Safe {rel.skinSafetyScore}%
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

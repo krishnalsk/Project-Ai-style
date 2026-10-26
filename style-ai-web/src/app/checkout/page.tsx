@@ -8,8 +8,12 @@ import { useToast } from "@/components/ui/Toast";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ShieldCheckIcon, LeafIcon } from "@/components/ui/Icons";
 
+import { useAuth } from "@/context/AuthContext";
+import { createOrder } from "@/lib/firestoreService";
+
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { items, totalPrice, clearCart } = useCart();
   const { show } = useToast();
   const [step, setStep] = useState<"address" | "payment" | "success">("address");
@@ -40,18 +44,53 @@ export default function CheckoutPage() {
     return true;
   }
 
-  function handlePlaceOrder() {
+  async function handlePlaceOrder() {
     if (!validateAddress()) return;
     if (items.length === 0) {
       show("Your cart is empty", "error");
       return;
     }
     setPlacing(true);
-    setTimeout(() => {
-      clearCart();
-      setStep("success");
-      setPlacing(false);
-    }, 1200);
+
+    const orderId = `#ST${Math.floor(1000 + Math.random() * 9000)}`;
+    const newOrder = {
+      id: orderId,
+      date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
+      product: items[0]?.product?.name + (items.length > 1 ? ` (+${items.length - 1} more)` : ""),
+      image: items[0]?.product?.images?.[0] || "",
+      status: "Processing" as const,
+      amount: totalPrice,
+      points: Math.round(totalPrice * 0.1),
+    };
+
+    // Save order to Firestore if logged in
+    if (user?.uid) {
+      try {
+        await createOrder(user.uid, {
+          date: newOrder.date,
+          status: "Processing",
+          totalAmount: totalPrice,
+          pointsEarned: newOrder.points,
+          items: items.map((i) => ({
+            name: i.product.name,
+            price: i.product.price,
+            quantity: i.quantity,
+          })),
+        });
+      } catch {
+        // Fallback to local storage if firestore connection is offline
+      }
+    }
+
+    // Always preserve local demo orders for immediate offline view in /orders
+    try {
+      const existing = JSON.parse(localStorage.getItem("style_ai_user_orders") || "[]");
+      localStorage.setItem("style_ai_user_orders", JSON.stringify([newOrder, ...existing]));
+    } catch {}
+
+    clearCart();
+    setStep("success");
+    setPlacing(false);
   }
 
   if (step === "success") {
@@ -61,17 +100,20 @@ export default function CheckoutPage() {
           <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-4">
             <ShieldCheckIcon size={28} className="text-emerald-600" />
           </div>
+          <span className="inline-block bg-amber-50 text-amber-800 text-[11px] font-bold px-3 py-1 rounded-full border border-amber-200 mb-3">
+            🧪 Demo Simulation Order · No Real Charges
+          </span>
           <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Order Confirmed!</h1>
           <p className="text-slate-500 text-sm leading-relaxed">Your eco-certified garments are being prepared with zero-waste packaging.</p>
           <p className="mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-2 inline-flex items-center gap-1.5">
             <LeafIcon size={14} /> +150 Style Points earned
           </p>
           <div className="flex flex-col gap-3 mt-8">
-            <Link href="/dashboard" className="bg-[#4A90E2] text-white font-bold py-3 rounded-xl hover:bg-[#3A6BC8] transition text-center">
-              Back to Dashboard
+            <Link href="/orders" className="bg-[#4A90E2] text-white font-bold py-3 rounded-xl hover:bg-[#3A6BC8] transition text-center">
+              View in My Orders →
             </Link>
-            <Link href="/shop" className="border border-slate-200 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-50 transition text-center">
-              Continue Shopping
+            <Link href="/dashboard" className="border border-slate-200 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-50 transition text-center">
+              Back to Dashboard
             </Link>
           </div>
         </div>
@@ -84,6 +126,16 @@ export default function CheckoutPage() {
       <PageHeader title="Checkout" subtitle={`${items.length} items · ₹${totalPrice.toLocaleString()}`} onBack={() => router.back()} />
 
       <main className="page-container py-6 sm:py-8">
+        {/* Transparent Demo Notice */}
+        <div className="card bg-amber-50/70 border-amber-200 p-4 mb-6 flex items-start gap-3">
+          <span className="text-lg" aria-hidden>🧪</span>
+          <div>
+            <h2 className="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Demo Environment · Simulated Checkout</h2>
+            <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">
+              No real payments or credit card charges will occur. This flow demonstrates complete address validation, item calculations, and order creation in a sandbox environment.
+            </p>
+          </div>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_0.9fr] gap-6">
           <div className="space-y-5">
             {/* Delivery Address */}

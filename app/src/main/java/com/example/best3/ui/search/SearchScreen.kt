@@ -71,10 +71,14 @@ fun SearchScreen(
     )
 
     val products = listOf(
-        Product("Cooling Linen Shirt", "100% Organic Linen", "₹4,399", "98", "https://images.unsplash.com/photoAN-1596755094514-f87e34085b2c?w=800"),
+        Product("Cooling Linen Shirt", "100% Organic Linen", "₹4,399", "98", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800"),
         Product("Organic Cotton Hoodie", "GOTS Certified Cotton", "₹5,799", "95", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800"),
         Product("Premium Silk Blouse", "100% Mulberry Silk", "₹6,499", "99", "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800"),
-        Product("Eco-Cotton Dress", "Recycled Cotton Blend", "₹4,199", "94", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800")
+        Product("Eco-Cotton Dress", "Recycled Cotton Blend", "₹4,199", "94", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800"),
+        Product("Bamboo Polo Shirt", "Bamboo Fiber • Sweat Wicking", "₹2,199", "97", "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=800"),
+        Product("Linen Wide-Leg Trousers", "Pure Linen • Breathable", "₹2,499", "96", "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800"),
+        Product("Breathable Ethnic Kurta", "Pure Linen • Soft Weave", "₹4,599", "98", "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800"),
+        Product("Cooling Activewear Top", "Mesh Cotton • Anti-Irritation", "₹2,299", "95", "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800")
     )
 
     Scaffold(
@@ -213,9 +217,8 @@ fun SearchScreen(
                                 AsyncImage(
                                     model = image,
                                     contentDescription = title,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                                    modifier = Modifier.fillMaxSize().background(SoftGray),
+                                    contentScale = ContentScale.Crop
                                 )
                                 Box(
                                     modifier = Modifier
@@ -291,9 +294,9 @@ fun ProductCard(product: Product, onClick: (String) -> Unit) {
                 contentDescription = product.name,
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(SoftGray),
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {

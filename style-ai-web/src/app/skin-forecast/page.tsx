@@ -18,6 +18,9 @@ interface WeatherAlert {
 export default function SkinForecastPage() {
   const [city, setCity] = useState("Mumbai");
   const [searchCity, setSearchCity] = useState("Mumbai");
+  const [loadingWeather, setLoadingWeather] = useState(false);
+  const [dataSource, setDataSource] = useState<"Live Sensor API" | "Regional Reference Station">("Regional Reference Station");
+  const [weatherData, setWeatherData] = useState<WeatherAlert | null>(null);
 
   useEffect(() => {
     document.title = "Skin Forecast | Style AI";
@@ -25,7 +28,7 @@ export default function SkinForecastPage() {
     if (meta) meta.setAttribute("content", "Weather-based skin safety forecast");
   }, []);
 
-  const forecastData: Record<string, WeatherAlert> = {
+  const referenceData: Record<string, WeatherAlert> = {
     mumbai: {
       location: "Mumbai, India",
       temp: 31,
@@ -61,12 +64,148 @@ export default function SkinForecastPage() {
     },
   };
 
-  const activeKey = city.toLowerCase().trim();
-  const current = forecastData[activeKey] || forecastData["mumbai"];
+  function deriveSkinAdvice(temp: number, humidity: number, uv: number, locationName: string, conditionText: string): WeatherAlert {
+    let skinRiskLevel: WeatherAlert["skinRiskLevel"] = "LOW";
+    let recommendedFabric = "100% GOTS Organic Cotton, Bamboo Viscose";
+    let avoidFabric = "Heavy Synthetics, Tight Denim";
+    let dermatologyTip = "Balanced environmental factors. Light natural cotton maintains skin barrier respiration.";
+
+    if (uv >= 8 || temp >= 34) {
+      skinRiskLevel = "EXTREME";
+      recommendedFabric = "GOTS Organic Cotton (Long Sleeve), Unbleached Linen";
+      avoidFabric = "Dark Synthetic Blends, Raw Wool";
+      dermatologyTip = "Intense solar radiation and heat. Wear breathable long-sleeve organic cotton to shield epidermal layers from UV irritation.";
+    } else if (humidity >= 75 || temp >= 30) {
+      skinRiskLevel = "HIGH";
+      recommendedFabric = "100% French Linen, Antibacterial Bamboo Viscose";
+      avoidFabric = "Polyester Activewear, Nylon, Spandex Blends";
+      dermatologyTip = "High ambient moisture traps perspiration under synthetic garments. Choose open-weave flax linen to avoid sweat gland occlusion.";
+    } else if (humidity < 40 || temp < 18) {
+      skinRiskLevel = "MODERATE";
+      recommendedFabric = "Soft Organic Cotton Layering, Mulberry Silk Innerwear";
+      avoidFabric = "Coarse Wool, Acrylic Knits";
+      dermatologyTip = "Dry or cool conditions can strip skin hydration. Use soft organic cotton base layers to avoid direct skin friction.";
+    }
+
+    return {
+      location: locationName,
+      temp: Math.round(temp),
+      condition: conditionText,
+      uvIndex: Math.round(uv),
+      humidity: Math.round(humidity),
+      skinRiskLevel,
+      recommendedFabric,
+      avoidFabric,
+      dermatologyTip,
+    };
+  }
+
+  async function fetchLiveWeather(targetCity: string) {
+    setLoadingWeather(true);
+    try {
+      // 1. Geocode city name via Open-Meteo
+      const geoRes = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(targetCity)}&count=1&language=en&format=json`
+      );
+      if (!geoRes.ok) throw new Error("Geocoding failed");
+      const geoData = await geoRes.json();
+
+      if (geoData.results && geoData.results.length > 0) {
+        const place = geoData.results[0];
+        const { latitude, longitude, name, country } = place;
+
+        // 2. Fetch live weather & UV index
+        const weatherRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index&timezone=auto`
+        );
+        if (!weatherRes.ok) throw new Error("Weather fetch failed");
+        const wData = await weatherRes.json();
+        const cur = wData.current;
+
+        const weatherCode = cur.weather_code ?? 0;
+        const condition =
+          weatherCode === 0
+            ? "Clear Sky"
+            : weatherCode <= 3
+            ? "Partly Cloudy"
+            : weatherCode <= 67
+            ? "Rain & Moisture"
+            : "Scattered Clouds";
+
+        const alert = deriveSkinAdvice(
+          cur.temperature_2m,
+          cur.relative_humidity_2m,
+          cur.uv_index || 5,
+          `${name}, ${country}`,
+          condition
+        );
+
+        setWeatherData(alert);
+        setDataSource("Live Sensor API");
+        setCity(name);
+        setLoadingWeather(false);
+        return;
+      }
+    } catch {
+      // Fallback handled below
+    }
+
+    // Reference fallback
+    const key = targetCity.toLowerCase().trim();
+    const fallback = referenceData[key] || {
+      ...referenceData["mumbai"],
+      location: `${targetCity.charAt(0).toUpperCase() + targetCity.slice(1)} (Regional Reference)`,
+    };
+    setWeatherData(fallback);
+    setDataSource("Regional Reference Station");
+    setCity(targetCity);
+    setLoadingWeather(false);
+  }
+
+  function handleUseGeolocation() {
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      setLoadingWeather(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const weatherRes = await fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index&timezone=auto`
+            );
+            if (weatherRes.ok) {
+              const wData = await weatherRes.json();
+              const cur = wData.current;
+              const alert = deriveSkinAdvice(
+                cur.temperature_2m,
+                cur.relative_humidity_2m,
+                cur.uv_index || 6,
+                "Your Current Coordinates",
+                cur.weather_code <= 3 ? "Local Conditions" : "Variable Sky"
+              );
+              setWeatherData(alert);
+              setDataSource("Live Sensor API");
+              setCity("Your Location");
+              setLoadingWeather(false);
+              return;
+            }
+          } catch {}
+          setLoadingWeather(false);
+        },
+        () => {
+          setLoadingWeather(false);
+        },
+        { timeout: 8000 }
+      );
+    }
+  }
+
+  const current = weatherData || referenceData[city.toLowerCase().trim()] || referenceData["mumbai"];
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    setCity(searchCity);
+    if (searchCity.trim()) {
+      fetchLiveWeather(searchCity.trim());
+    }
   }
 
   return (
@@ -74,7 +213,7 @@ export default function SkinForecastPage() {
       <header className="sticky top-0 z-40 bg-white border-b border-slate-100 px-4 py-4 shadow-xs">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition">
+            <Link href="/dashboard" aria-label="Back to dashboard" className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition">
               ←
             </Link>
             <div>
@@ -82,29 +221,56 @@ export default function SkinForecastPage() {
               <p className="text-xs text-slate-500">Real-time UV, humidity & weather-adjusted fabric safety</p>
             </div>
           </div>
-          <span className="text-xs bg-amber-50 text-amber-700 font-bold px-3 py-1 rounded-full border border-amber-200">
-            UV Sensor Active
+          <span
+            className={`text-xs font-bold px-3 py-1 rounded-full border ${
+              dataSource === "Live Sensor API"
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : "bg-amber-50 text-amber-700 border-amber-200"
+            }`}
+          >
+            {dataSource === "Live Sensor API" ? "📡 Live Sensor API (Open-Meteo)" : "📍 Climate Reference Station"}
           </span>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        {/* City Search Bar */}
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <input
-            type="text"
-            value={searchCity}
-            onChange={(e) => setSearchCity(e.target.value)}
-            placeholder="Search city (e.g. Mumbai, Delhi, Bengaluru)..."
-            className="flex-1 bg-white border border-slate-200 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 shadow-xs"
-          />
+        {/* City Search Bar & GPS */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+            <input
+              type="text"
+              value={searchCity}
+              onChange={(e) => setSearchCity(e.target.value)}
+              placeholder="Search any global city (e.g. Paris, Tokyo, Mumbai, New York)..."
+              className="flex-1 bg-white border border-slate-200 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 shadow-xs"
+            />
+            <button
+              type="submit"
+              disabled={loadingWeather}
+              className="bg-blue-600 text-white font-bold px-6 py-3 rounded-2xl hover:bg-blue-700 transition text-sm shadow-xs disabled:opacity-50"
+            >
+              {loadingWeather ? "Fetching..." : "Search City"}
+            </button>
+          </form>
+
           <button
-            type="submit"
-            className="bg-blue-600 text-white font-bold px-6 py-3 rounded-2xl hover:bg-blue-700 transition text-sm shadow-xs"
+            type="button"
+            onClick={handleUseGeolocation}
+            disabled={loadingWeather}
+            className="bg-white border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-600 font-bold px-4 py-3 rounded-2xl transition text-sm shadow-xs flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
           >
-            Update Location
+            📍 Use My GPS
           </button>
-        </form>
+        </div>
+
+        {dataSource === "Regional Reference Station" && (
+          <div className="bg-amber-50/70 border border-amber-200 text-amber-900 text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2">
+            <span>ℹ️</span>
+            <span>
+              Showing regional reference climate baseline for &quot;{city}&quot;. Enter another city or click &quot;Use My GPS&quot; to fetch live open satellite sensor telemetry.
+            </span>
+          </div>
+        )}
 
         {/* Live Weather Card */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-md">
@@ -181,6 +347,12 @@ export default function SkinForecastPage() {
           >
             Consult AI Stylist
           </Link>
+        </div>
+
+        <div className="text-center mt-6">
+          <p className="text-[11px] text-slate-400 max-w-xl mx-auto leading-relaxed">
+            ⚕️ <strong>Informational Guidance:</strong> Skin Forecast provides environmental fabric suggestions based on regional meteorological readings. It does not replace medical sun protection guidance or individualized dermatological care.
+          </p>
         </div>
       </main>
     </div>

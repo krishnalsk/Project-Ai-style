@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 1. Shared Products Catalog (Public read-only, admin-only write)
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if false; // Only server/admin SDK can modify products
+    }
+
+    // 2. User Profiles and Private Subcollections
+    match /users/{userId} {
+      // User can only read and write their own profile
+      allow read, create, update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
+      // Private shopping cart
+      match /cart/{cartItemId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+
+      // Private wishlist
+      match /wishlist/{wishlistItemId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+
+      // Private order history (immutable once created)
+      match /orders/{orderId} {
+        allow read, create: if isOwner(userId);
+        allow update, delete: if false; // Orders cannot be modified or deleted by clients
+      }
+
+      // Private virtual closet
+      match /closet/{closetItemId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+
+      // Private skin diary entries
+      match /diaryEntries/{entryId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+    }
+
+    // Default catch-all: deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,7 +46,7 @@ fun CartScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Go back")
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
             )
         }
     ) { padding ->
@@ -187,7 +186,7 @@ fun CartScreen(
                     SummaryRow("Subtotal", "₹10,198")
                     SummaryRow("Shipping", "Free")
                     SummaryRow("Tax", "₹849")
-                    Divider(modifier = Modifier.padding(vertical = 12.dp), color = SoftGray)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = SoftGray)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -223,9 +222,8 @@ fun CartItemCard(name: String, fabric: String, price: String, score: String, ima
             AsyncImage(
                 model = image,
                 contentDescription = null,
-                modifier = Modifier.size(90.dp).clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                modifier = Modifier.size(90.dp).clip(RoundedCornerShape(12.dp)).background(SoftGray),
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {

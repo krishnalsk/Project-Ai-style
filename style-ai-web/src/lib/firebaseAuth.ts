@@ -108,7 +108,16 @@ export async function loginWithGoogle(): Promise<User> {
 /**
  * Sign out the current user session.
  */
+/**
+ * Sign out the current user session and clear local demo storage.
+ */
 export async function logout(): Promise<void> {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem("style_ai_demo_user");
+      localStorage.removeItem("style_ai_demo_profile");
+    } catch {}
+  }
   await signOut(auth);
 }
 
@@ -117,11 +126,61 @@ export async function logout(): Promise<void> {
  */
 export async function resetPassword(email: string): Promise<void> {
   const actionCodeSettings: ActionCodeSettings = {
-    url: window.location.origin,
+    url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
     handleCodeInApp: true,
   };
 
   await sendPasswordResetEmail(auth, email, actionCodeSettings);
+}
+
+/**
+ * Maps raw Firebase authentication errors to clean, actionable user-facing messages.
+ */
+export function friendlyAuthError(err: unknown): string {
+  if (!err) return "An unexpected error occurred. Please try again.";
+  const msg = err instanceof Error ? err.message : String(err);
+  const code = (err as { code?: string }).code || "";
+
+  if (code === "auth/popup-closed-by-user" || msg.includes("popup-closed-by-user")) {
+    return "Google sign-in popup was closed before completing.";
+  }
+  if (code === "auth/unauthorized-domain" || msg.includes("unauthorized-domain")) {
+    return "Firebase Auth Domain Notice: This domain is not in your Firebase Authorized Domains list. Use Instant Demo Mode below or add this domain in the Firebase Console.";
+  }
+  if (
+    code === "auth/user-not-found" ||
+    code === "auth/wrong-password" ||
+    code === "auth/invalid-credential" ||
+    code === "auth/invalid-login-credentials" ||
+    msg.includes("invalid-credential") ||
+    msg.includes("user-not-found") ||
+    msg.includes("wrong-password")
+  ) {
+    return "Incorrect email or password. Please check your credentials and try again.";
+  }
+  if (code === "auth/email-already-in-use" || msg.includes("email-already-in-use")) {
+    return "An account with this email already exists. Please log in instead.";
+  }
+  if (code === "auth/weak-password" || msg.includes("weak-password")) {
+    return "Password is too weak. Please use at least 8 characters.";
+  }
+  if (code === "auth/invalid-email" || msg.includes("invalid-email")) {
+    return "Please enter a valid email address.";
+  }
+  if (code === "auth/too-many-requests" || msg.includes("too-many-requests")) {
+    return "Too many failed attempts. Access is temporarily paused. Please try again shortly or reset your password.";
+  }
+  if (code === "auth/network-request-failed" || msg.includes("network")) {
+    return "Network connection issue. Please check your internet connection.";
+  }
+  if (code === "auth/operation-not-allowed" || msg.includes("operation-not-allowed")) {
+    return "This sign-in provider is not enabled in Firebase Console. Please enable Email/Password or Google in Firebase Auth.";
+  }
+  if (code === "auth/user-disabled" || msg.includes("user-disabled")) {
+    return "This user account has been disabled. Please contact support.";
+  }
+
+  return msg.replace(/^Firebase:\s*/i, "").replace(/^Error\s*\((auth\/[^)]+)\):\s*/i, "");
 }
 
 /**
@@ -180,3 +239,4 @@ export function getCurrentUser(): User | null {
 export function isLoggedIn(): boolean {
   return auth.currentUser !== null;
 }
+

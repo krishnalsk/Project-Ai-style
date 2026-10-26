@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ShirtIcon, SparklesIcon } from "@/components/ui/Icons";
+import { useAuth } from "@/context/AuthContext";
+import {
+  fetchFirestoreCloset,
+  addFirestoreClosetItem,
+  removeFirestoreClosetItem,
+} from "@/lib/firestoreService";
 
 interface ClosetItem {
   id: string;
@@ -23,18 +29,125 @@ const DEFAULT_CLOSET: ClosetItem[] = [
 ];
 
 export default function VirtualClosetPage() {
+  const { user } = useAuth();
   const [closet, setCloset] = useState<ClosetItem[]>(DEFAULT_CLOSET);
   const [filter, setFilter] = useState("All");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newItem, setNewItem] = useState({
+    name: "",
+    fabric: "100% GOTS Organic Cotton",
+    category: "Casual",
+    comfortRating: 5,
+  });
 
   useEffect(() => {
     document.title = "Virtual Closet | Style AI";
-  }, []);
+    let active = true;
+
+    async function loadCloset() {
+      const items: ClosetItem[] = [];
+
+      // 1. Fetch remote items from Firestore if authenticated
+      if (user?.uid) {
+        try {
+          const remoteCloset = await fetchFirestoreCloset(user.uid);
+          for (const item of remoteCloset) {
+            items.push({
+              id: item.id || `fs-${Math.random()}`,
+              name: item.name,
+              fabric: item.fabric,
+              category: item.category,
+              image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400",
+              wearCount: item.wearCount || 1,
+              lastWorn: item.lastWorn || "Recently",
+              comfortRating: item.comfortRating || 5,
+            });
+          }
+        } catch {}
+      }
+
+      // 2. Fetch local demo closet items
+      try {
+        const saved = localStorage.getItem("style_ai_virtual_closet");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            items.push(...parsed);
+          }
+        }
+      } catch {}
+
+      if (active) {
+        setCloset(items.length > 0 ? items : DEFAULT_CLOSET);
+      }
+    }
+
+    loadCloset();
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   const categories = ["All", ...Array.from(new Set(closet.map((i) => i.category)))];
   const filtered = filter === "All" ? closet : closet.filter((i) => i.category === filter);
 
-  function removeItem(id: string) {
-    setCloset((prev) => prev.filter((i) => i.id !== id));
+  async function removeItem(id: string) {
+    if (user?.uid) {
+      removeFirestoreClosetItem(user.uid, id).catch(() => {});
+    }
+
+    setCloset((prev) => {
+      const updated = prev.filter((i) => i.id !== id);
+      try {
+        localStorage.setItem("style_ai_virtual_closet", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  }
+
+  async function handleAddGarment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newItem.name.trim()) return;
+
+    const added: ClosetItem = {
+      id: `cl-${Date.now()}`,
+      name: newItem.name.trim(),
+      fabric: newItem.fabric,
+      category: newItem.category,
+      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+      wearCount: 1,
+      lastWorn: "Today",
+      comfortRating: newItem.comfortRating,
+    };
+
+    if (user?.uid) {
+      try {
+        await addFirestoreClosetItem(user.uid, {
+          name: added.name,
+          category: added.category,
+          fabric: added.fabric,
+          wearCount: 1,
+          lastWorn: "Today",
+          comfortRating: added.comfortRating,
+        });
+      } catch {}
+    }
+
+    setCloset((prev) => {
+      const updated = [added, ...prev];
+      try {
+        localStorage.setItem("style_ai_virtual_closet", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
+    setNewItem({
+      name: "",
+      fabric: "100% GOTS Organic Cotton",
+      category: "Casual",
+      comfortRating: 5,
+    });
+    setShowAddModal(false);
   }
 
   const totalWears = closet.reduce((s, i) => s + i.wearCount, 0);
@@ -47,11 +160,112 @@ export default function VirtualClosetPage() {
         subtitle={`${closet.length} items · ${totalWears} total wears`}
         backHref="/dashboard"
         actions={
-          <Link href="/shop" className="text-xs font-bold bg-[#4A90E2] text-white px-4 py-2 rounded-xl hover:bg-[#3A6BC8] transition">
-            + Add Items
-          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="text-xs font-bold bg-[#4A90E2] text-white px-3.5 py-2 rounded-xl hover:bg-[#3A6BC8] transition shadow-xs"
+            >
+              + Add Garment
+            </button>
+            <Link href="/shop" className="text-xs font-bold bg-white text-slate-700 border border-slate-200 px-3.5 py-2 rounded-xl hover:bg-slate-50 transition">
+              Shop Fashion
+            </Link>
+          </div>
         }
       />
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-xl border border-slate-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-extrabold text-slate-900 text-lg">Add Wardrobe Item</h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleAddGarment} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Garment Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Crisp Linen Summer Shirt"
+                  value={newItem.name}
+                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90E2]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Fabric Composition</label>
+                <select
+                  value={newItem.fabric}
+                  onChange={(e) => setNewItem({ ...newItem, fabric: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800"
+                >
+                  <option value="100% GOTS Organic Cotton">100% GOTS Organic Cotton (Safe)</option>
+                  <option value="100% French Linen">100% French Linen (Safe)</option>
+                  <option value="95% Bamboo Viscose">95% Bamboo Viscose (Safe)</option>
+                  <option value="Tencel Lyocell Blend">Tencel Lyocell Blend (Safe)</option>
+                  <option value="Mulberry Silk">Mulberry Silk (Safe)</option>
+                  <option value="Cotton / Poly Blend">Cotton / Poly Blend (Moderate)</option>
+                  <option value="100% Polyester / Synthetic">100% Polyester / Synthetic (Avoid for sensitive skin)</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Season / Category</label>
+                  <select
+                    value={newItem.category}
+                    onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800"
+                  >
+                    <option value="Casual">Casual</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Active">Active</option>
+                    <option value="Formal">Formal</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Comfort Rating (1-5)</label>
+                  <select
+                    value={newItem.comfortRating}
+                    onChange={(e) => setNewItem({ ...newItem, comfortRating: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800"
+                  >
+                    <option value={5}>5 ★ (Silky / Ideal)</option>
+                    <option value={4}>4 ★ (Comfortable)</option>
+                    <option value={3}>3 ★ (Neutral)</option>
+                    <option value={2}>2 ★ (Slight Friction)</option>
+                    <option value={1}>1 ★ (Irritating)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-[#4A90E2] text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-[#3A6BC8] transition shadow-xs"
+                >
+                  Save to Closet
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <main className="page-container py-6 sm:py-8">
         <div className="grid grid-cols-3 gap-4 mb-8">

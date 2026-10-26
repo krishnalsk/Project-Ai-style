@@ -80,7 +80,7 @@ fun FabricEncyclopediaScreen(onBackClick: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
             )
         }
     ) { padding ->
@@ -121,10 +121,8 @@ fun FabricCard(fabric: FabricInfo) {
                 AsyncImage(
                     model = fabric.imageUrl,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                    error = painterResource(id = android.R.drawable.stat_notify_error)
+                    modifier = Modifier.fillMaxSize().background(SoftGray),
+                    contentScale = ContentScale.Crop
                 )
                 // Premium Overlay
                 Box(

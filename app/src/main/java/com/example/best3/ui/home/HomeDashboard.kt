@@ -109,17 +109,19 @@ fun HomeDashboard(
         Product("Organic Cotton T-Shirt", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80", "₹1,499", "Organic Cotton", "Hypoallergenic"),
         Product("Bamboo Polo Shirt", "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=800&auto=format&fit=crop&q=80", "₹2,199", "Bamboo Fiber", "Sweat Absorption"),
         Product("Linen Casual Shirt", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop&q=80", "₹2,899", "Linen", "Breathable & Cool"),
-        Product("Denim Jacket", "https://images.unsplash.com/photo-1544441893-675973e31985?w=800&auto=format&fit=crop&q=80", "₹1,299", "Cotton Twill", "Smart Fabric"),
-        Product("Merino Wool - Pink", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop&q=80", "₹7,299", "Merino Wool", "Skin Safe"),
-        Product("Merino Wool - Lavender", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80", "₹7,299", "Merino Wool", "Skin Safe"),
-        Product("Merino Wool - Striped", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop&q=80", "₹7,299", "Merino Wool", "Skin Safe"),
-        Product("Oversized Knit Sweater", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop&q=80", "₹999", "Knit", "Cozy"),
-        Product("Ribbed Bodycon Top", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80", "₹749", "Ribbed", "Breathable"),
-        Product("Merino Wool - Black", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80", "₹7,299", "Merino Wool", "Skin Safe"),
-        Product("Linen Wide-Leg Pants", "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&auto=format&fit=crop&q=80", "₹2,499", "Linen", "Comfortable"),
-        Product("Silk Slip Dress", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&auto=format&fit=crop&q=80", "₹3,999", "Silk", "Elegant"),
-        Product("Bamboo Fiber Tee", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80", "₹1,299", "Bamboo", "Skin Safe"),
-        Product("Cotton Twill Shorts", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=800&auto=format&fit=crop&q=80", "₹1,499", "Cotton", "Casual"),
+        Product("Classic Denim Jacket", "https://images.unsplash.com/photo-1544441893-675973e31985?w=800&auto=format&fit=crop&q=80", "₹4,299", "Cotton Twill", "Smart Fabric"),
+        Product("Pastel Pink Sweater", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop&q=80", "₹3,499", "Merino Wool", "Soft Touch"),
+        Product("Lavender Knit Cardigan", "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&auto=format&fit=crop&q=80", "₹3,899", "Soft Cotton", "Cozy Fit"),
+        Product("Oversized Chunky Sweater", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop&q=80", "₹4,999", "Organic Wool", "Winter Warmth"),
+        Product("Ribbed Cotton Crop Top", "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80", "₹1,299", "Stretch Cotton", "Breathable"),
+        Product("Linen Wide-Leg Trousers", "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&auto=format&fit=crop&q=80", "₹2,499", "Linen", "All-Day Comfort"),
+        Product("Mulberry Silk Evening Dress", "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&auto=format&fit=crop&q=80", "₹6,999", "Mulberry Silk", "Frictionless"),
+        Product("Bamboo Fiber Everyday Tee", "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&auto=format&fit=crop&q=80", "₹1,699", "Bamboo Viscose", "Anti-Irritation"),
+        Product("Cotton Twill Summer Shorts", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=800&auto=format&fit=crop&q=80", "₹1,899", "Cotton", "Lightweight"),
+        Product("Silk Satin Blouse", "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800&auto=format&fit=crop&q=80", "₹5,299", "Pure Silk", "Elegant Office"),
+        Product("Breathable Ethnic Kurta Set", "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80", "₹4,599", "Pure Linen", "Festive Comfort"),
+        Product("Cooling Activewear Sports Top", "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80", "₹2,299", "Mesh Cotton", "Sweat Wicking"),
+        Product("Organic Fleece Hoodie", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop&q=80", "₹3,999", "Recycled Fleece", "Soft Warmth")
     )
 
     val filteredProducts = remember(searchQuery) {
@@ -206,11 +208,10 @@ fun HomeDashboard(
                             tonalElevation = 2.dp
                         ) {
                             AsyncImage(
-                                model = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=60",
+                                model = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80",
                                 contentDescription = "Profile",
                                 modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery)
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }
@@ -542,9 +543,7 @@ fun ProductItem(product: Product, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(130.dp)
                     .background(SoftGray),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                error = painterResource(id = android.R.drawable.stat_notify_error)
+                contentScale = ContentScale.Crop
             )
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).weight(1f)) {
                 Text(

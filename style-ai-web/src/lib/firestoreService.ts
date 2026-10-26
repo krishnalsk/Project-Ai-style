@@ -167,6 +167,10 @@ export async function createFirestoreOrder(userId: string, order: FirestoreOrder
   return docRef.id;
 }
 
+export const fetchOrders = fetchFirestoreOrders;
+export const getOrders = fetchFirestoreOrders;
+export const createOrder = createFirestoreOrder;
+
 // ─── 6. VIRTUAL CLOSET SUBCOLLECTION (`users/{userId}/closet`) ─────────────────
 
 export interface FirestoreClosetItem {
@@ -195,6 +199,16 @@ export async function addFirestoreClosetItem(userId: string, item: FirestoreClos
   await addDoc(collection(db, "users", userId, "closet"), item);
 }
 
+export async function removeFirestoreClosetItem(userId: string, itemId: string): Promise<void> {
+  await safeFirestoreQuery(
+    async () => {
+      await deleteDoc(doc(db, "users", userId, "closet", itemId));
+    },
+    undefined,
+    "removeClosetItem"
+  );
+}
+
 // ─── 7. SKIN DIARY (`users/{userId}/diaryEntries`) ────────────────────────────
 
 export interface FirestoreDiaryEntry {
@@ -221,3 +235,14 @@ export async function fetchFirestoreDiaryEntries(userId: string): Promise<Firest
 export async function addFirestoreDiaryEntry(userId: string, entry: FirestoreDiaryEntry): Promise<void> {
   await addDoc(collection(db, "users", userId, "diaryEntries"), entry);
 }
+
+export async function removeFirestoreDiaryEntry(userId: string, entryId: string): Promise<void> {
+  await safeFirestoreQuery(
+    async () => {
+      await deleteDoc(doc(db, "users", userId, "diaryEntries", entryId));
+    },
+    undefined,
+    "removeDiaryEntry"
+  );
+}
+

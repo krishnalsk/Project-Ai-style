@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { resetPassword } from "@/lib/firebaseAuth";
+import { resetPassword, friendlyAuthError } from "@/lib/firebaseAuth";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -18,8 +18,7 @@ export default function ForgotPasswordPage() {
       await resetPassword(email);
       setSent(true);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to send reset email";
-      setError(msg.includes("user-not-found") ? "No account found with this email." : msg);
+      setError(friendlyAuthError(err));
     } finally {
       setLoading(false);
     }

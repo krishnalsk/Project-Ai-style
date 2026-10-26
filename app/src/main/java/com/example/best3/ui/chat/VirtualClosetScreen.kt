@@ -1,6 +1,5 @@
 package com.example.best3.ui.chat
 
-import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
@@ -63,11 +62,15 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
         val result = FirebaseManager.getClosetItems()
         if (result.isSuccess) {
             closetItems = result.getOrNull()?.map { map ->
+                val name = map["name"] as? String ?: "Scanned Clothes"
+                val category = map["category"] as? String ?: "Tops"
+                val rawUrl = map["imageUrl"] as? String ?: ""
+                val validUrl = if (rawUrl.isNotBlank() && rawUrl.startsWith("http")) rawUrl else getFallbackClothesImage(category, name)
                 ClosetItem(
                     id = map["id"] as? String ?: "",
-                    name = map["name"] as? String ?: "Unknown",
-                    category = map["category"] as? String ?: "Tops",
-                    imageUrl = map["imageUrl"] as? String ?: ""
+                    name = name,
+                    category = category,
+                    imageUrl = validUrl
                 )
             } ?: emptyList()
         }
@@ -118,7 +121,7 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
                         Icon(Icons.Default.Search, null)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
             )
         },
         floatingActionButton = {
@@ -226,8 +229,25 @@ fun VirtualClosetScreen(onBackClick: () -> Unit) {
     }
 }
 
+fun getFallbackClothesImage(category: String = "", name: String = ""): String {
+    val input = "$category $name".lowercase()
+    return when {
+        input.contains("shirt") || input.contains("top") || input.contains("tee") -> "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop"
+        input.contains("hoodie") || input.contains("sweater") || input.contains("jacket") -> "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop"
+        input.contains("dress") || input.contains("skirt") -> "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&auto=format&fit=crop"
+        input.contains("pant") || input.contains("trouser") || input.contains("short") || input.contains("bottom") -> "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&auto=format&fit=crop"
+        else -> "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop"
+    }
+}
+
 @Composable
 fun ClosetGridItem(item: ClosetItem, onDelete: () -> Unit) {
+    val imageUrl = if (item.imageUrl.isNotBlank() && item.imageUrl.startsWith("http")) {
+        item.imageUrl
+    } else {
+        getFallbackClothesImage(item.category, item.name)
+    }
+
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = White),
@@ -237,12 +257,10 @@ fun ClosetGridItem(item: ClosetItem, onDelete: () -> Unit) {
         Column {
             Box {
                 AsyncImage(
-                    model = item.imageUrl,
+                    model = imageUrl,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(160.dp),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                    error = painterResource(id = android.R.drawable.stat_notify_error)
+                    modifier = Modifier.fillMaxWidth().height(160.dp).background(SoftGray),
+                    contentScale = ContentScale.Crop
                 )
                 IconButton(
                     onClick = onDelete,

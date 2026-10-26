@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signUpWithEmail, loginWithGoogle } from "@/lib/firebaseAuth";
+import { signUpWithEmail, loginWithGoogle, friendlyAuthError } from "@/lib/firebaseAuth";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
@@ -17,7 +17,11 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      router.push("/onboarding");
+      if (!user.emailVerified) {
+        router.push("/verify-email");
+      } else {
+        router.push("/onboarding");
+      }
     }
   }, [user, authLoading, router]);
 
@@ -33,21 +37,10 @@ export default function SignupPage() {
       await signUpWithEmail(email, password, fullName);
       router.push("/verify-email");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Sign-up failed";
-      setError(friendlyError(msg));
+      setError(friendlyAuthError(err));
     } finally {
       setLoading(false);
     }
-  }
-
-  function friendlyError(msg: string): string {
-    if (msg.includes("auth/unauthorized-domain")) {
-      return "Firebase Auth Domain Warning: This hosting domain (GitHub Pages) is not yet in your Firebase Authorized Domains list. You can click 'Instant Demo Access' below to explore immediately, or whitelist this domain in Firebase Console.";
-    }
-    if (msg.includes("email-already-in-use")) return "This email is already registered. Please sign in.";
-    if (msg.includes("weak-password")) return "Password must be at least 6 characters.";
-    if (msg.includes("invalid-email")) return "Please enter a valid email address.";
-    return msg;
   }
 
   function handleDemoAccess() {
@@ -62,8 +55,7 @@ export default function SignupPage() {
       await loginWithGoogle();
       router.push("/onboarding");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Google sign-in failed";
-      setError(friendlyError(msg));
+      setError(friendlyAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -194,14 +186,3 @@ export default function SignupPage() {
   );
 }
 
-function friendlyError(msg: string): string {
-  if (msg.includes("email-already-in-use"))
-    return "An account with this email already exists. Try logging in.";
-  if (msg.includes("weak-password"))
-    return "Password is too weak. Use at least 8 characters.";
-  if (msg.includes("invalid-email"))
-    return "Please enter a valid email address.";
-  if (msg.includes("network"))
-    return "Network error. Please check your connection.";
-  return msg;
-}

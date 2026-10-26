@@ -43,12 +43,7 @@
 # Coil
 -dontwarn coil.**
 
-# OpenRouter API Models
--keep class com.example.best3.data.remote.OpenRouterModels$* { *; }
--keep class com.example.best3.data.remote.ChatRequest { *; }
--keep class com.example.best3.data.remote.ChatResponse { *; }
--keep class com.example.best3.data.remote.Message { *; }
--keep class com.example.best3.data.remote.Choice { *; }
+
 
 # Remove logging in release
 -assumenosideeffects class android.util.Log {

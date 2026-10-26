@@ -21,20 +21,34 @@ data class UserProfile(
 )
 
 object FirebaseManager {
-    private val auth = FirebaseAuth.getInstance()
-    private val db get() = FirebaseFirestore.getInstance()
-    private val usersCollection get() = db.collection("users")
+    private val auth: FirebaseAuth?
+        get() = try {
+            FirebaseAuth.getInstance()
+        } catch (_: Exception) {
+            null
+        }
+
+    private val db: FirebaseFirestore?
+        get() = try {
+            FirebaseFirestore.getInstance()
+        } catch (_: Exception) {
+            null
+        }
+
+    private val usersCollection get() = db?.collection("users")
 
     // Mutable profile state — scoped to navigation lifecycle via ViewModel in production
     @Volatile
     var tempProfile = UserProfile()
 
-    val currentUser get() = auth.currentUser
+    val currentUser get() = try { auth?.currentUser } catch (_: Exception) { null }
 
-    fun isUserLoggedIn(): Boolean = auth.currentUser != null
+    fun isUserLoggedIn(): Boolean = currentUser != null
 
     fun logout() {
-        auth.signOut()
+        try {
+            auth?.signOut()
+        } catch (_: Exception) {}
     }
 
     /**
@@ -42,7 +56,7 @@ object FirebaseManager {
      * If Firestore delete fails, the account is still removed (recoverable).
      */
     suspend fun deleteUserAccount(): Result<Unit> {
-        val user = auth.currentUser ?: return Result.failure(Exception("User not logged in"))
+        val user = currentUser ?: return Result.failure(Exception("User not logged in"))
         val userId = user.uid
 
         return try {
@@ -50,7 +64,7 @@ object FirebaseManager {
             user.delete().await()
             // 2. Then delete Firestore Data
             try {
-                usersCollection.document(userId).delete().await()
+                usersCollection?.document(userId)?.delete()?.await()
             } catch (_: Exception) {
                 // Firestore delete failed but Auth account is gone — acceptable
             }
@@ -61,9 +75,10 @@ object FirebaseManager {
     }
 
     suspend fun signInWithGoogle(idToken: String): Result<Unit> {
+        val firebaseAuth = auth ?: return Result.failure(Exception("Firebase Auth unavailable"))
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
-            auth.signInWithCredential(credential).await()
+            firebaseAuth.signInWithCredential(credential).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -71,9 +86,10 @@ object FirebaseManager {
     }
 
     suspend fun saveUserProfile(profile: UserProfile): Result<Unit> {
-        val userId = auth.currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
+        val collection = usersCollection ?: return Result.failure(Exception("Firestore unavailable"))
+        val userId = currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
         return try {
-            usersCollection.document(userId).set(profile, com.google.firebase.firestore.SetOptions.merge()).await()
+            collection.document(userId).set(profile, com.google.firebase.firestore.SetOptions.merge()).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -81,9 +97,10 @@ object FirebaseManager {
     }
 
     suspend fun getUserProfile(): Result<UserProfile?> {
-        val userId = auth.currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
+        val collection = usersCollection ?: return Result.failure(Exception("Firestore unavailable"))
+        val userId = currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
         return try {
-            val snapshot = usersCollection.document(userId).get().await()
+            val snapshot = collection.document(userId).get().await()
             val data = snapshot.data
             if (data != null) {
                 Result.success(UserProfile(
@@ -109,9 +126,10 @@ object FirebaseManager {
     // --- VIRTUAL CLOSET METHODS ---
 
     suspend fun getClosetItems(): Result<List<Map<String, Any>>> {
-        val userId = auth.currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
+        val collection = usersCollection ?: return Result.failure(Exception("Firestore unavailable"))
+        val userId = currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
         return try {
-            val snapshot = usersCollection.document(userId).collection("closet").get().await()
+            val snapshot = collection.document(userId).collection("closet").get().await()
             val items = snapshot.documents.map { doc ->
                 val data = doc.data?.toMutableMap() ?: mutableMapOf()
                 data["id"] = doc.id
@@ -124,7 +142,8 @@ object FirebaseManager {
     }
 
     suspend fun addClosetItem(name: String, category: String, imageUrl: String): Result<String> {
-        val userId = auth.currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
+        val collection = usersCollection ?: return Result.failure(Exception("Firestore unavailable"))
+        val userId = currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
         return try {
             val item = mapOf(
                 "name" to name,
@@ -132,7 +151,7 @@ object FirebaseManager {
                 "imageUrl" to imageUrl,
                 "timestamp" to com.google.firebase.Timestamp.now()
             )
-            val docRef = usersCollection.document(userId).collection("closet").add(item).await()
+            val docRef = collection.document(userId).collection("closet").add(item).await()
             Result.success(docRef.id)
         } catch (e: Exception) {
             Result.failure(e)
@@ -140,9 +159,10 @@ object FirebaseManager {
     }
 
     suspend fun deleteClosetItem(itemId: String): Result<Unit> {
-        val userId = auth.currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
+        val collection = usersCollection ?: return Result.failure(Exception("Firestore unavailable"))
+        val userId = currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
         return try {
-            usersCollection.document(userId).collection("closet").document(itemId).delete().await()
+            collection.document(userId).collection("closet").document(itemId).delete().await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

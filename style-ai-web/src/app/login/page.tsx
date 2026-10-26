@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { loginWithEmail, loginWithGoogle } from "@/lib/firebaseAuth";
+import { loginWithEmail, loginWithGoogle, friendlyAuthError } from "@/lib/firebaseAuth";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
@@ -16,7 +16,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      router.push("/dashboard");
+      if (!user.emailVerified) {
+        router.push("/verify-email");
+      } else {
+        router.push("/dashboard");
+      }
     }
   }, [user, authLoading, router]);
 
@@ -30,15 +34,14 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const user = await loginWithEmail(email, password);
-      if (!user.emailVerified) {
+      const u = await loginWithEmail(email, password);
+      if (!u.emailVerified) {
         router.push("/verify-email");
       } else {
         router.push("/dashboard");
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Login failed";
-      setError(friendlyError(msg));
+      setError(friendlyAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -51,8 +54,7 @@ export default function LoginPage() {
       await loginWithGoogle();
       router.push("/dashboard");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Google sign-in failed";
-      setError(friendlyError(msg));
+      setError(friendlyAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -174,16 +176,4 @@ export default function LoginPage() {
   );
 }
 
-function friendlyError(msg: string): string {
-  if (msg.includes("auth/unauthorized-domain")) {
-    return "Firebase Auth Domain Notice: GitHub Pages domain is not yet whitelisted in Firebase Console. You can click 'Instant Demo Access' above to explore immediately, or whitelist 'krishnalsk.github.io' in Firebase Console.";
-  }
-  if (msg.includes("user-not-found") || msg.includes("wrong-password") || msg.includes("invalid-credential"))
-    return "Incorrect email or password. Please try again.";
-  if (msg.includes("too-many-requests"))
-    return "Too many attempts. Please wait a moment and try again.";
-  if (msg.includes("network"))
-    return "Network error. Please check your connection.";
-  return msg;
-}
 
