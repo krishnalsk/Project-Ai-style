@@ -11,7 +11,7 @@ interface Message {
   sender: "user" | "ai";
   text: string;
   timestamp: string;
-  source?: "rule-engine" | "openrouter" | "fallback" | "system";
+  source?: "rule-engine" | "fallback" | "system";
 }
 
 const SUGGESTIONS = [
@@ -87,7 +87,7 @@ export default function AiStylistPage() {
         } else if (res.ok) {
           const data = await res.json();
           replyText = data.reply;
-          replySource = data.source || "openrouter";
+          replySource = data.source || "rule-engine";
         }
       } catch {
         // Fallback to local rule engine if network/API fails
@@ -171,11 +171,9 @@ Tip: You can ask about "sensitive skin wear", "best fabric for dermatitis", or "
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                     {m.source === "rule-engine"
                       ? "🔬 4-Step Derm Rule Engine"
-                      : m.source === "openrouter"
-                        ? "🤖 Claude 3.5 Sonnet"
-                        : m.source === "system"
-                          ? "ℹ️ System Notice"
-                          : "🌿 Reference Guide"}
+                      : m.source === "system"
+                        ? "ℹ️ System Notice"
+                        : "🌿 Reference Guide"}
                   </span>
                 )}
               </div>

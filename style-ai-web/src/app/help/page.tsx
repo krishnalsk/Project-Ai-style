@@ -23,7 +23,7 @@ const FAQS: FAQItem[] = [
   {
     category: "AI Stylist",
     question: "How does the AI Stylist work?",
-    answer: "The AI Stylist uses a 4-step algorithm: Skin Safety Check → Clothing Weighting → Real-time Weather Adjustment → Structured Output. It provides instant 0ms responses for common questions and uses OpenRouter AI for complex queries.",
+    answer: "The AI Stylist uses a 4-step algorithm: Skin Safety Check → Clothing Weighting → Real-time Weather Adjustment → Structured Output. It provides instant responses with dermatologically verified fabric recommendations and safety scores.",
   },
   {
     category: "Certifications",

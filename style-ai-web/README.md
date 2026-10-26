@@ -23,7 +23,7 @@ npm run start
 
 ## ✨ Key Features & Architecture
 
-- 🤖 **AI Stylist (`/ai-stylist`):** Instant 0ms dermatological rule engine + OpenRouter Claude 3.5 Sonnet / Gemini fallback.
+- 🤖 **AI Stylist (`/ai-stylist`):** Instant 0ms dermatological rule engine with verified comfort & skin-safety scoring.
 - 🌤️ **Live Skin Forecast (`/skin-forecast`):** Real-time UV Index sensor alerts, humidity tracking, and weather-adjusted fabric safety recommendations.
 - 🔍 **Label Lens™ (`/label-lens`):** Clothing wash-care label OCR parser & skin friction risk analyzer.
 - 📖 **Fabric Encyclopedia (`/fabric-encyclopedia`):** Detailed textile database with SAFE / MODERATE / AVOID skin safety ratings.
@@ -46,7 +46,7 @@ npm run start
 - **Language:** TypeScript 5 (Strict Mode)
 - **Styling:** Tailwind CSS 4 + Glassmorphism UI
 - **Authentication & DB:** Firebase Auth + Firestore
-- **AI Integration:** OpenRouter API + 4-Step Rules Engine
+- **AI Integration:** 4-Step Dermatological Rule Engine
 - **State Management:** React Context (`AuthContext`, `CartContext`, `WishlistContext`)
 - **PWA Ready:** Web App Manifest (`/manifest.webmanifest`)
 
