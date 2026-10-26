@@ -10,6 +10,7 @@ interface AuthContextValue {
   profile: UserProfile | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
+  updateProfile: (updated: Partial<UserProfile>) => Promise<void>;
   demoLogin: (name?: string, email?: string) => void;
   logout: () => Promise<void>;
 }
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextValue>({
   profile: null,
   loading: true,
   refreshProfile: async () => {},
+  updateProfile: async () => {},
   demoLogin: () => {},
   logout: async () => {},
 });
@@ -70,6 +72,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const p = await getUserProfile(auth.currentUser.uid);
       setProfile(p);
     }
+  };
+
+  const updateProfile = async (updated: Partial<UserProfile>) => {
+    setProfile((prev) => {
+      const merged: UserProfile = { ...(prev || defaultProfile), ...updated };
+      if (user?.uid) {
+        saveUserProfile(user.uid, merged).catch(console.error);
+      }
+      try {
+        localStorage.setItem("style_ai_demo_profile", JSON.stringify(merged));
+      } catch {}
+      return merged;
+    });
   };
 
   useEffect(() => {
@@ -152,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, refreshProfile, demoLogin, logout: logoutUser }}>
+    <AuthContext.Provider value={{ user, profile, loading, refreshProfile, updateProfile, demoLogin, logout: logoutUser }}>
       {children}
     </AuthContext.Provider>
   );

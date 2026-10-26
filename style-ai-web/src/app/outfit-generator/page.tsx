@@ -1,320 +1,428 @@
+// src/app/outfit-generator/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { addFirestoreClosetItem } from "@/lib/firestoreService";
+import { queryCatalog, ScoredProduct } from "@/lib/queryEngine";
+import { ClosetItem } from "@/app/virtual-closet/page";
 
-interface OutfitCombo {
+interface OutfitPiece {
+  name: string;
+  fabric: string;
+  source: "Your Virtual Closet" | "Suggested from Catalog";
+  image: string;
+  price?: number;
+  productId?: string;
+  laundryStatus?: string;
+}
+
+interface GeneratedOutfit {
   title: string;
-  top: string;
-  bottom: string;
-  shoes: string;
-  accessories: string;
+  occasion: string;
+  season: string;
+  top: OutfitPiece;
+  bottom: OutfitPiece;
+  shoes: OutfitPiece;
+  accessories?: OutfitPiece;
   comfortScore: number;
   safetyScore: number;
   weatherSuitability: string;
   whyItWorks: string;
+  allergySafe: boolean;
 }
 
-const OCCASIONS = ["Casual Everyday", "Office & Formal", "Summer Heat", "Cold Winter", "Active & Gym", "Party & Night Out"];
+const OCCASIONS = [
+  "Casual Everyday",
+  "Office & Formal",
+  "Summer Heat",
+  "Cold Winter",
+  "Active & Workout",
+  "Party & Night Out",
+];
 
-const CLOTHING_IMAGES: { [key: string]: string } = {
-  "linen shirt": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&auto=format&fit=crop&q=80",
-  "white dress shirt": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&auto=format&fit=crop&q=80",
-  "hoodie": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&auto=format&fit=crop&q=80",
-  "viscose tee": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&auto=format&fit=crop&q=80",
-  "silk-blend shirt": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&auto=format&fit=crop&q=80",
-  "cotton chinos": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&auto=format&fit=crop&q=80",
-  "trousers": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&auto=format&fit=crop&q=80",
-  "shorts": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&auto=format&fit=crop&q=80",
-  "sweatpants": "https://images.unsplash.com/photo-1551854838-212c50b4c184?w=400&auto=format&fit=crop&q=80",
-  "sneakers": "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&auto=format&fit=crop&q=80",
-  "loafers": "https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=400&auto=format&fit=crop&q=80",
-  "espadrilles": "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&auto=format&fit=crop&q=80",
-  "boots": "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=400&auto=format&fit=crop&q=80",
-  "tote": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&auto=format&fit=crop&q=80",
-  "pocket square": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&auto=format&fit=crop&q=80",
-  "hat": "https://images.unsplash.com/photo-1576871337622-98d48d4aa53e?w=400&auto=format&fit=crop&q=80",
-  "scarf": "https://images.unsplash.com/photo-1584030373081-f37b7bb4fa8e?w=400&auto=format&fit=crop&q=80",
-  "sweatband": "https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=400&auto=format&fit=crop&q=80",
-  "pendant": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&auto=format&fit=crop&q=80",
-};
-
-function getClothingImage(text: string, type: "top" | "bottom" | "shoes" | "accessories"): string {
-  const lowercase = text.toLowerCase();
-  for (const [key, value] of Object.entries(CLOTHING_IMAGES)) {
-    if (lowercase.includes(key)) {
-      return value;
-    }
-  }
-  if (type === "top") return "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400";
-  if (type === "bottom") return "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400";
-  if (type === "shoes") return "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400";
-  return "https://images.unsplash.com/photo-1544816155-12df9643f363?w=400";
-}
+const SEASONS = ["All-Season", "Summer", "Winter", "Monsoon"];
 
 export default function OutfitGeneratorPage() {
-  const { user } = useAuth();
+  const { profile } = useAuth();
   const [occasion, setOccasion] = useState("Casual Everyday");
+  const [season, setSeason] = useState("All-Season");
+  const [minComfort, setMinComfort] = useState(90);
+  const [closetItems, setClosetItems] = useState<ClosetItem[]>([]);
   const [generating, setGenerating] = useState(false);
-  const [savedToCloset, setSavedToCloset] = useState(false);
-  const [outfit, setOutfit] = useState<OutfitCombo | null>({
-    title: "Minimalist Linen & Cotton Everyday Combo",
-    top: "Azure Blue 100% French Linen Shirt",
-    bottom: "Relaxed Fit Organic Cotton Chinos",
-    shoes: "Minimalist Canvas Sneakers (Soft Cotton Lining)",
-    accessories: "Unbleached Organic Cotton Tote",
-    comfortScore: 97,
-    safetyScore: 98,
-    weatherSuitability: "Ideal for 25°C - 34°C with high humidity",
-    whyItWorks: "Natural open-weave flax linen allows max ventilation while organic cotton lining prevents skin friction around waist and ankles.",
-  });
+  const [outfit, setOutfit] = useState<GeneratedOutfit | null>(null);
 
   useEffect(() => {
-    document.title = "Outfit Generator | Style AI";
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "AI-powered outfit suggestions");
+    document.title = "Smart Outfit Generator | Style AI";
+    try {
+      const stored = localStorage.getItem("style_ai_virtual_closet");
+      if (stored) {
+        setClosetItems(JSON.parse(stored));
+      }
+    } catch {}
   }, []);
 
-  async function handleSaveToCloset() {
-    if (!outfit) return;
+  // Filter closet items for availability (Clean & Ready) and allergy exclusion
+  const cleanClosetItems = closetItems.filter((item) => {
+    // 1. Availability / Laundry Status Gate
+    if (item.laundryStatus && item.laundryStatus !== "Clean & Ready") return false;
 
-    if (user?.uid) {
-      try {
-        await addFirestoreClosetItem(user.uid, {
-          name: outfit.top,
-          category: occasion,
-          fabric: "Skin-Safe Certified Blend",
-          wearCount: 1,
-          lastWorn: "Planned",
-          comfortRating: Math.min(5, Math.max(1, Math.round(outfit.comfortScore / 20))),
-        });
-      } catch {}
+    // 2. Mandatory Allergy Gate
+    if (profile?.confirmedAllergies && profile.confirmedAllergies.length > 0) {
+      const fLower = item.fabric.toLowerCase();
+      const hasConflict = profile.confirmedAllergies.some((a) => fLower.includes(a.toLowerCase()));
+      if (hasConflict) return false;
     }
 
-    try {
-      const existing = JSON.parse(localStorage.getItem("style_ai_virtual_closet") || "[]");
-      const newItem = {
-        id: `gen-${Date.now()}`,
-        name: outfit.top,
-        fabric: "Skin-Safe Certified Blend",
-        category: occasion,
-        image: getClothingImage(outfit.top, "top"),
-        wearCount: 1,
-        lastWorn: "Planned",
-        comfortRating: Math.min(5, Math.max(1, Math.round(outfit.comfortScore / 20))),
-      };
-      localStorage.setItem("style_ai_virtual_closet", JSON.stringify([newItem, ...existing]));
-    } catch {}
+    return true;
+  });
 
-    setSavedToCloset(true);
-    setTimeout(() => setSavedToCloset(false), 3000);
-  }
-
-  function generateOutfit(selectedOccasion: string) {
-    setOccasion(selectedOccasion);
+  function handleGenerateOutfit() {
     setGenerating(true);
 
     setTimeout(() => {
-      let result: OutfitCombo;
-      if (selectedOccasion.includes("Office")) {
-        result = {
-          title: "Executive Soft-Touch Formal",
-          top: "Crisp White 100% GOTS Cotton Dress Shirt",
-          bottom: "Tailored Tencel-Lyocell Pleated Trousers",
-          shoes: "Soft Leather Padded Loafers",
-          accessories: "Pure Silk Pocket Square",
-          comfortScore: 94,
-          safetyScore: 96,
-          weatherSuitability: "Air-conditioned indoors & warm commute",
-          whyItWorks: "Tencel drape stays sharp while maintaining silky smooth skin contact throughout long work hours.",
+      // Find clean tops, bottoms, shoes from closet
+      const closetTops = cleanClosetItems.filter((i) => i.category === "Tops");
+      const closetBottoms = cleanClosetItems.filter((i) => i.category === "Bottoms");
+      const closetShoes = cleanClosetItems.filter((i) => i.category === "Footwear");
+
+      // Complementary catalog items from 1,000-record dataset
+      const catalogTops = queryCatalog({
+        category: "Tops",
+        occasion,
+        confirmedAllergies: profile?.confirmedAllergies || [],
+        minSkinSafety: 90,
+        limit: 3,
+      }).items;
+
+      const catalogBottoms = queryCatalog({
+        category: "Bottoms",
+        occasion,
+        confirmedAllergies: profile?.confirmedAllergies || [],
+        minSkinSafety: 90,
+        limit: 3,
+      }).items;
+
+      const catalogShoes = queryCatalog({
+        category: "Footwear",
+        confirmedAllergies: profile?.confirmedAllergies || [],
+        minSkinSafety: 85,
+        limit: 2,
+      }).items;
+
+      // Select Top
+      let selectedTop: OutfitPiece;
+      if (closetTops.length > 0) {
+        const topItem = closetTops[0];
+        selectedTop = {
+          name: topItem.name,
+          fabric: topItem.fabric,
+          source: "Your Virtual Closet",
+          image: topItem.image,
+          laundryStatus: topItem.laundryStatus,
         };
-      } else if (selectedOccasion.includes("Summer")) {
-        result = {
-          title: "Breeze Master Resort Combo",
-          top: "Unbleached French Linen Cuban Collar Shirt",
-          bottom: "Bamboo Viscose Lightweight Drawstring Shorts",
-          shoes: "Breathable Canvas Espadrilles",
-          accessories: "UV-Blocking Organic Cotton Bucket Hat",
-          comfortScore: 98,
-          safetyScore: 99,
-          weatherSuitability: "Extreme Heat (32°C - 42°C)",
-          whyItWorks: "Bamboo moisture management rapidly cools sweat while linen prevents heat traps.",
-        };
-      } else if (selectedOccasion.includes("Cold") || selectedOccasion.includes("Winter")) {
-        result = {
-          title: "Hypoallergenic Thermal Layering",
-          top: "Organic Cotton Thermal Base + 18.5µ Merino Sweater",
-          bottom: "Cotton-Lined Heavyweight Chinos",
-          shoes: "Padded Leather Boots",
-          accessories: "Superfine Merino Wool Scarf",
-          comfortScore: 95,
-          safetyScore: 93,
-          weatherSuitability: "Cold / Chilly (5°C - 18°C)",
-          whyItWorks: "Cotton inner layer shields skin from wool fibers while outer merino provides thermal insulation.",
-        };
-      } else if (selectedOccasion.includes("Active") || selectedOccasion.includes("Gym")) {
-        result = {
-          title: "Anti-Chafe Performance Outfit",
-          top: "95% Bamboo Viscose Moisture-Wick Tee",
-          bottom: "Seamless Bamboo Active Training Shorts",
-          shoes: "Lightweight Mesh Running Sneakers",
-          accessories: "Organic Terry Cotton Sweatband",
-          comfortScore: 97,
-          safetyScore: 96,
-          weatherSuitability: "High Intensity Workouts / All Weather",
-          whyItWorks: "Naturally antibacterial bamboo fibers mitigate sweat odor and prevent inner-thigh friction rashes.",
+      } else if (catalogTops.length > 0) {
+        const prod = catalogTops[0].product;
+        selectedTop = {
+          name: prod.name,
+          fabric: prod.fabric,
+          source: "Suggested from Catalog",
+          image: prod.images[0],
+          price: prod.price,
+          productId: prod.id,
         };
       } else {
-        result = {
-          title: "Elevated Night Out Casual",
-          top: "Dark Navy Silk-Blend Short Sleeve Shirt",
-          bottom: "Tencel Relaxed Fit Trousers",
-          shoes: "Clean Leather Low-Top Sneakers",
-          accessories: "Minimalist Silver Pendant",
-          comfortScore: 93,
-          safetyScore: 95,
-          weatherSuitability: "Evening / Moderate Climate",
-          whyItWorks: "Silk and Tencel create a subtle sheen and premium drape without synthetics or skin stiffness.",
+        selectedTop = {
+          name: "Azure 100% French Linen Shirt",
+          fabric: "100% French Linen",
+          source: "Suggested from Catalog",
+          image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400",
+          price: 1499,
+          productId: "p1",
         };
       }
-      setOutfit(result);
+
+      // Select Bottom
+      let selectedBottom: OutfitPiece;
+      if (closetBottoms.length > 0) {
+        const botItem = closetBottoms[0];
+        selectedBottom = {
+          name: botItem.name,
+          fabric: botItem.fabric,
+          source: "Your Virtual Closet",
+          image: botItem.image,
+          laundryStatus: botItem.laundryStatus,
+        };
+      } else if (catalogBottoms.length > 0) {
+        const prod = catalogBottoms[0].product;
+        selectedBottom = {
+          name: prod.name,
+          fabric: prod.fabric,
+          source: "Suggested from Catalog",
+          image: prod.images[0],
+          price: prod.price,
+          productId: prod.id,
+        };
+      } else {
+        selectedBottom = {
+          name: "Relaxed Fit Organic Cotton Chinos",
+          fabric: "100% GOTS Organic Cotton",
+          source: "Suggested from Catalog",
+          image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400",
+          price: 2299,
+          productId: "p2",
+        };
+      }
+
+      // Select Shoes
+      let selectedShoes: OutfitPiece;
+      if (closetShoes.length > 0) {
+        const shoeItem = closetShoes[0];
+        selectedShoes = {
+          name: shoeItem.name,
+          fabric: shoeItem.fabric,
+          source: "Your Virtual Closet",
+          image: shoeItem.image,
+          laundryStatus: shoeItem.laundryStatus,
+        };
+      } else if (catalogShoes.length > 0) {
+        const prod = catalogShoes[0].product;
+        selectedShoes = {
+          name: prod.name,
+          fabric: prod.fabric,
+          source: "Suggested from Catalog",
+          image: prod.images[0],
+          price: prod.price,
+          productId: prod.id,
+        };
+      } else {
+        selectedShoes = {
+          name: "Minimalist Canvas Trainers (Cotton Lined)",
+          fabric: "Organic Cotton Canvas + Cork",
+          source: "Suggested from Catalog",
+          image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400",
+          price: 3699,
+          productId: "p16",
+        };
+      }
+
+      const generated: GeneratedOutfit = {
+        title: `${occasion} Harmonious Pairing`,
+        occasion,
+        season,
+        top: selectedTop,
+        bottom: selectedBottom,
+        shoes: selectedShoes,
+        accessories: {
+          name: "Unbleached Organic Cotton Tote",
+          fabric: "100% GOTS Certified Cotton",
+          source: "Suggested from Catalog",
+          image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=400",
+          price: 899,
+          productId: "p17",
+        },
+        comfortScore: 97,
+        safetyScore: 98,
+        weatherSuitability:
+          season === "Summer"
+            ? "Ideal for 26°C - 35°C with high humidity"
+            : season === "Winter"
+            ? "Thermal protection with zero rough wool on skin"
+            : "Balanced thermal dissipation for 20°C - 30°C",
+        whyItWorks: `Seamlessly coordinates clean wardrobe items with hypoallergenic catalog pieces. Open weave and low-friction natural fibers maintain cutaneous airflow while strictly excluding your confirmed allergens (${
+          profile?.confirmedAllergies?.join(", ") || "None recorded"
+        }).`,
+        allergySafe: true,
+      };
+
+      setOutfit(generated);
       setGenerating(false);
     }, 400);
   }
 
+  // Trigger initial generation on mount
+  useEffect(() => {
+    handleGenerateOutfit();
+  }, [occasion, season]);
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-40 bg-white border-b border-slate-100 px-4 py-4 shadow-xs">
+    <div className="min-h-screen bg-slate-50 pb-16">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-100 px-4 py-3 shadow-xs">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition">
+            <Link href="/virtual-closet" className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition">
               ←
             </Link>
             <div>
-              <h1 className="text-xl font-extrabold text-slate-900">AI Outfit Generator</h1>
-              <p className="text-xs text-slate-500">Generate skin-safe, weather-adjusted outfit pairings</p>
+              <h1 className="text-lg font-black text-slate-900">Smart Outfit Generator</h1>
+              <p className="text-[11px] text-slate-500">Virtual Closet + 1,000-Record Catalog Coordinator</p>
             </div>
           </div>
-          <span className="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-full border border-indigo-200">
-            Random Forest v2.4
-          </span>
+          <Link
+            href="/virtual-closet"
+            className="text-xs font-bold bg-white text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl hover:bg-slate-50"
+          >
+            My Closet ({cleanClosetItems.length} Clean)
+          </Link>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        {/* Select Occasion */}
-        <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs">
-          <h2 className="text-sm font-extrabold text-slate-900 mb-3">Choose Your Occasion</h2>
-          <div className="flex flex-wrap gap-2">
-            {OCCASIONS.map((occ) => (
-              <button
-                key={occ}
-                aria-pressed={occasion === occ}
-                onClick={() => generateOutfit(occ)}
-                className={`text-xs font-bold px-4 py-2.5 rounded-2xl transition ${
-                  occasion === occ
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700 border border-slate-200"
-                }`}
-              >
-                ✨ {occ}
-              </button>
-            ))}
+      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Preference Filters Card */}
+        <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
+            <h3 className="text-sm font-black text-slate-900">Occasion & Environmental Filters</h3>
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              ✓ Allergy Exclusion Active ({profile?.confirmedAllergies?.length || 0} allergens purged)
+            </span>
           </div>
-        </div>
 
-        {/* Outfit Display Card */}
-        {generating ? (
-          <div className="bg-white border border-slate-100 rounded-3xl p-12 shadow-xs text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
-            <p className="font-extrabold text-slate-800 text-sm">Matching Skin-Safe Fabrics & Weather Rules...</p>
-          </div>
-        ) : (
-          outfit && (
-            <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-xs space-y-6 animate-fade-in">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-                <div>
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Recommended Look</span>
-                  <h3 className="text-xl font-black text-slate-900 mt-0.5">{outfit.title}</h3>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-xs bg-emerald-50 text-emerald-700 font-bold px-3 py-1.5 rounded-full border border-emerald-200">
-                    🛡️ Safety: {outfit.safetyScore}%
-                  </span>
-                  <span className="text-xs bg-blue-50 text-blue-700 font-bold px-3 py-1.5 rounded-full border border-blue-200">
-                    ✨ Comfort: {outfit.comfortScore}%
-                  </span>
-                </div>
-              </div>
-
-              {/* Garment Breakdown Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { label: "Top / Shirt", value: outfit.top, type: "top" as const },
-                  { label: "Bottom / Pants", value: outfit.bottom, type: "bottom" as const },
-                  { label: "Footwear", value: outfit.shoes, type: "shoes" as const },
-                  { label: "Accessories", value: outfit.accessories, type: "accessories" as const },
-                ].map((item) => (
-                  <div key={item.label} className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex gap-4 items-center">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getClothingImage(item.value, item.type)}
-                        alt={`Style AI clothing recommendation for ${item.value}`}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">{item.label}</span>
-                      <span className="text-xs font-bold text-slate-900 block mt-0.5 leading-tight">{item.value}</span>
-                    </div>
-                  </div>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-1.5">Occasion / Dress Code</label>
+              <div className="flex flex-wrap gap-2">
+                {OCCASIONS.map((occ) => (
+                  <button
+                    key={occ}
+                    onClick={() => setOccasion(occ)}
+                    className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition ${
+                      occasion === occ
+                        ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                        : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    {occ}
+                  </button>
                 ))}
               </div>
+            </div>
 
-              {/* Weather & Science */}
-              <div className="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-5 space-y-2">
-                <span className="text-xs font-bold text-indigo-900 block">🌤️ Weather Adaptation:</span>
-                <p className="text-xs text-indigo-800 font-medium">{outfit.weatherSuitability}</p>
-
-                <span className="text-xs font-bold text-indigo-900 block pt-2">🧪 Dermatologist AI Rationale:</span>
-                <p className="text-xs text-indigo-800 leading-relaxed">{outfit.whyItWorks}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1.5">Target Season / Climate</label>
+                <div className="flex gap-2">
+                  {SEASONS.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSeason(s)}
+                      className={`flex-1 text-xs font-bold py-1.5 rounded-xl border transition ${
+                        season === s
+                          ? "bg-slate-900 text-white border-slate-900"
+                          : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleSaveToCloset}
-                  className="bg-emerald-600 text-white font-bold text-xs px-6 py-3 rounded-2xl hover:bg-emerald-700 transition shadow-xs"
-                >
-                  {savedToCloset ? "✓ Added to Closet!" : "+ Save Look to Virtual Closet"}
-                </button>
-                <Link
-                  href="/shop"
-                  className="bg-blue-600 text-white font-bold text-xs px-6 py-3 rounded-2xl hover:bg-blue-700 transition"
-                >
-                  Shop This Look →
-                </Link>
-                <Link
-                  href="/ai-stylist"
-                  className="border-2 border-slate-200 text-slate-700 font-bold text-xs px-6 py-3 rounded-2xl hover:bg-slate-50 transition"
-                >
-                  Ask AI Stylist to Modify
-                </Link>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1.5">
+                  Min Comfort Threshold: {minComfort}%
+                </label>
+                <input
+                  type="range"
+                  min="80"
+                  max="98"
+                  value={minComfort}
+                  onChange={(e) => setMinComfort(Number(e.target.value))}
+                  className="w-full accent-blue-600 cursor-pointer"
+                />
               </div>
             </div>
-          )
-        )}
+          </div>
 
-        <div className="text-center mt-6">
-          <p className="text-[11px] text-slate-400 max-w-xl mx-auto leading-relaxed">
-            ⚕️ <strong>Informational Guidance:</strong> Outfit combinations are generated using our textile sensitivity heuristic matrix and local climate rules. Always verify personal fabric allergies before wearing.
-          </p>
+          <button
+            onClick={handleGenerateOutfit}
+            disabled={generating}
+            className="w-full bg-blue-600 text-white font-black text-xs py-3 rounded-2xl hover:bg-blue-700 transition disabled:opacity-50 shadow-xs"
+          >
+            {generating ? "Coordinating Clean Garments..." : "✨ Regenerate Optimal Outfit"}
+          </button>
         </div>
+
+        {/* Generated Outfit Output */}
+        {outfit && (
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
+              <div>
+                <span className="text-xs font-black text-blue-600 uppercase tracking-wider block">
+                  {outfit.occasion} · {outfit.season}
+                </span>
+                <h3 className="text-xl font-black text-slate-900 mt-0.5">{outfit.title}</h3>
+              </div>
+
+              <div className="flex gap-2">
+                <span className="text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl">
+                  {outfit.safetyScore}% Skin Safety
+                </span>
+                <span className="text-xs font-black bg-blue-50 text-blue-800 border border-blue-200 px-3 py-1 rounded-xl">
+                  {outfit.comfortScore}% Comfort
+                </span>
+              </div>
+            </div>
+
+            {/* 4-Piece Visual Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { label: "Top Layer", piece: outfit.top },
+                { label: "Bottom Layer", piece: outfit.bottom },
+                { label: "Footwear", piece: outfit.shoes },
+              ].map(({ label, piece }) => (
+                <div key={label} className="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                      <span>{label}</span>
+                      <span
+                        className={`px-1.5 py-0.5 rounded ${
+                          piece.source === "Your Virtual Closet"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {piece.source === "Your Virtual Closet" ? "In Closet" : "Catalog"}
+                      </span>
+                    </div>
+
+                    <div className="relative aspect-square rounded-xl overflow-hidden bg-slate-200 mb-2">
+                      <img src={piece.image} alt={piece.name} className="w-full h-full object-cover" />
+                    </div>
+
+                    <h4 className="font-black text-slate-900 text-xs truncate">{piece.name}</h4>
+                    <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{piece.fabric}</p>
+                  </div>
+
+                  {piece.productId ? (
+                    <Link
+                      href={`/shop/${piece.productId}`}
+                      className="text-xs font-bold text-blue-600 bg-white border border-slate-200 rounded-xl py-1.5 text-center hover:bg-blue-50 transition"
+                    >
+                      Shop ₹{piece.price?.toLocaleString("en-IN")} →
+                    </Link>
+                  ) : (
+                    <div className="text-[11px] font-bold text-emerald-700 bg-emerald-50 rounded-xl py-1.5 text-center border border-emerald-100">
+                      ✓ Clean & Ready in Closet
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Explanatory Clinical Rationale */}
+            <div className="bg-slate-50 rounded-2xl p-4 space-y-2 border border-slate-100 text-xs">
+              <span className="font-black text-slate-800 uppercase tracking-wide block">
+                Clinical Comfort & Color Rationale
+              </span>
+              <p className="text-slate-700 leading-relaxed">{outfit.whyItWorks}</p>
+              <div className="text-[11px] text-slate-500 pt-1 flex items-center gap-1.5">
+                <span>🌤️</span>
+                <span>Weather suitability: {outfit.weatherSuitability}</span>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -24,8 +24,16 @@ export interface UserProfile {
   profession: string | null;
   age: string | null;
   size: string | null;
+  sizes?: string[];
+  preferredFit?: "Relaxed" | "Loose" | "Regular" | "Slim" | "Oversized" | null;
+  budgetMin?: number | null;
+  budgetMax?: number | null;
   skinType: string | null;
+  confirmedAllergies?: string[];
+  reportedSensitivities?: string[];
   preferredFabric: string | null;
+  preferredFabrics?: string[];
+  stylePreferences?: string[];
   location: string | null;
   comfortScore: number;
 }
@@ -35,11 +43,19 @@ export const defaultProfile: UserProfile = {
   fullName: null,
   profession: null,
   age: null,
-  size: null,
-  skinType: null,
-  preferredFabric: null,
-  location: null,
-  comfortScore: 92,
+  size: "M",
+  sizes: ["M", "L"],
+  preferredFit: "Relaxed",
+  budgetMin: 500,
+  budgetMax: 3500,
+  skinType: "Sensitive",
+  confirmedAllergies: [],
+  reportedSensitivities: ["Rough Synthetics", "Coarse Wool"],
+  preferredFabric: "100% GOTS Organic Cotton",
+  preferredFabrics: ["100% GOTS Organic Cotton", "100% Pure French Flax Linen", "Bamboo Viscose"],
+  stylePreferences: ["Minimalist", "Korean Casual"],
+  location: "Mumbai",
+  comfortScore: 94,
 };
 
 // ─── Authentication Operations ───────────────────────────────────────────────
