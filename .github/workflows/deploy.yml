@@ -197,6 +197,7 @@ jobs:
     - name: Build Next.js Production Static Website
       env:
         NEXT_PUBLIC_BASE_PATH: '/Project-Ai-style'
+        STATIC_EXPORT: 'true'
       run: |
         cd style-ai-web
         npm install
@@ -217,9 +218,16 @@ jobs:
       with:
         path: style-ai-web/out
 
-    - name: Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages (Actions Artifact)
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Deploy to gh-pages branch (Dual Deployment Guarantee)
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: style-ai-web/out
+        keep_files: false
 
     - name: Publish Deployment Summary
       if: always()
