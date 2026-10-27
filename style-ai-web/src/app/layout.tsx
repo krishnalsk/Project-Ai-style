@@ -36,6 +36,10 @@ export const metadata: Metadata = {
     title: "Style AI – Smart Comfort Meets Style",
     description: "Skin-safe, sustainable fashion powered by AI.",
   },
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
   robots: {
     index: true,
     follow: true,

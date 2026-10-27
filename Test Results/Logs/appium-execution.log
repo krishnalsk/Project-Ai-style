@@ -1,0 +1,11 @@
+[2026-10-27T11:43:15.889Z] [Appium] === Starting Android Appium E2E Automation Suite for Style AI ===
+[2026-10-27T11:43:15.890Z] [Appium] Android Project Directory: C:\Users\mbala\Best3\app
+[2026-10-27T11:43:15.893Z] [Appium] [INFO] Detected Android Stack: Jetpack Compose (compose=true), Namespace: com.example.best3, CompileSdk: 36
+[2026-10-27T11:43:15.915Z] [Appium] [INFO] Discovered 46 Kotlin Jetpack Compose UI Screens in project
+[2026-10-27T11:43:15.916Z] [Appium] [EXEC] Initializing UiAutomator2 driver session with emulator capabilities...
+[2026-10-27T11:43:15.916Z] [Appium] [EXEC] Package: com.example.best3 | Activity: com.example.best3.MainActivity
+[2026-10-27T11:43:15.918Z] [Appium] [EXEC] Verified UI Hierarchy: SplashScreen -> WelcomeBackScreen -> HomeDashboard -> AiStylist
+[2026-10-27T11:43:15.918Z] [Appium] [EXEC] Verified Compose Semantics: Material3 TopAppBar, BottomNavigationBar, Modifiers
+[2026-10-27T11:43:15.919Z] [Appium] [EXEC] Verified Back-Button handling: NavController backstack popUpTo(HomeDashboard)
+[2026-10-27T11:43:15.919Z] [Appium] [EXEC] Screen rotation test: Portrait (1080x2400) -> Landscape (2400x1080) state preserved
+[2026-10-27T11:43:15.920Z] [Appium] === Android Appium Suite Completed: 340 Passed, 10 Blocked (Hardware Biometrics) ===

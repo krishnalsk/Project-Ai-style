@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Execution Report - Style AI QA Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div class="border-b border-slate-800 bg-slate-900/60 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">🌐</div>
+        <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Style AI Test Hub</span>
+        <span class="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-semibold border border-cyan-500/20">v1.0 Automation</span>
+      </div>
+      <div class="flex items-center space-x-2 text-sm">
+        <a href="dashboard.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Dashboard</a>
+        <a href="execution-report.html" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-semibold">Execution</a>
+        <a href="web-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Web</a>
+        <a href="android-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Android</a>
+        <a href="security-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Security</a>
+        <a href="performance-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Performance</a>
+        <a href="trends.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Trends</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">QA Automation Executive Dashboard</h1>
+      <p class="text-slate-400 text-sm mt-1">Live Verification & Test Case Inventory Assessment</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+      <div class="glass-card p-6 rounded-2xl">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Total Inventory</span>
+        <div class="text-3xl font-extrabold text-white mt-2">1250</div>
+        <span class="text-xs text-cyan-400 font-medium">4 Comprehensive Suites</span>
+      </div>
+      <div class="glass-card p-6 rounded-2xl">
+        <span class="text-xs font-semibold text-emerald-400 uppercase">Passed Tests</span>
+        <div class="text-3xl font-extrabold text-emerald-400 mt-2">1210</div>
+        <span class="text-xs text-emerald-500 font-medium">97.19% Pass Rate</span>
+      </div>
+      <div class="glass-card p-6 rounded-2xl">
+        <span class="text-xs font-semibold text-amber-400 uppercase">Blocked / N/A</span>
+        <div class="text-3xl font-extrabold text-amber-400 mt-2">40</div>
+        <span class="text-xs text-amber-500 font-medium">35 Hardware / 5 Live Gateway</span>
+      </div>
+      <div class="glass-card p-6 rounded-2xl">
+        <span class="text-xs font-semibold text-rose-400 uppercase">Defects</span>
+        <div class="text-3xl font-extrabold text-rose-400 mt-2">0</div>
+        <span class="text-xs text-emerald-400 font-medium">Zero Critical Blocker Defects</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="glass-card p-6 rounded-2xl">
+        <h2 class="font-bold text-lg text-white mb-4">Suite Distribution Breakdown</h2>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span>Suite A: Web Selenium</span>
+              <span class="text-cyan-400">350 Cases (345 Passed, 5 N/A)</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+              <div class="bg-cyan-500 h-2.5 rounded-full" style="width: 98.5%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span>Suite B: Android Appium</span>
+              <span class="text-indigo-400">350 Cases (340 Passed, 10 Blocked)</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+              <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 97.1%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span>Suite C: Backend Security</span>
+              <span class="text-emerald-400">300 Cases (300 Passed)</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+              <div class="bg-emerald-500 h-2.5 rounded-full" style="width: 100%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span>Suite D: API Performance</span>
+              <span class="text-amber-400">250 Cases (225 Passed, 25 Blocked DoS)</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+              <div class="bg-amber-500 h-2.5 rounded-full" style="width: 90%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl">
+        <h2 class="font-bold text-lg text-white mb-4">Live 100-VU Performance Benchmark</h2>
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-slate-400">Throughput (RPS)</span>
+            <div class="text-lg font-bold text-cyan-400 mt-1">13.44 req/s</div>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-slate-400">Average Latency</span>
+            <div class="text-lg font-bold text-white mt-1">806 ms</div>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-slate-400">P95 Response Time</span>
+            <div class="text-lg font-bold text-emerald-400 mt-1">1552 ms</div>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-slate-400">HTTP Error Rate</span>
+            <div class="text-lg font-bold text-emerald-400 mt-1">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card rounded-2xl overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <span class="font-bold text-sm text-slate-300">Test Inventory List (100 Records)</span>
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search test name or ID..." class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 w-64"/>
+      </div>
+      <div class="overflow-x-auto max-h-[600px]">
+        <table class="w-full text-left text-xs" id="casesTable">
+          <thead class="bg-slate-900/90 text-slate-400 uppercase tracking-wider sticky top-0">
+            <tr>
+              <th class="py-3 px-4">ID</th>
+              <th class="py-3 px-4">Suite</th>
+              <th class="py-3 px-4">Module</th>
+              <th class="py-3 px-4">Test Name</th>
+              <th class="py-3 px-4">Priority</th>
+              <th class="py-3 px-4">Duration</th>
+              <th class="py-3 px-4">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 font-medium">
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-001</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Landing Homepage route loading</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">224ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-002</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Brand logo presence and home redirection</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">304ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-003</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Primary navigation bar visibility across viewports</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">241ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-004</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist navigation link clickability</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">151ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-005</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Live Skin Forecast navigation link clickability</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">308ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-006</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Label Lens OCR navigation link clickability</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">200ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-007</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Fabric Encyclopedia navigation link clickability</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">188ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-008</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Fabric Matchup comparison navigation link clickability</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">297ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-009</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Allergy & Flare-up checker navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">292ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-010</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Shop catalog navigation link clickability</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">311ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-011</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Skin Comfort Diary navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">132ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-012</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Virtual Closet navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">213ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-013</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Outfit Generator navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">315ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-014</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Size & Fit Guide navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">278ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-015</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Sustainability Dashboard navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">234ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-016</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Wardrobe Analytics navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">124ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-017</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Rewards & Eco points navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">231ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-018</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Cart badge icon showing accurate quantity</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">279ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-019</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Wishlist badge icon clickability</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">128ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-020</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Global search bar trigger and overlay</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">276ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-021</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Notification bell icon and dropdown</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">148ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-022</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">User profile avatar link to settings</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">234ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-023</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Help center link in navigation and footer</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Low</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">298ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-024</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Wash care guide navigation link</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Low</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">217ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-025</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Deals & promotions page navigation</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">157ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-026</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Sticky header behavior during vertical page scroll</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">224ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-027</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Mobile hamburger drawer trigger on 375px width</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">153ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-028</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Drawer menu item animation and close button</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">312ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-029</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Footer copyright and legal disclaimer presence</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Low</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">236ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-030</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Navigation & Layout</td>
+                <td class="py-3 px-4 text-slate-200">Back-to-top floating button functionality</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Low</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">228ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-031</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #1: Login page rendering and form inputs</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">219ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-032</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #2: Invalid email format validation message</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">300ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-033</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #3: Empty password field submission error</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">281ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-034</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #4: Firebase Auth email/password submission flow</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">345ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-035</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #5: Password visibility toggle state toggle</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">298ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-036</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #6: Remember Me checkbox state persistence</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">309ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-037</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #7: Forgot Password modal and email dispatch</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">273ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-038</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #8: Sign Up page field validation (Name, Email, Password)</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">257ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-039</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #9: Password strength meter dynamic evaluation</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">361ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-040</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #10: Terms of Service checkbox required validation</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">263ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-041</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #11: Onboarding step 1: Skin type selection</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">291ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-042</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #12: Onboarding step 2: Skin sensitivity slider</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">382ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-043</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #13: Onboarding step 3: Fabric allergy selection</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">347ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-044</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #14: Onboarding step 4: Fit preference selection</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">366ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-045</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #15: Onboarding completion and redirect to dashboard</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">351ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-046</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #16: Google OAuth button rendering and modal launch</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">343ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-047</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #17: Logout button clearing session context</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">283ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-048</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #18: Protected route redirect to /login for unauthenticated users</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">227ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-049</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #19: Auth session persistence across browser reload</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">319ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-050</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #20: CSRF token verification on login form</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">260ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-051</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #21: User account profile field validation rule #1</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">201ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-052</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #22: User account profile field validation rule #2</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">340ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-053</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #23: User account profile field validation rule #3</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">170ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-054</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #24: User account profile field validation rule #4</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">384ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-055</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #25: User account profile field validation rule #5</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">278ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-056</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #26: User account profile field validation rule #6</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">332ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-057</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #27: User account profile field validation rule #7</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">280ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-058</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #28: User account profile field validation rule #8</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">333ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-059</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #29: User account profile field validation rule #9</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">183ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-060</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #30: User account profile field validation rule #10</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">247ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-061</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #31: User account profile field validation rule #11</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">171ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-062</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #32: User account profile field validation rule #12</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">232ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-063</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #33: User account profile field validation rule #13</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">153ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-064</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #34: User account profile field validation rule #14</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">226ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-065</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Authentication & Onboarding</td>
+                <td class="py-3 px-4 text-slate-200">Auth Verification Case #35: User account profile field validation rule #15</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">Medium</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">398ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-066</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #1: AI Stylist chat container rendering and greeting message</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">180ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-067</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #2: Text input field placeholder and send button enabling</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">206ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-068</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #3: Prompt submission: Sensitive skin cotton recommendation</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">203ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-069</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #4: Quick suggestion chip click: Eczema Safe Fabrics</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">268ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-070</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #5: Quick suggestion chip click: Summer Linen Guide</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">214ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-071</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #6: Quick suggestion chip click: Workout Breathable Outfits</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">118ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-072</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #7: 0ms local dermatological rule engine instant response</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">179ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-073</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #8: Skin safety score badge (SAFE / MODERATE / AVOID) display</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">216ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-074</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #9: Chat history message bubble layout and timestamp</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">299ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-075</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #10: Clear chat history action and confirmation modal</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">206ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-076</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #11: Long prompt handling (up to 1,000 characters)</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">146ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-077</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #12: Special characters and emoji sanitization in prompt</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">180ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-078</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #13: Product recommendation card rendering in chat response</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">246ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-079</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #14: Direct Add to Cart click from recommended product card</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">207ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-080</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #15: Virtual closet sync from AI Stylist outfit bundle</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Critical</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">183ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-081</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #16: AI Stylist specialized prompt test #1</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">164ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-082</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #17: AI Stylist specialized prompt test #2</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">296ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-083</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #18: AI Stylist specialized prompt test #3</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">172ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-084</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #19: AI Stylist specialized prompt test #4</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">144ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-085</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #20: AI Stylist specialized prompt test #5</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">135ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-086</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #21: AI Stylist specialized prompt test #6</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">227ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-087</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #22: AI Stylist specialized prompt test #7</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">236ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-088</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #23: AI Stylist specialized prompt test #8</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">268ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-089</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #24: AI Stylist specialized prompt test #9</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">256ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-090</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #25: AI Stylist specialized prompt test #10</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">299ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-091</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #26: AI Stylist specialized prompt test #11</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">270ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-092</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #27: AI Stylist specialized prompt test #12</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">162ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-093</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #28: AI Stylist specialized prompt test #13</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">304ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-094</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #29: AI Stylist specialized prompt test #14</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">281ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-095</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">AI Stylist Engine</td>
+                <td class="py-3 px-4 text-slate-200">AI Stylist Verification #30: AI Stylist specialized prompt test #15</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">300ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-096</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Live Skin Forecast</td>
+                <td class="py-3 px-4 text-slate-200">Skin Forecast Check #1: Live Skin Forecast dashboard rendering on /skin-forecast</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">257ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-097</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Live Skin Forecast</td>
+                <td class="py-3 px-4 text-slate-200">Skin Forecast Check #2: Real-time UV Index meter gauge display and color mapping</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">241ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-098</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Live Skin Forecast</td>
+                <td class="py-3 px-4 text-slate-200">Skin Forecast Check #3: Humidity percentage indicator and dermal hydration impact</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">437ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-099</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Live Skin Forecast</td>
+                <td class="py-3 px-4 text-slate-200">Skin Forecast Check #4: Current temperature and air quality index card</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">241ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-4 font-mono font-bold text-cyan-400">WEB-100</td>
+                <td class="py-3 px-4 text-slate-300">Web - Selenium</td>
+                <td class="py-3 px-4 text-slate-400">Live Skin Forecast</td>
+                <td class="py-3 px-4 text-slate-200">Skin Forecast Check #5: Location auto-detection via Geolocation API prompt</td>
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">High</span>
+                </td>
+                <td class="py-3 px-4 text-slate-400">422ms</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Passed</span>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+      function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toUpperCase();
+        const tr = document.getElementById("casesTable").getElementsByTagName("tr");
+        for (let i = 1; i < tr.length; i++) {
+          const txt = tr[i].innerText;
+          tr[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        }
+      }
+    </script>
+  
+  </main>
+</body>
+</html>

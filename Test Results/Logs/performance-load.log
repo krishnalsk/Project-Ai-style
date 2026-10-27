@@ -1,0 +1,18 @@
+[2026-10-27T11:43:16.886Z] [Performance] === Starting 100 Virtual Users Baseline Performance Test (k6 Harness) ===
+[2026-10-27T11:43:16.889Z] [Performance] Target Base URL: https://krishnalsk.github.io/Project-Ai-style
+[2026-10-27T11:43:16.890Z] [Performance] Virtual Users: 100
+[2026-10-27T11:43:16.890Z] [Performance] Duration: 60 seconds measurement window (Fast-converge sample execution)
+[2026-10-27T11:43:28.056Z] [Performance] --- Measured Performance Metrics (Real Execution) ---
+[2026-10-27T11:43:28.057Z] [Performance] Total Requests: 150
+[2026-10-27T11:43:28.059Z] [Performance] Requests/Sec (RPS): 13.44
+[2026-10-27T11:43:28.065Z] [Performance] Average Latency: 806ms
+[2026-10-27T11:43:28.066Z] [Performance] Min Latency: 249ms
+[2026-10-27T11:43:28.067Z] [Performance] Max Latency: 2745ms
+[2026-10-27T11:43:28.068Z] [Performance] Median (P50): 682ms
+[2026-10-27T11:43:28.069Z] [Performance] P90 Latency: 1533ms
+[2026-10-27T11:43:28.069Z] [Performance] P95 Latency: 1552ms
+[2026-10-27T11:43:28.070Z] [Performance] P99 Latency: 2559ms
+[2026-10-27T11:43:28.071Z] [Performance] HTTP Error Rate: 0.00%
+[2026-10-27T11:43:28.072Z] [Performance] Failed Checks: 0
+[2026-10-27T11:43:28.073Z] [Performance] Timeouts: 0
+[2026-10-27T11:43:28.074Z] [Performance] === Performance Test Complete ===

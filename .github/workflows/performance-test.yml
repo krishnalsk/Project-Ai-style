@@ -1,0 +1,48 @@
+name: API Performance & Load Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      vus:
+        description: 'Virtual Users'
+        required: true
+        default: '100'
+      duration:
+        description: 'Test Duration'
+        required: true
+        default: '60s'
+
+jobs:
+  k6-load-test:
+    name: k6 100-VU Baseline Performance Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup k6 Load Testing Binary
+        uses: grafana/setup-k6-action@v1
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Execute 100-VU Baseline Performance Runner
+        env:
+          WEB_DEPLOYMENT_URL: ${{ vars.WEB_DEPLOYMENT_URL || 'https://krishnalsk.github.io/Project-Ai-style/' }}
+        run: |
+          cd style-ai-web
+          node -e "require('./testing-automation/performance-runner').runPerformanceSuite().then(m => console.log('Performance complete:', m))"
+
+      - name: Upload Performance Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Performance-Reports
+          path: |
+            Test Results/Logs/performance-load.log
+            Test Results/Logs/k6-baseline-test.js
+            Test Results/Excel/API_Performance_Report.xlsx
+            Test Results/HTML/performance-report.html
+          retention-days: 30

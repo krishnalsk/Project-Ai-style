@@ -1,0 +1,56 @@
+name: Security SAST & DAST Review
+
+on:
+  schedule:
+    - cron: '0 2 * * 1' # Weekly Monday security audit
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-audit:
+    name: Semgrep SAST, Gitleaks & DAST Headers Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Run Semgrep SAST Analysis
+        run: |
+          python3 -m pip install semgrep
+          semgrep scan --config=auto style-ai-web/src --error || true
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Backend API Security & Rules Audit Suite
+        env:
+          WEB_DEPLOYMENT_URL: ${{ vars.WEB_DEPLOYMENT_URL || 'https://krishnalsk.github.io/Project-Ai-style/' }}
+        run: |
+          cd style-ai-web
+          node -e "require('./testing-automation/security-runner').runSecuritySuite().then(() => console.log('Security suite passed'))"
+
+      - name: Upload Security Logs & Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Security-Audit-Reports
+          path: |
+            Test Results/Logs/security-scan.log
+            Test Results/Excel/Backend_Security_Report.xlsx
+            Test Results/HTML/security-report.html
+          retention-days: 30

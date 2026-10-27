@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historical Trends - Style AI QA Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div class="border-b border-slate-800 bg-slate-900/60 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">🌐</div>
+        <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Style AI Test Hub</span>
+        <span class="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-semibold border border-cyan-500/20">v1.0 Automation</span>
+      </div>
+      <div class="flex items-center space-x-2 text-sm">
+        <a href="dashboard.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Dashboard</a>
+        <a href="execution-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Execution</a>
+        <a href="web-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Web</a>
+        <a href="android-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Android</a>
+        <a href="security-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Security</a>
+        <a href="performance-report.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Performance</a>
+        <a href="trends.html" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-semibold">Trends</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">CI/CD Quality & Regression Trends</h1>
+      <p class="text-slate-400 text-sm mt-1">Multi-Build Historical Stability Index</p>
+    </div>
+    <div class="glass-card p-6 rounded-2xl mb-8">
+      <h2 class="font-bold text-lg text-white mb-4">Build Regression Comparison</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 text-slate-400">
+            <tr>
+              <th class="py-3 px-4">Build / Commit</th>
+              <th class="py-3 px-4">Date</th>
+              <th class="py-3 px-4">Executed Cases</th>
+              <th class="py-3 px-4">Pass Rate</th>
+              <th class="py-3 px-4">P95 Latency</th>
+              <th class="py-3 px-4">Security Gate</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">
+            <tr class="bg-cyan-500/10 font-semibold">
+              <td class="py-3 px-4 text-cyan-400">Build #104 (Current - main)</td>
+              <td class="py-3 px-4">27 Oct 2026</td>
+              <td class="py-3 px-4">1,250</td>
+              <td class="py-3 px-4 text-emerald-400">97.19%</td>
+              <td class="py-3 px-4">1552 ms</td>
+              <td class="py-3 px-4 text-emerald-400">PASSED</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 text-slate-400">Build #103 (Pre-verification)</td>
+              <td class="py-3 px-4">25 Oct 2026</td>
+              <td class="py-3 px-4">850</td>
+              <td class="py-3 px-4 text-emerald-400">96.2%</td>
+              <td class="py-3 px-4">420 ms</td>
+              <td class="py-3 px-4 text-emerald-400">PASSED</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+  </main>
+</body>
+</html>
