@@ -1,0 +1,4 @@
+Appium-Python-Client>=4.0.0
+selenium>=4.25.0
+openpyxl>=3.1.5
+pytest>=8.0.0
