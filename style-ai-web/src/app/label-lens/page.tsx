@@ -400,7 +400,7 @@ export default function LabelLensPage() {
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-black text-slate-900 mt-1">"{result.composition}"</h3>
+                <h3 className="text-lg font-black text-slate-900 mt-1">&ldquo;{result.composition}&rdquo;</h3>
               </div>
 
               {/* Safety Badge */}
