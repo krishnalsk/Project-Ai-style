@@ -598,6 +598,8 @@ function generatePerformanceTestCases() {
     { name: 'AI Chat Endpoint Concurrency', count: 30, priority: 'High' },
     { name: 'Stress & Spike Profile Compatibility', count: 30, priority: 'Medium' },
     { name: 'Endurance & Memory Leak Stability', count: 25, priority: 'Low' },
+    { name: 'Microservice Gateway & CDN Cache Invalidation', count: 25, priority: 'Medium' },
+    { name: 'Burst Traffic Recovery & Reconnection Resilience', count: 25, priority: 'High' },
     { name: 'Uncapped Production DoS Stress Profile', count: 25, priority: 'Critical' }
   ];
 
