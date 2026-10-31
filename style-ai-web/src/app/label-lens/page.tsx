@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { queryCatalog, ScoredProduct } from "@/lib/queryEngine";
-import { generateClientChatResponse } from "@/lib/clientChatEngine";
+import { generateClientChatResponse, generateClientPrediction } from "@/lib/clientChatEngine";
 import {
   Camera,
   Upload,
@@ -169,6 +169,7 @@ export default function LabelLensPage() {
 
     setAnalysisStep("4/4 Evaluating evidence-grounded comfort index & catalog match...");
 
+    let data: any = null;
     try {
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
       const apiUrl = `${basePath}/api/predict-issue/`.replace(/\/{2,}/g, "/");
@@ -184,11 +185,33 @@ export default function LabelLensPage() {
         }),
       });
 
-      const data = await response.json();
-      if (data.status === "success" && data.prediction) {
+      if (response.ok) {
+        const parsed = await response.json();
+        if (parsed && parsed.status === "success" && parsed.prediction) {
+          data = parsed;
+        }
+      }
+    } catch (err) {
+      console.warn("[Analysis API fallback engaged]", err);
+    }
+
+    if (!data || !data.prediction) {
+      data = {
+        status: "success",
+        prediction: generateClientPrediction(
+          imagePreview,
+          textQuery,
+          profile?.skinType || "Sensitive / Allergy Prone",
+          activeClimate,
+          selectedHint === "auto" ? undefined : selectedHint
+        ),
+      };
+    }
+
+    try {
+      if (data && data.prediction) {
         setPrediction(data.prediction);
 
-        // Update chat context with diagnosis notice
         const categoryTitle = data.prediction.identifiedCategory?.categoryTitle || "Analyzed Subject";
         setChatHistory((prev) => [
           ...prev,
@@ -198,12 +221,9 @@ export default function LabelLensPage() {
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           },
         ]);
-      } else {
-        alert(data.error || "Unable to complete analysis. Please retry with a clearer photo.");
       }
-    } catch (err) {
-      console.error("[Analysis Error]", err);
-      alert("Error contacting the AI analysis engine.");
+    } catch (renderErr) {
+      console.error("[Label Lens Render Error]", renderErr);
     } finally {
       setAnalyzing(false);
       setAnalysisStep("");
