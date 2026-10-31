@@ -48,6 +48,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [profileError, setProfileError] = useState("");
 
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || "",
@@ -110,6 +111,11 @@ export default function ProfilePage() {
   }
 
   async function handleSave() {
+    setProfileError("");
+    if (!formData.fullName.trim()) {
+      setProfileError("Please enter a valid full name.");
+      return;
+    }
     setSaving(true);
     await updateProfile(formData);
     setSaving(false);
@@ -181,6 +187,13 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {profileError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-bold px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{profileError}</span>
+          </div>
+        )}
 
         {saveSuccess && (
           <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-3 rounded-2xl flex items-center gap-2">

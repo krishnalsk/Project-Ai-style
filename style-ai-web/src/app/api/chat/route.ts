@@ -1,12 +1,11 @@
 // src/app/api/chat/route.ts
 import { NextResponse } from "next/server";
-import { getAssistantRuleResponse } from "@/lib/aiStylistRules";
+import { processChatTurn, ChatHistoryMessage } from "@/lib/chatbotEngine";
 
-const MAX_MESSAGE_LENGTH = 2000;
+const MAX_MESSAGE_LENGTH = 3000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 20;
+const MAX_REQUESTS_PER_WINDOW = 40;
 
-// In-memory sliding window rate limiter
 const ipRequestCounts = new Map<string, number[]>();
 
 function isRateLimited(ip: string): boolean {
@@ -27,13 +26,12 @@ function isRateLimited(ip: string): boolean {
 function sanitizeInput(input: string): string {
   return input
     .trim()
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "") // Remove control chars
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
     .slice(0, MAX_MESSAGE_LENGTH);
 }
 
 export async function POST(req: Request) {
   try {
-    // 1. IP extraction & rate limiting check
     const forwarded = req.headers.get("x-forwarded-for");
     const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
 
@@ -45,34 +43,37 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const message = typeof body.message === "string" ? sanitizeInput(body.message) : "";
+    const rawMessage = typeof body.message === "string" ? body.message : "";
+    const message = sanitizeInput(rawMessage);
+    const image = body.image || null;
+    const skinType = body.skinType || "Sensitive / Allergy Prone";
+    const climate = body.climate || "Moderate (18°C - 24°C)";
+    const history: ChatHistoryMessage[] = Array.isArray(body.history) ? body.history : [];
+    const allergies: string[] = Array.isArray(body.allergies) ? body.allergies : [];
+    const cityName: string | undefined = typeof body.cityName === "string" ? body.cityName : undefined;
 
-    if (!message || message.trim().length === 0) {
-      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    if (!message && !image) {
+      return NextResponse.json({ error: "Message or image is required" }, { status: 400 });
     }
 
-    if (message.length > MAX_MESSAGE_LENGTH) {
-      return NextResponse.json(
-        { error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters.` },
-        { status: 400 }
-      );
-    }
+    // Process turn with conversational retrieval engine
+    const response = await processChatTurn({
+      message,
+      image,
+      skinType,
+      climate,
+      history,
+      allergies,
+      cityName,
+    });
 
-    // 2. High-performance deterministic rule engine match (matching Android app logic)
-    const ruleMatch = getAssistantRuleResponse(message);
-    if (ruleMatch) {
-      return NextResponse.json({ reply: ruleMatch, source: "rule-engine" });
-    }
-
-    // 3. Graceful dermatology fallback with prompt suggestions
-    const fallbackReply = `Recommendation: Soft Organic Cotton essentials paired with relaxed-fit breathable trousers.
-Why: Designed to maximize airflow while preventing skin irritation across varied conditions.
-Comfort Score: 95%
-Skin Safety Score: 96%
-
-Tip: You can ask about "sensitive skin wear", "best fabric for dermatitis", "summer outfit", "rainy season", or "office wear" for tailored recommendations!`;
-
-    return NextResponse.json({ reply: fallbackReply, source: "rule-engine" });
+    return NextResponse.json({
+      reply: response.reply,
+      source: response.source,
+      matchedProducts: response.matchedProducts,
+      diagnosis: response.diagnosis,
+      suggestedPills: response.suggestedPills,
+    });
   } catch (err: unknown) {
     console.error("Chat API internal error:", err instanceof Error ? err.message : err);
     return NextResponse.json(

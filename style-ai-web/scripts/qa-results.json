@@ -1,0 +1,359 @@
+{
+  "total": 50,
+  "passed": 50,
+  "failed": 0,
+  "notTested": 0,
+  "accuracy": "100.00",
+  "results": [
+    {
+      "testCase": "TC-01: Login with valid credentials format",
+      "expected": "Credentials satisfy email regex and min length 8",
+      "actual": "Valid email and password accepted",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-02: Login with incorrect password",
+      "expected": "Generic message: 'Incorrect email or password. Please check your credentials and try again.'",
+      "actual": "Incorrect email or password. Please check your credentials and try again.",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-03: Login with unregistered email",
+      "expected": "Generic message: 'Incorrect email or password. Please check your credentials and try again.'",
+      "actual": "Incorrect email or password. Please check your credentials and try again.",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-04: Account enumeration prevention (generic error for non-existent users)",
+      "expected": "Unregistered user and wrong password return identical generic error",
+      "actual": "Identical error returned (No user enumeration)",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-05: Login with empty email",
+      "expected": "Empty email rejected before submission",
+      "actual": "Explicit client-side empty email validation present",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-06: Login with empty password",
+      "expected": "Empty password rejected before submission",
+      "actual": "Explicit client-side empty password validation present",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-07: Login with both fields empty",
+      "expected": "Submission blocked when both fields empty",
+      "actual": "Submission successfully blocked on both fields",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-08: Login with invalid email format (missing @)",
+      "expected": "Invalid format rejected by email pattern",
+      "actual": "Rejected format 'testuser.com'",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-09: Login with invalid email format (missing domain)",
+      "expected": "Invalid format rejected by email pattern",
+      "actual": "Rejected format 'user@'",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-10: Login password min length check (less than 8 chars)",
+      "expected": "Password under 8 characters flagged as short",
+      "actual": "Detected short password (< 8 chars)",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-11: Password non-exposure in error messages",
+      "expected": "Error message never echoes plain-text password",
+      "actual": "Password completely sanitized from error",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-12: Registration form required fields presence (Name, Email, Password, Confirm Password)",
+      "expected": "Form contains Full Name, Email, Password, and Confirm Password fields",
+      "actual": "All 4 required fields present in form",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-13: Empty registration form submission",
+      "expected": "Submission rejected when all registration fields are blank",
+      "actual": "Rejected empty submission with specific error feedback",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-14: Full Name whitespace-only rejection",
+      "expected": "Names with only spaces rejected (min 2 trimmed chars)",
+      "actual": "Rejected whitespace-only name",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-15: Registration invalid email format rejection",
+      "expected": "Malformed email strings rejected by email pattern",
+      "actual": "All 4 malformed email formats rejected",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-16: Registration weak password (< 8 chars) rejection",
+      "expected": "Passwords under 8 chars rejected with 'Password is too weak. Please use at least 8 characters.'",
+      "actual": "Password is too weak. Please use at least 8 characters.",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-17: Password and confirm-password mismatch check",
+      "expected": "Mismatched passwords rejected before submission with 'Passwords do not match. Please re-enter your confirm password.'",
+      "actual": "Mismatched passwords rejected with mismatch error",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-18: Duplicate email registration rejection",
+      "expected": "Expected message: 'An account with this email already exists. Please log in instead.'",
+      "actual": "An account with this email already exists. Please log in instead.",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-19: Valid registration acceptance check",
+      "expected": "Valid registration inputs pass all validation checks",
+      "actual": "All registration validation checks passed",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-20: Checkout - Empty required delivery fields",
+      "expected": "Empty address fields rejected with 'Please fill all delivery fields'",
+      "actual": "Detected empty address fields",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-21: Checkout - Invalid mobile phone (< 10 digits)",
+      "expected": "Mobile number with 8 digits rejected with 'Enter a valid 10-digit mobile number'",
+      "actual": "Rejected 8-digit mobile number",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-22: Checkout - Non-numeric characters in mobile phone",
+      "expected": "Mobile number with letters rejected",
+      "actual": "Rejected non-numeric mobile number",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-23: Checkout - Valid 10-digit mobile number with whitespace",
+      "expected": "Accepted 10-digit mobile number after trimming whitespace",
+      "actual": "Accepted '98765 43210'",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-24: Checkout - Invalid postal pincode (< 6 digits)",
+      "expected": "5-digit pincode rejected with 'Enter a valid 6-digit pincode'",
+      "actual": "Rejected 5-digit pincode '40001'",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-25: Checkout - Non-numeric postal pincode",
+      "expected": "Pincode with letters rejected",
+      "actual": "Rejected pincode '40001A'",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-26: Checkout - Valid 6-digit numeric pincode",
+      "expected": "6-digit numeric pincode accepted",
+      "actual": "Accepted '400001'",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-27: Checkout - Empty cart order rejection",
+      "expected": "Order placement blocked when cart is empty with 'Your cart is empty'",
+      "actual": "Order blocked for 0 cart items",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-28: Forgot Password - Client-side empty email validation check",
+      "expected": "Explicit JS check prevents blank submission before network call",
+      "actual": "Explicit client check present",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-29: Forgot Password - Client-side email format regex check",
+      "expected": "Explicit JS email regex prevents malformed email submission",
+      "actual": "Email regex check present",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-30: Profile Page - Empty full name validation check",
+      "expected": "handleSave rejects blank or whitespace-only name",
+      "actual": "Name validation present",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-31: Onboarding - Step 1 required full name validation",
+      "expected": "Step 1 Continue button checks that full name is provided",
+      "actual": "Step 1 validation present",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-32: Onboarding - Step 2 required skin type validation",
+      "expected": "Step 2 Continue button checks that a skin type is selected",
+      "actual": "Step 2 validation present",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-33: Skin Diary - Empty garment entry validation",
+      "expected": "handleAddEntry rejects submission when garment name is blank",
+      "actual": "Empty garment rejected via !garment.trim()",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-34: API /api/predict-issue - Empty payload rejection",
+      "expected": "HTTP 400 with 'Please provide either an image, a description, or both.'",
+      "actual": "HTTP 400: Please provide either an image, a description, or both.",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-35: API /api/predict-issue - Valid text query processing",
+      "expected": "HTTP 200 with structured prediction and comfort score",
+      "actual": "HTTP 200: Score = 81, Status = SELF_REPORTED_ONLY",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-36: API /api/chat - Empty message rejection",
+      "expected": "HTTP 400 rejection for empty message and image",
+      "actual": "HTTP 400: Message or image is required",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-37: API /api/chat - Cotton vs Polyester natural language query",
+      "expected": "HTTP 200 with detailed comparison explanation",
+      "actual": "HTTP 200: Length = 1053 chars, Source = conversational-ai",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-38: API /api/chat - Price filtering (under ₹2,000)",
+      "expected": "HTTP 200 with all returned products priced <= ₹2,000",
+      "actual": "HTTP 200: 4 products matched, max price = ₹2000",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-39: Page Navigation - Homepage (/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-40: Page Navigation - Shop Catalog (/shop/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-41: Page Navigation - Label Lens (/label-lens/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-42: Page Navigation - AI Stylist (/ai-stylist/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-43: Page Navigation - Login (/login/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-44: Page Navigation - Signup (/signup/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-45: Page Navigation - Checkout (/checkout/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-46: Page Navigation - Style Quiz (/quiz/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-47: Page Navigation - Profile Page (/profile/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-48: Page Navigation - Onboarding Wizard (/onboarding/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-49: Page Navigation - Skin Diary (/skin-diary/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "testCase": "TC-50: Page Navigation - Dashboard (/dashboard/)",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "reason": ""
+    }
+  ]
+}

@@ -58,6 +58,9 @@ export default function Navbar() {
             <Link href="/ai-stylist" className="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
               AI Stylist
             </Link>
+            <Link href="/multimodal-diagnosis" className="px-3.5 py-2 rounded-xl text-sm font-semibold text-blue-600 hover:text-blue-900 hover:bg-blue-50 transition-colors flex items-center gap-1">
+              🔬 Diagnosis
+            </Link>
             <Link href="/fabric-encyclopedia" className="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
               Encyclopedia
             </Link>
@@ -142,6 +145,7 @@ export default function Navbar() {
         <Link href="/shop" onClick={closeMenu} className="px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50" role="menuitem">Shop</Link>
         <Link href="/deals" onClick={closeMenu} className="px-3 py-2.5 rounded-xl text-sm font-bold text-orange-600 hover:bg-orange-50" role="menuitem">🔥 Deals</Link>
         <Link href="/ai-stylist" onClick={closeMenu} className="px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50" role="menuitem">AI Stylist</Link>
+        <Link href="/multimodal-diagnosis" onClick={closeMenu} className="px-3 py-2.5 rounded-xl text-sm font-semibold text-blue-600 hover:bg-blue-50 flex items-center gap-1.5" role="menuitem">🔬 Diagnosis</Link>
         <Link href="/fabric-encyclopedia" onClick={closeMenu} className="px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50" role="menuitem">Encyclopedia</Link>
         <Link href="/skin-forecast" onClick={closeMenu} className="px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50" role="menuitem">Forecast</Link>
         <div className="h-px bg-slate-100 my-2" />

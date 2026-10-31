@@ -1,510 +1,870 @@
 // src/app/ai-stylist/page.tsx
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { queryCatalog, ScoredProduct } from "@/lib/queryEngine";
-import { getAssistantRuleResponse } from "@/lib/aiStylistRules";
+import { ScoredProduct } from "@/lib/queryEngine";
+import {
+  Camera,
+  X,
+  Sparkles,
+  Shirt,
+  Send,
+  Plus,
+  Trash2,
+  MessageSquare,
+  Menu,
+  ChevronRight,
+  ShieldAlert,
+  ThumbsUp,
+  ThumbsDown,
+  ExternalLink,
+  Bot,
+  User,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+} from "lucide-react";
+
+interface DiagnosisData {
+  diseaseOrCondition: string;
+  severity: string;
+  comfortScore: number;
+  rootCause: string;
+  recommendedFabric: string;
+  recommendedWeave: string;
+  careTip: string;
+}
 
 interface Message {
   id: string;
   sender: "user" | "ai";
   text: string;
+  image?: string | null;
   timestamp: string;
-  source?: "rule-engine" | "catalog-retrieval" | "system";
+  source?: "multimodal-ai-engine" | "catalog-retrieval" | "conversational-ai" | "system";
+  diagnosis?: DiagnosisData;
   matchedProducts?: ScoredProduct[];
-  userFeedback?: "useful" | "comfortable" | "affordable" | "relevant" | "unsuitable";
+  userFeedback?: "useful" | "comfortable" | "unsuitable";
   feedbackNote?: string;
+  isStreaming?: boolean;
 }
 
-interface ConversationContext {
-  budgetMax?: number;
-  category?: string;
-  color?: string;
-  occasion?: string;
-  excludedMaterials: string[];
-  recommendedIds: Set<string>;
+interface ChatSession {
+  id: string;
+  title: string;
+  createdAt: number;
+  messages: Message[];
 }
 
-const INITIAL_SUGGESTIONS = [
-  "Recommend sensitive skin shirts",
+const DEFAULT_SUGGESTIONS = [
+  "What fabric is suitable for my skin?",
+  "Show me products under ₹2,000",
+  "Is polyester suitable for sensitive skin?",
+  "📸 Upload skin irritation photo",
   "Best clothes for eczema & dermatitis",
-  "Summer outfits under ₹2,000",
-  "Korean casual loose-fit styles",
-  "Office formal wear with high comfort",
-  "Exclude all synthetic polyester",
+  "Summer outfits in linen & cotton",
 ];
 
-export default function AiStylistPage() {
-  const { profile, updateProfile } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      sender: "ai",
-      text: "Hello! I am your AI Style Architect — connected directly to our 1,000-record clinical fashion catalog and 4-Step Dermatological Rule Engine. Ask me about skin-safe fabrics, weather-adapted outfits, or budget-friendly recommendations.",
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      source: "system",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const msgCounter = useRef(0);
+const STORAGE_KEY = "styleai_chat_sessions_v2";
 
-  // Conversational Context (Continuity Memory)
-  const [context, setContext] = useState<ConversationContext>({
-    budgetMax: profile?.budgetMax || 4000,
-    excludedMaterials: profile?.confirmedAllergies || [],
-    recommendedIds: new Set<string>(),
+/**
+ * Clean native Markdown renderer for ChatGPT-like rich text output.
+ */
+function MarkdownRenderer({ content }: { content: string }) {
+  if (!content) return null;
+
+  const lines = content.split("\n");
+
+  return (
+    <div className="space-y-2 text-sm leading-relaxed text-slate-800">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+
+        // Empty line
+        if (!trimmed) {
+          return <div key={idx} className="h-1.5" />;
+        }
+
+        // Heading 3
+        if (trimmed.startsWith("### ")) {
+          return (
+            <h4 key={idx} className="font-extrabold text-base text-slate-900 mt-2 mb-1">
+              {renderInlineMarkdown(trimmed.replace(/^###\s+/, ""))}
+            </h4>
+          );
+        }
+
+        // Heading 2 or 1
+        if (trimmed.startsWith("## ") || trimmed.startsWith("# ")) {
+          return (
+            <h3 key={idx} className="font-black text-lg text-slate-900 mt-2.5 mb-1.5">
+              {renderInlineMarkdown(trimmed.replace(/^#+\s+/, ""))}
+            </h3>
+          );
+        }
+
+        // Blockquote
+        if (trimmed.startsWith("> ")) {
+          return (
+            <div
+              key={idx}
+              className="border-l-4 border-blue-500 bg-blue-50/70 p-2.5 rounded-r-xl text-xs text-blue-950 font-medium my-1.5 italic"
+            >
+              {renderInlineMarkdown(trimmed.replace(/^>\s+/, ""))}
+            </div>
+          );
+        }
+
+        // Bullet point
+        if (trimmed.startsWith("• ") || trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          const bulletText = trimmed.replace(/^[•\-\*]\s+/, "");
+          return (
+            <div key={idx} className="flex items-start gap-2 pl-2">
+              <span className="text-blue-600 font-black shrink-0 mt-0.5">•</span>
+              <span className="flex-1">{renderInlineMarkdown(bulletText)}</span>
+            </div>
+          );
+        }
+
+        // Numbered list
+        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+        if (numMatch) {
+          return (
+            <div key={idx} className="flex items-start gap-2 pl-2">
+              <span className="font-bold text-blue-700 shrink-0 text-xs mt-0.5">{numMatch[1]}.</span>
+              <span className="flex-1">{renderInlineMarkdown(numMatch[2])}</span>
+            </div>
+          );
+        }
+
+        // Regular paragraph
+        return (
+          <p key={idx} className="text-slate-800 font-medium">
+            {renderInlineMarkdown(trimmed)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * Parses bold, italics, code, and links inside inline markdown strings.
+ */
+function renderInlineMarkdown(text: string): React.ReactNode {
+  // Regex to match **bold**, *italic*, `code`, and [link](url)
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
+  const parts = text.split(regex);
+
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={i} className="font-extrabold text-slate-950">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return (
+        <em key={i} className="italic text-slate-700">
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return (
+        <code key={i} className="px-1.5 py-0.5 rounded bg-slate-100 font-mono text-xs text-blue-700 border border-slate-200">
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (linkMatch) {
+      return (
+        <Link
+          key={i}
+          href={linkMatch[2]}
+          className="text-blue-600 font-bold hover:underline inline-flex items-center gap-0.5"
+        >
+          {linkMatch[1]}
+        </Link>
+      );
+    }
+    return part;
   });
+}
+
+export default function AiStylistPage() {
+  const router = useRouter();
+  const { profile } = useAuth();
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [suggestedPills, setSuggestedPills] = useState<string[]>(DEFAULT_SUGGESTIONS);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const msgCounter = useRef(0);
 
   const nextId = useCallback(() => {
     msgCounter.current += 1;
-    return `msg-${msgCounter.current}-${Date.now()}`;
+    return `msg-${Date.now()}-${msgCounter.current}`;
   }, []);
+
+  // 1. Load initial sessions from localStorage or initialize first session
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed: ChatSession[] = JSON.parse(stored);
+        if (parsed.length > 0) {
+          setSessions(parsed);
+          setActiveSessionId(parsed[0].id);
+          setMessages(parsed[0].messages);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to read chat sessions from storage:", e);
+    }
+
+    // Default first session
+    startNewChat(false);
+  }, []);
+
+  // 2. Persist active session updates to localStorage
+  const saveSessionsToStorage = (updatedSessions: ChatSession[]) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedSessions));
+    } catch (e) {
+      console.warn("Failed to persist chat sessions:", e);
+    }
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
   useEffect(() => {
-    document.title = "AI Style Chat (1,000-Record Engine) | Style AI";
+    document.title = "Style AI | ChatGPT-Style Fashion & Skin Assistant";
   }, []);
 
-  // Update context when profile loads
-  useEffect(() => {
-    if (profile) {
-      setContext((prev) => ({
-        ...prev,
-        budgetMax: prev.budgetMax || profile.budgetMax || 4000,
-        excludedMaterials: Array.from(new Set([...prev.excludedMaterials, ...(profile.confirmedAllergies || [])])),
-      }));
+  // Back navigation handler
+  const handleGoBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
     }
-  }, [profile]);
+  };
 
-  function parseIntentFromQuery(text: string, currentContext: ConversationContext): {
-    updatedContext: ConversationContext;
-    detectedCategory?: string;
-    detectedWeather?: string;
-    detectedOccasion?: string;
-    detectedColor?: string;
-    detectedBudget?: number;
-    detectedMaterialExclusion?: string;
-  } {
-    const lower = text.toLowerCase();
-    const updated = { ...currentContext };
+  // Start a fresh chat session
+  const startNewChat = (saveCurrent = true) => {
+    const welcomeMsg: Message = {
+      id: "welcome-" + Date.now(),
+      sender: "ai",
+      text:
+        `Hello! 👋 I am your **Style AI Assistant**, trained on real fashion and textile dermatology datasets.\n\n` +
+        `Ask me anything about fabrics, outfits, skin sensitivities, or search our verified catalog (*e.g. "Show me products under ₹2,000"*). You can also click the camera icon to upload a photo of your skin, fabric, or clothing care tag!`,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      source: "system",
+    };
 
-    // Budget intent
-    const budgetMatch = lower.match(/(?:under|below|less than|budget|max)\s*(?:₹|rs\.?|inr)?\s*(\d{3,5})/i);
-    let detectedBudget: number | undefined = undefined;
-    if (budgetMatch && budgetMatch[1]) {
-      detectedBudget = parseInt(budgetMatch[1], 10);
-      updated.budgetMax = detectedBudget;
+    const newSessionId = "session-" + Date.now();
+    const newSession: ChatSession = {
+      id: newSessionId,
+      title: "New Conversation",
+      createdAt: Date.now(),
+      messages: [welcomeMsg],
+    };
+
+    setSessions((prev) => {
+      const updated = [newSession, ...prev.filter((s) => s.id !== newSessionId)].slice(0, 20);
+      saveSessionsToStorage(updated);
+      return updated;
+    });
+
+    setActiveSessionId(newSessionId);
+    setMessages([welcomeMsg]);
+    setInput("");
+    setAttachedImage(null);
+    setSuggestedPills(DEFAULT_SUGGESTIONS);
+  };
+
+  // Switch to an existing session
+  const handleSelectSession = (sessionId: string) => {
+    const found = sessions.find((s) => s.id === sessionId);
+    if (found) {
+      setActiveSessionId(found.id);
+      setMessages(found.messages);
+      setAttachedImage(null);
+      setInput("");
     }
+  };
 
-    // Material Exclusion intent (e.g. "no wool", "exclude polyester")
-    let detectedMaterialExclusion: string | undefined = undefined;
-    if (lower.includes("no wool") || lower.includes("without wool") || lower.includes("exclude wool")) {
-      detectedMaterialExclusion = "Wool";
-      updated.excludedMaterials = Array.from(new Set([...updated.excludedMaterials, "Wool / Lanolin"]));
-    }
-    if (lower.includes("no polyester") || lower.includes("exclude polyester") || lower.includes("avoid synthetics")) {
-      detectedMaterialExclusion = "Polyester";
-      updated.excludedMaterials = Array.from(new Set([...updated.excludedMaterials, "Polyester"]));
-    }
+  // Delete a session
+  const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const filtered = sessions.filter((s) => s.id !== sessionId);
+    setSessions(filtered);
+    saveSessionsToStorage(filtered);
 
-    // Category intent
-    let detectedCategory: string | undefined = undefined;
-    if (lower.includes("shirt") || lower.includes("t-shirt") || lower.includes("top") || lower.includes("polo")) {
-      detectedCategory = "Tops";
-      updated.category = "Tops";
-    } else if (lower.includes("pant") || lower.includes("trouser") || lower.includes("chino") || lower.includes("short") || lower.includes("bottom")) {
-      detectedCategory = "Bottoms";
-      updated.category = "Bottoms";
-    } else if (lower.includes("hoodie") || lower.includes("jacket") || lower.includes("coat") || lower.includes("sweater")) {
-      detectedCategory = "Outerwear";
-      updated.category = "Outerwear";
-    } else if (lower.includes("dress") || lower.includes("maxi")) {
-      detectedCategory = "Dresses";
-      updated.category = "Dresses";
-    } else if (lower.includes("shoe") || lower.includes("sneaker") || lower.includes("loafer") || lower.includes("trainer")) {
-      detectedCategory = "Footwear";
-      updated.category = "Footwear";
-    }
-
-    // Color intent
-    let detectedColor: string | undefined = undefined;
-    for (const c of ["blue", "green", "white", "black", "beige", "rose", "grey", "sand", "olive"]) {
-      if (lower.includes(c)) {
-        detectedColor = c;
-        updated.color = c;
-        break;
+    if (activeSessionId === sessionId) {
+      if (filtered.length > 0) {
+        setActiveSessionId(filtered[0].id);
+        setMessages(filtered[0].messages);
+      } else {
+        startNewChat(false);
       }
     }
+  };
 
-    // Occasion intent
-    let detectedOccasion: string | undefined = undefined;
-    if (lower.includes("formal") || lower.includes("office") || lower.includes("work")) {
-      detectedOccasion = "Office & Formal";
-      updated.occasion = "Office & Formal";
-    } else if (lower.includes("summer") || lower.includes("hot") || lower.includes("beach")) {
-      detectedOccasion = "Summer Heat";
-      updated.occasion = "Summer Heat";
-    } else if (lower.includes("winter") || lower.includes("cold")) {
-      detectedOccasion = "Cold Winter";
-      updated.occasion = "Cold Winter";
-    } else if (lower.includes("workout") || lower.includes("gym") || lower.includes("active")) {
-      detectedOccasion = "Active & Workout";
-      updated.occasion = "Active & Workout";
+  // Handle image upload from file picker
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAttachedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
+  };
 
-    return {
-      updatedContext: updated,
-      detectedCategory,
-      detectedBudget,
-      detectedColor,
-      detectedOccasion,
-      detectedMaterialExclusion,
-    };
-  }
-
+  // Send message and get assistant response
   async function handleSend(textToSend?: string) {
     const text = textToSend || input;
-    if (!text.trim() || loading) return;
+    if ((!text.trim() && !attachedImage) || loading) return;
 
+    const userMessageText = text.trim() || (attachedImage ? "Uploaded photo for diagnosis" : "");
     const userMsg: Message = {
       id: nextId(),
       sender: "user",
-      text: text.trim(),
+      text: userMessageText,
+      image: attachedImage,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
+
+    // Update session title if first user message
+    const isFirstUserMsg = !messages.some((m) => m.sender === "user");
+    const updatedTitle = isFirstUserMsg ? userMessageText.slice(0, 28) + (userMessageText.length > 28 ? "..." : "") : undefined;
+
+    const sentImage = attachedImage;
     if (!textToSend) setInput("");
+    setAttachedImage(null);
     setLoading(true);
 
-    setTimeout(() => {
-      // 1. Process conversational continuity intent
-      const { updatedContext, detectedBudget, detectedMaterialExclusion, detectedCategory, detectedOccasion } =
-        parseIntentFromQuery(text, context);
-      setContext(updatedContext);
-
-      // 2. Query 1,000-Record Catalog with Hard Constraints
-      const queryResult = queryCatalog({
-        query: text,
-        category: updatedContext.category,
-        maxPrice: updatedContext.budgetMax,
-        color: updatedContext.color,
-        occasion: updatedContext.occasion,
-        confirmedAllergies: updatedContext.excludedMaterials,
-        reportedSensitivities: profile?.reportedSensitivities || ["Rough Synthetics"],
-        preferredFabrics: profile?.preferredFabrics || ["100% GOTS Organic Cotton"],
-        fit: profile?.preferredFit || "Relaxed",
-        inStockOnly: true,
-        limit: 3,
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text.trim(),
+          image: sentImage,
+          skinType: profile?.skinType || "Sensitive / Allergy Prone",
+          climate: "Moderate (18°C - 24°C)",
+          history: updatedMessages.map((m) => ({
+            sender: m.sender,
+            text: m.text,
+            matchedProducts: m.matchedProducts,
+            diagnosis: m.diagnosis,
+          })),
+        }),
       });
 
-      // Filter out products already shown in recent turns to avoid repetitive recommendations
-      const freshItems = queryResult.items.filter((item) => !updatedContext.recommendedIds.has(item.product.id));
-      const chosenItems = freshItems.length > 0 ? freshItems.slice(0, 2) : queryResult.items.slice(0, 2);
+      const data = await res.json();
+      if (res.ok && data.reply) {
+        const aiMsg: Message = {
+          id: nextId(),
+          sender: "ai",
+          text: data.reply,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          source: data.source || "conversational-ai",
+          diagnosis: data.diagnosis,
+          matchedProducts: data.matchedProducts || [],
+        };
 
-      // Record recommended IDs
-      const newIds = new Set(updatedContext.recommendedIds);
-      chosenItems.forEach((c) => newIds.add(c.product.id));
-      setContext((prev) => ({ ...prev, recommendedIds: newIds }));
+        const finalMessages = [...updatedMessages, aiMsg];
+        setMessages(finalMessages);
 
-      // 3. Compose Natural, Context-Aware Styling Answer
-      let replyText = "";
-      const ruleText = getAssistantRuleResponse(text);
-
-      if (detectedMaterialExclusion) {
-        replyText = `Understood! I have dynamically updated your exclusions to purge **${detectedMaterialExclusion}** from all calculations. `;
-      } else if (detectedBudget) {
-        replyText = `Got it! I adjusted your price limit to **under ₹${detectedBudget.toLocaleString("en-IN")}**. `;
-      }
-
-      if (chosenItems.length > 0) {
-        const topItem = chosenItems[0].product;
-        replyText += `Based on our 1,000-record dataset and your profile (${profile?.skinType || "Sensitive skin"}, ${
-          updatedContext.excludedMaterials.length > 0 ? "excluding " + updatedContext.excludedMaterials.join(", ") : "hypoallergenic priority"
-        }), here are clinical recommendations that balance skin barrier protection and aesthetic fit:
-
-• **Primary Recommendation:** ${topItem.name} (${topItem.fabric})
-• **Why it works:** ${chosenItems[0].explanation}
-• **Comfort Score:** ${topItem.comfortScore}% | **Skin Safety:** ${topItem.skinSafetyScore}%
-• **Price:** ₹${topItem.price.toLocaleString("en-IN")} (In Stock: ${topItem.stock} units)`;
-      } else if (ruleText) {
-        replyText += ruleText;
-      } else {
-        replyText += `Here is optimal dermatological advice for "${text}": Soft 100% GOTS Certified Organic Cotton or Pure French Flax Linen. These natural cellulosic fibers allow epidermal respiration while preventing cutaneous flare-ups.\n\nTip: You can specify a budget (e.g. "under ₹2000"), occasion ("for office"), or exclude fabrics ("no wool").`;
-      }
-
-      const aiMsg: Message = {
-        id: nextId(),
-        sender: "ai",
-        text: replyText,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        source: chosenItems.length > 0 ? "catalog-retrieval" : "rule-engine",
-        matchedProducts: chosenItems,
-      };
-
-      setMessages((prev) => [...prev, aiMsg]);
-      setLoading(false);
-    }, 400);
-  }
-
-  function handleFeedback(messageId: string, feedbackType: Message["userFeedback"]) {
-    setMessages((prev) =>
-      prev.map((m) => {
-        if (m.id === messageId) {
-          return {
-            ...m,
-            userFeedback: feedbackType,
-            feedbackNote:
-              feedbackType === "useful"
-                ? "Noted as helpful! Prioritizing similar natural fibers."
-                : feedbackType === "affordable"
-                ? "Noted as good value."
-                : feedbackType === "comfortable"
-                ? "Comfort confirmed."
-                : "Feedback recorded to refine future recommendations.",
-          };
+        if (Array.isArray(data.suggestedPills) && data.suggestedPills.length > 0) {
+          setSuggestedPills(data.suggestedPills);
         }
-        return m;
-      })
-    );
 
-    // If user clicked unsuitable on a product, dynamically adjust preferences
-    if (feedbackType === "unsuitable") {
-      updateProfile({ comfortScore: Math.max(80, (profile?.comfortScore || 94) - 1) });
+        // Persist session
+        setSessions((prev) => {
+          const mapped = prev.map((s) =>
+            s.id === activeSessionId
+              ? {
+                  ...s,
+                  title: updatedTitle || s.title,
+                  messages: finalMessages,
+                }
+              : s
+          );
+          saveSessionsToStorage(mapped);
+          return mapped;
+        });
+      } else {
+        const errorMsg: Message = {
+          id: nextId(),
+          sender: "ai",
+          text: data.error || "I encountered an issue retrieving that information. Please try again.",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          source: "system",
+        };
+        setMessages((prev) => [...prev, errorMsg]);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: nextId(),
+          sender: "ai",
+          text: "Network connection error contacting the Style AI service. Please verify your connection.",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          source: "system",
+        },
+      ]);
+    } finally {
+      setLoading(false);
     }
   }
 
-  return (
-    <div className="flex flex-col h-screen bg-[#F8FAFC]">
-      <PageHeader
-        title="AI Style Chat"
-        subtitle={`1,000-Record Dataset Engine · ${context.excludedMaterials.length} Exclusions Active · Max ₹${context.budgetMax?.toLocaleString("en-IN")}`}
-        backHref="/dashboard"
-        actions={
-          <div className="flex items-center gap-2">
-            <Link
-              href="/profile"
-              className="text-xs font-bold bg-white text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition"
-            >
-              ⚙️ Preferences
-            </Link>
-            <Link
-              href="/virtual-closet"
-              className="text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition"
-            >
-              👗 My Closet
-            </Link>
-          </div>
-        }
-      />
+  const handleFeedback = (msgId: string, feedback: "useful" | "comfortable" | "unsuitable") => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === msgId
+          ? {
+              ...m,
+              userFeedback: feedback,
+              feedbackNote:
+                feedback === "unsuitable"
+                  ? "Feedback noted: Excluded from style preferences."
+                  : "Saved to your textile preferences!",
+            }
+          : m
+      )
+    );
+  };
 
-      {/* Active Constraints Banner */}
-      <div className="bg-slate-100/80 border-b border-slate-200/60 px-4 py-2">
-        <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-800">Active Filters:</span>
-            <span className="bg-white px-2 py-0.5 rounded-md border text-[11px] font-bold text-slate-700">
-              🧴 {profile?.skinType || "Sensitive Skin"}
+  return (
+    <div className="flex h-[calc(100vh-64px)] bg-slate-900 text-slate-100 overflow-hidden font-sans">
+      {/* ============================================================================== */}
+      {/* 1. CHATGPT-STYLE SIDEBAR */}
+      {/* ============================================================================== */}
+      <div
+        className={`${
+          isSidebarOpen ? "w-72" : "w-0 -translate-x-full"
+        } transition-all duration-300 ease-in-out bg-slate-950 border-r border-slate-800 flex flex-col shrink-0 z-20 overflow-hidden md:relative absolute h-full`}
+      >
+        {/* New Chat Button & Back Navigation */}
+        <div className="p-3.5 border-b border-slate-800/80 flex items-center gap-2">
+          <button
+            onClick={handleGoBack}
+            className="p-2.5 rounded-xl border border-slate-700/80 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-bold shrink-0"
+            title="Go Back"
+            aria-label="Go Back"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Back</span>
+          </button>
+
+          <button
+            onClick={() => startNewChat(true)}
+            className="flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl border border-slate-700/80 bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-100 hover:text-white transition shadow-xs group"
+          >
+            <span className="flex items-center gap-2">
+              <Plus className="w-4 h-4 text-blue-400 group-hover:rotate-90 transition-transform duration-200" />
+              New Chat
             </span>
-            <span className="bg-white px-2 py-0.5 rounded-md border text-[11px] font-bold text-slate-700">
-              💰 Max ₹{context.budgetMax?.toLocaleString("en-IN")}
-            </span>
-            {context.excludedMaterials.length > 0 && (
-              <span className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-md text-[11px] font-bold">
-                🛡️ Excluding: {context.excludedMaterials.join(", ")}
-              </span>
-            )}
+            <span className="text-[10px] text-slate-500 font-mono">⌘N</span>
+          </button>
+        </div>
+
+        {/* Sessions List */}
+        <div className="flex-1 overflow-y-auto p-2.5 space-y-1">
+          <div className="px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+            Recent Conversations
           </div>
-          <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
-            Retrieving from 1,000 verified catalog items
-          </span>
+
+          {sessions.map((session) => {
+            const isActive = session.id === activeSessionId;
+            return (
+              <div
+                key={session.id}
+                onClick={() => handleSelectSession(session.id)}
+                className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs cursor-pointer transition ${
+                  isActive
+                    ? "bg-slate-800 text-white font-bold border border-slate-700/70"
+                    : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-blue-400" : "text-slate-500"}`} />
+                  <span className="truncate">{session.title}</span>
+                </div>
+                <button
+                  onClick={(e) => handleDeleteSession(session.id, e)}
+                  className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 p-1 transition"
+                  title="Delete chat"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* User Context Footer in Sidebar */}
+        <div className="p-3.5 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-2 bg-slate-950/60">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500">Skin Profile:</span>
+            <span className="font-bold text-blue-300">{profile?.skinType || "Sensitive"}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500">Catalog Engine:</span>
+            <span className="font-bold text-emerald-400">1,000 In-Stock</span>
+          </div>
+          <button
+            onClick={handleGoBack}
+            className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white text-[11px] font-semibold transition border border-slate-800 cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-blue-400" /> Return to Store
+          </button>
         </div>
       </div>
 
-      {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 max-w-4xl w-full mx-auto space-y-5">
-        {messages.map((m) => (
-          <div key={m.id} className={`flex flex-col ${m.sender === "user" ? "items-end" : "items-start"}`}>
-            <div
-              className={`max-w-[90%] sm:max-w-[78%] rounded-3xl p-4 sm:p-5 shadow-xs whitespace-pre-line text-sm leading-relaxed ${
-                m.sender === "user"
-                  ? "bg-blue-600 text-white rounded-br-xs"
-                  : "bg-white text-slate-800 border border-slate-100 rounded-bl-xs"
-              }`}
+      {/* ============================================================================== */}
+      {/* 2. MAIN CHAT CONTAINER */}
+      {/* ============================================================================== */}
+      <div className="flex-1 flex flex-col bg-slate-50 text-slate-900 relative min-w-0">
+        {/* Top Header */}
+        <div className="h-14 border-b border-slate-200 bg-white px-3 sm:px-4 flex items-center justify-between shrink-0 shadow-2xs">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {/* Back Arrow Navigation Button */}
+            <button
+              onClick={handleGoBack}
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg hover:bg-slate-100 text-slate-700 hover:text-blue-600 transition flex items-center gap-1.5 text-xs font-bold shrink-0 border border-slate-200/80 cursor-pointer"
+              title="Go Back"
+              aria-label="Go Back"
             >
-              {m.text}
+              <ArrowLeft className="w-4 h-4 text-slate-700" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
 
-              {/* Matched Real Product Cards from 1,000-Record Dataset */}
-              {m.matchedProducts && m.matchedProducts.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
-                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider block">
-                    Verified Catalog Matches (Real Stock & Pricing)
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {m.matchedProducts.map(({ product, score, explanation }) => (
-                      <div
-                        key={product.id}
-                        className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col justify-between hover:border-blue-400 transition"
-                      >
-                        <div className="flex gap-3">
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="w-16 h-16 object-cover rounded-xl border border-slate-200"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-black text-slate-900 text-xs truncate">{product.name}</h4>
-                            <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{product.fabric}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs font-black text-blue-600">
-                                ₹{product.price.toLocaleString("en-IN")}
-                              </span>
-                              <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
-                                {score}% Match
-                              </span>
-                            </div>
+            <div className="h-5 w-px bg-slate-200 mx-0.5 shrink-0" />
+
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition"
+              title="Toggle Sidebar"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <Link href="/" className="flex items-center gap-2 group cursor-pointer">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 group-hover:bg-blue-700 text-white flex items-center justify-center font-black text-sm shadow-xs transition">
+                ✨
+              </div>
+              <div>
+                <h1 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                  Style AI Assistant <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 font-bold">ChatGPT Mode</span>
+                </h1>
+                <p className="text-[10px] text-slate-500">Grounded in 1,000 Verified Fashion Items & Sharp Vision Models</p>
+              </div>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => startNewChat(true)}
+              className="text-xs font-bold text-slate-600 hover:text-blue-600 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition flex items-center gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" /> New Chat
+            </button>
+          </div>
+        </div>
+
+        {/* Message Stream */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 max-w-4xl w-full mx-auto">
+          {messages.map((m) => {
+            const isUser = m.sender === "user";
+
+            return (
+              <div key={m.id} className={`flex items-start gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+                {/* Avatar Icon */}
+                <div
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs shadow-xs ${
+                    isUser
+                      ? "bg-slate-900 text-white"
+                      : "bg-gradient-to-tr from-blue-600 to-indigo-600 text-white"
+                  }`}
+                >
+                  {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                </div>
+
+                {/* Message Bubble Container */}
+                <div className={`max-w-[85%] md:max-w-[78%] space-y-2`}>
+                  <div
+                    className={`rounded-2xl p-4 shadow-xs ${
+                      isUser
+                        ? "bg-blue-600 text-white rounded-tr-xs"
+                        : "bg-white text-slate-900 border border-slate-200/90 rounded-tl-xs"
+                    }`}
+                  >
+                    {/* User Attached Image Preview */}
+                    {m.image && (
+                      <div className="mb-3 rounded-xl overflow-hidden border border-slate-200 max-h-56 bg-slate-950/10">
+                        <img src={m.image} alt="Uploaded attachment" className="object-contain w-full max-h-56 rounded-lg" />
+                      </div>
+                    )}
+
+                    {/* Formatted Markdown Content */}
+                    {isUser ? (
+                      <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap">{m.text}</p>
+                    ) : (
+                      <MarkdownRenderer content={m.text} />
+                    )}
+
+                    {/* Diagnostic Process Card (When Diagnosis Returned) */}
+                    {m.diagnosis && (
+                      <div className="mt-3.5 pt-3 border-t border-slate-100 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2">
+                        <div className="flex items-center justify-between font-bold text-slate-800 border-b border-slate-200 pb-1.5">
+                          <span className="flex items-center gap-1.5 text-blue-900 uppercase tracking-wider text-[11px]">
+                            <Sparkles className="w-3.5 h-3.5 text-blue-600" /> Clinical Assessment
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px]">
+                            Comfort Index: {m.diagnosis.comfortScore}/100
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <div>
+                            <span className="text-slate-500 block">Condition / Finding:</span>
+                            <strong className="text-slate-900">{m.diagnosis.diseaseOrCondition}</strong>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">Recommended Fabric:</span>
+                            <strong className="text-emerald-700">{m.diagnosis.recommendedFabric}</strong>
                           </div>
                         </div>
+                      </div>
+                    )}
 
-                        <p className="text-[10px] text-slate-600 mt-2 line-clamp-2 italic">{explanation}</p>
+                    {/* Authentic Catalog Item Recommendations */}
+                    {m.matchedProducts && m.matchedProducts.length > 0 && (
+                      <div className="mt-4 pt-3 border-t border-slate-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                            <Shirt className="w-3.5 h-3.5 text-blue-600" /> Authentic Items From 1,000-Item Catalog:
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-bold">100% In-Stock</span>
+                        </div>
 
-                        <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200/60">
-                          <span className="text-[10px] text-slate-400">Stock: {product.stock} left</span>
-                          <Link
-                            href={`/shop/${product.id}`}
-                            className="text-xs font-extrabold text-blue-600 hover:text-blue-800"
-                          >
-                            View Product Details →
-                          </Link>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {m.matchedProducts.map(({ product, explanation }) => (
+                            <div
+                              key={product.id}
+                              className="p-3 bg-slate-50/80 hover:bg-blue-50/30 rounded-xl border border-slate-200 transition text-xs flex flex-col justify-between shadow-2xs"
+                            >
+                              <div>
+                                <div className="flex items-center justify-between gap-1 mb-1">
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">
+                                    {product.fabric}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-slate-500">
+                                    Safety: {product.skinSafetyScore}/100
+                                  </span>
+                                </div>
+                                <h5 className="font-extrabold text-slate-900 line-clamp-1">{product.name}</h5>
+                                <p className="text-[11px] text-slate-600 mt-1 line-clamp-2">{explanation}</p>
+                              </div>
+
+                              <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                                <span className="font-black text-sm text-slate-900">
+                                  ₹{product.price.toLocaleString("en-IN")}
+                                </span>
+                                <Link
+                                  href={`/shop/${product.id}`}
+                                  className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 hover:underline"
+                                >
+                                  View Item <ExternalLink className="w-3 h-3" />
+                                </Link>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* Feedback Action Buttons */}
+                    {!isUser && m.source !== "system" && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleFeedback(m.id, "useful")}
+                            className={`px-2 py-0.5 rounded-lg border text-[10px] font-bold transition flex items-center gap-1 ${
+                              m.userFeedback === "useful"
+                                ? "bg-emerald-600 text-white border-emerald-600"
+                                : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                            }`}
+                          >
+                            <ThumbsUp className="w-3 h-3" /> Helpful
+                          </button>
+                          <button
+                            onClick={() => handleFeedback(m.id, "unsuitable")}
+                            className={`px-2 py-0.5 rounded-lg border text-[10px] font-bold transition flex items-center gap-1 ${
+                              m.userFeedback === "unsuitable"
+                                ? "bg-rose-600 text-white border-rose-600"
+                                : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                            }`}
+                          >
+                            <ThumbsDown className="w-3 h-3" /> Unsuitable
+                          </button>
+                          {m.feedbackNote && (
+                            <span className="text-[10px] text-emerald-600 font-bold ml-1">{m.feedbackNote}</span>
+                          )}
+                        </div>
+
+                        {/* Source Badge */}
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {m.source === "multimodal-ai-engine"
+                            ? "🔬 Multimodal Vision"
+                            : m.source === "catalog-retrieval"
+                            ? "🛍️ 1,000-Product Catalog"
+                            : "💬 Style AI Assistant"}
+                        </span>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Timestamp */}
+                  <span className={`text-[10px] text-slate-400 block px-1 ${isUser ? "text-right" : "text-left"}`}>
+                    {m.timestamp}
+                  </span>
                 </div>
-              )}
+              </div>
+            );
+          })}
 
-              {/* User Feedback Widget on AI Recommendations */}
-              {m.sender === "ai" && m.source !== "system" && (
-                <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-xs">
-                  <span className="text-[11px] font-bold text-slate-400 mr-1">Feedback:</span>
-                  <button
-                    onClick={() => handleFeedback(m.id, "useful")}
-                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold transition ${
-                      m.userFeedback === "useful"
-                        ? "bg-emerald-600 text-white border-emerald-600"
-                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}
-                  >
-                    👍 Useful
-                  </button>
-                  <button
-                    onClick={() => handleFeedback(m.id, "comfortable")}
-                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold transition ${
-                      m.userFeedback === "comfortable"
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}
-                  >
-                    ☁️ Comfortable
-                  </button>
-                  <button
-                    onClick={() => handleFeedback(m.id, "affordable")}
-                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold transition ${
-                      m.userFeedback === "affordable"
-                        ? "bg-indigo-600 text-white border-indigo-600"
-                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}
-                  >
-                    💰 Affordable
-                  </button>
-                  <button
-                    onClick={() => handleFeedback(m.id, "unsuitable")}
-                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold transition ${
-                      m.userFeedback === "unsuitable"
-                        ? "bg-red-600 text-white border-red-600"
-                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}
-                  >
-                    ❌ Unsuitable
-                  </button>
-                  {m.feedbackNote && (
-                    <span className="text-[11px] text-emerald-600 font-bold ml-1">{m.feedbackNote}</span>
-                  )}
-                </div>
-              )}
+          {/* Assistant Loading Pulse */}
+          {loading && (
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs animate-pulse">
+                <Bot className="w-4 h-4" />
+              </div>
+              <div className="p-3.5 bg-white border border-slate-200 rounded-2xl rounded-tl-xs shadow-xs text-xs font-bold text-slate-500 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-600 animate-spin" />
+                <span>Thinking & querying verified product catalog...</span>
+              </div>
             </div>
+          )}
 
-            {/* Message Meta Info */}
-            <div className="flex items-center gap-2 mt-1 px-1">
-              <span className="text-[11px] text-slate-400">{m.timestamp}</span>
-              {m.sender === "ai" && m.source && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                  {m.source === "catalog-retrieval"
-                    ? "✨ 1,000-Record Retrieval Engine"
-                    : m.source === "rule-engine"
-                    ? "🔬 4-Step Derm Rule Engine"
-                    : "ℹ️ System Notice"}
-                </span>
-              )}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* ============================================================================== */}
+        {/* 3. DYNAMIC SUGGESTED PILLS */}
+        {/* ============================================================================== */}
+        <div className="px-4 py-2 max-w-4xl w-full mx-auto overflow-x-auto scrollbar-none flex gap-1.5 shrink-0">
+          {suggestedPills.map((sug) => (
+            <button
+              key={sug}
+              onClick={() => {
+                if (sug.includes("Upload")) {
+                  fileInputRef.current?.click();
+                } else {
+                  handleSend(sug);
+                }
+              }}
+              className="text-[11px] font-bold bg-white text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition whitespace-nowrap shadow-2xs hover:bg-blue-50/50"
+            >
+              {sug}
+            </button>
+          ))}
+        </div>
+
+        {/* Attached Image Preview Pill */}
+        {attachedImage && (
+          <div className="max-w-4xl w-full mx-auto px-4 py-1.5 shrink-0">
+            <div className="relative inline-flex items-center gap-2 border border-blue-300 rounded-xl overflow-hidden shadow-xs bg-blue-50/80 p-1.5 pr-3">
+              <img src={attachedImage} alt="Attachment" className="h-10 w-10 object-cover rounded-lg" />
+              <div className="text-[11px]">
+                <strong className="block text-blue-900">Photo Attached</strong>
+                <span className="text-slate-500 text-[10px]">Ready to diagnose</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAttachedImage(null)}
+                className="ml-2 bg-rose-600 text-white rounded-full p-0.5 hover:bg-rose-700 transition"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
-        ))}
-
-        {loading && (
-          <div className="flex items-center gap-2 text-slate-400 text-xs font-bold p-3 bg-white border border-slate-100 rounded-2xl w-fit animate-pulse">
-            <span>🔄</span>
-            <span>Querying 1,000-record catalog & cross-checking allergy exclusions...</span>
           </div>
         )}
 
-        <div ref={chatEndRef} />
-      </div>
-
-      {/* Suggested Follow-ups */}
-      <div className="px-4 py-2 max-w-4xl w-full mx-auto overflow-x-auto scrollbar-none flex gap-1.5">
-        {INITIAL_SUGGESTIONS.map((sug) => (
-          <button
-            key={sug}
-            onClick={() => handleSend(sug)}
-            className="text-[11px] font-bold bg-white text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition whitespace-nowrap shadow-2xs"
+        {/* ============================================================================== */}
+        {/* 4. CHAT INPUT BAR */}
+        {/* ============================================================================== */}
+        <div className="bg-white border-t border-slate-200 px-4 py-3 shrink-0">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+            className="max-w-4xl mx-auto flex items-center gap-2"
           >
-            {sug}
-          </button>
-        ))}
-      </div>
+            {/* Attachment Button */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition flex items-center justify-center shrink-0"
+              title="Attach skin, fabric, or care label photo"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageSelect}
+            />
 
-      {/* Input Bar */}
-      <div className="bg-white border-t border-slate-200 px-4 py-3">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
-          className="max-w-4xl mx-auto flex gap-2"
-        >
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about skin-safe fabrics, specify budget, or ask for alternatives..."
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 font-medium"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim() || loading}
-            className="bg-blue-600 text-white font-extrabold text-sm px-6 py-3 rounded-2xl hover:bg-blue-700 transition disabled:opacity-40 shadow-xs"
-          >
-            Send
-          </button>
-        </form>
+            {/* Main Text Input */}
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={
+                attachedImage
+                  ? "Describe this photo or ask a question (optional)..."
+                  : "Message Style AI (e.g. 'Show products under ₹2,000', 'Is polyester safe?')..."
+              }
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-900 placeholder:text-slate-400"
+            />
+
+            {/* Send Button */}
+            <button
+              type="submit"
+              disabled={(!input.trim() && !attachedImage) || loading}
+              className="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 transition disabled:opacity-40 shadow-xs flex items-center justify-center shrink-0"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

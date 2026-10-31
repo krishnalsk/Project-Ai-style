@@ -23,10 +23,29 @@ export default function OnboardingPage() {
   const [skinType, setSkinType] = useState("");
   const [preferredFabric, setPreferredFabric] = useState("");
   const [size, setSize] = useState("");
+  const [onboardingError, setOnboardingError] = useState("");
 
   const totalSteps = 3;
 
+  function handleNextStep() {
+    setOnboardingError("");
+    if (step === 1 && !fullName.trim()) {
+      setOnboardingError("Please enter your full name to proceed.");
+      return;
+    }
+    if (step === 2 && !skinType) {
+      setOnboardingError("Please select your skin type to proceed.");
+      return;
+    }
+    setStep(step + 1);
+  }
+
   async function handleFinish() {
+    setOnboardingError("");
+    if (!size) {
+      setOnboardingError("Please choose your clothing size.");
+      return;
+    }
     if (!user) return;
     setSaving(true);
     try {
@@ -170,6 +189,12 @@ export default function OnboardingPage() {
           </div>
         )}
 
+        {onboardingError && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold px-4 py-2.5 rounded-xl mb-4">
+            ⚠️ {onboardingError}
+          </div>
+        )}
+
         {/* Navigation Buttons */}
         <div className="flex gap-3 mt-8">
           {step > 1 && (
@@ -182,7 +207,7 @@ export default function OnboardingPage() {
           )}
           {step < totalSteps ? (
             <button
-              onClick={() => setStep(step + 1)}
+              onClick={handleNextStep}
               className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition"
             >
               Continue →
