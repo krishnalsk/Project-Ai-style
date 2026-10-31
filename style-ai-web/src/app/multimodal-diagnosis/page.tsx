@@ -101,7 +101,9 @@ export default function MultimodalDiagnosisPage() {
     // Run real-time visual subject recognition
     setIsRecognizing(true);
     try {
-      const response = await fetch("/api/recognize-subject", {
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+      const apiUrl = `${basePath}/api/recognize-subject/`.replace(/\/{2,}/g, "/");
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -277,7 +279,9 @@ export default function MultimodalDiagnosisPage() {
     setResult(null);
 
     try {
-      const response = await fetch("/api/predict-issue", {
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+      const apiUrl = `${basePath}/api/predict-issue/`.replace(/\/{2,}/g, "/");
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

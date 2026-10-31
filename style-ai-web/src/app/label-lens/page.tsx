@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { queryCatalog, ScoredProduct } from "@/lib/queryEngine";
+import { generateClientChatResponse } from "@/lib/clientChatEngine";
 import {
   Camera,
   Upload,
@@ -169,7 +170,9 @@ export default function LabelLensPage() {
     setAnalysisStep("4/4 Evaluating evidence-grounded comfort index & catalog match...");
 
     try {
-      const response = await fetch("/api/predict-issue", {
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+      const apiUrl = `${basePath}/api/predict-issue/`.replace(/\/{2,}/g, "/");
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ScoredProduct } from "@/lib/queryEngine";
+import { generateClientChatResponse } from "@/lib/clientChatEngine";
 import {
   Camera,
   X,
@@ -364,8 +365,12 @@ export default function AiStylistPage() {
     setAttachedImage(null);
     setLoading(true);
 
+    let data: any = null;
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+    const apiUrl = `${basePath}/api/chat/`.replace(/\/{2,}/g, "/");
+
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -379,11 +384,39 @@ export default function AiStylistPage() {
             matchedProducts: m.matchedProducts,
             diagnosis: m.diagnosis,
           })),
+          allergies: profile?.confirmedAllergies || [],
         }),
       });
 
-      const data = await res.json();
-      if (res.ok && data.reply) {
+      if (res.ok) {
+        const parsed = await res.json();
+        if (parsed && parsed.reply) {
+          data = parsed;
+        }
+      }
+    } catch (fetchErr) {
+      console.warn("[Style AI] Server API unavailable, engaging high-availability client intelligence engine:", fetchErr);
+    }
+
+    // High-availability fallback: If network failed or running as static GitHub Pages export
+    if (!data || !data.reply) {
+      data = await generateClientChatResponse({
+        message: text.trim(),
+        image: sentImage,
+        skinType: profile?.skinType || "Sensitive / Allergy Prone",
+        climate: "Moderate (18°C - 24°C)",
+        history: updatedMessages.map((m) => ({
+          sender: m.sender,
+          text: m.text,
+          matchedProducts: m.matchedProducts,
+          diagnosis: m.diagnosis,
+        })),
+        allergies: profile?.confirmedAllergies || [],
+      });
+    }
+
+    try {
+      if (data && data.reply) {
         const aiMsg: Message = {
           id: nextId(),
           sender: "ai",
@@ -415,28 +448,9 @@ export default function AiStylistPage() {
           saveSessionsToStorage(mapped);
           return mapped;
         });
-      } else {
-        const errorMsg: Message = {
-          id: nextId(),
-          sender: "ai",
-          text: data.error || "I encountered an issue retrieving that information. Please try again.",
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          source: "system",
-        };
-        setMessages((prev) => [...prev, errorMsg]);
       }
-    } catch (err) {
-      console.error(err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: nextId(),
-          sender: "ai",
-          text: "Network connection error contacting the Style AI service. Please verify your connection.",
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          source: "system",
-        },
-      ]);
+    } catch (renderErr) {
+      console.error("[Style AI render error]", renderErr);
     } finally {
       setLoading(false);
     }
