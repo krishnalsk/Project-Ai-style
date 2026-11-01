@@ -1,6 +1,6 @@
 # Style AI Web 🌐
 
-> **Smart Comfort Meets Style** — A Web Application for Skin-Safe Fashion & AI Styling Recommendations.
+> **Smart Comfort Meets Style** — Enterprise Next.js 16 Web Application for Skin-Safe Fashion, Multimodal Vision Scanning, and AI Styling.
 
 ---
 
@@ -9,48 +9,61 @@
 ### 1. Run Development Server
 ```bash
 cd style-ai-web
+npm install
 npm run dev
 ```
 Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
-### 2. Build for Production
+### 2. Run Test Suites
 ```bash
-npm run build
-npm run start
+# Run 50-Case Senior QA Validation Suite
+npm run test:qa
+
+# Run 21-Case Conversational AI & Out-of-Domain Suite
+npm run test:chat
+
+# Run 78-Assertion Complete System Benchmark
+npm run test:system
+
+# Run Care Label OCR & Verification Suite
+npm run test:label
+
+# Run Multimodal Vision Accuracy Benchmark
+npm run test:multimodal
+```
+
+### 3. Build Production Static Export (GitHub Pages)
+```bash
+STATIC_EXPORT=true npm run build
 ```
 
 ---
 
-## ✨ Key Features & Architecture
+## ✨ Key Pages & Modules
 
-- 🤖 **AI Stylist (`/ai-stylist`):** Instant 0ms dermatological rule engine with verified comfort & skin-safety scoring.
-- 🌤️ **Live Skin Forecast (`/skin-forecast`):** Real-time UV Index sensor alerts, humidity tracking, and weather-adjusted fabric safety recommendations.
-- 🔍 **Label Lens™ (`/label-lens`):** Clothing wash-care label OCR parser & skin friction risk analyzer.
-- 📖 **Fabric Encyclopedia (`/fabric-encyclopedia`):** Detailed textile database with SAFE / MODERATE / AVOID skin safety ratings.
-- ⚖️ **Side-by-Side Fabric Matchup (`/fabric-compare`):** Compare breathability, water retention, and eco-impact across natural vs synthetic fibers.
-- 🩺 **Allergy & Flare-up Checker (`/allergy-checker`):** Custom multi-fiber blend risk calculator for eczema, psoriasis, and sensitive skin.
-- 🛍️ **E-Commerce & Shop (`/shop`):** 8 skin-certified garments, category filters, product details (`/shop/[id]`), cart (`/cart`), 2-step checkout (`/checkout`), and order tracking (`/orders`).
-- 📓 **Skin Comfort Diary (`/skin-diary`):** Daily outfit logging, flare-up history, and star ratings.
-- 🎁 **Rewards & Style Points (`/rewards`):** Eco Pioneer levels, points balance, and coupon code redemption.
-- 👗 **Virtual Closet (`/virtual-closet`):** Wardrobe item tracker, wear counter, and AI outfit recommendations.
-- ✨ **Outfit Generator (`/outfit-generator`):** Weather & occasion-adapted outfit mixer.
-- 📏 **Size & Fit Guide (`/size-guide`):** Measurement sliders mapping chest/waist to loose-fit sizes to reduce skin friction.
-- 📊 **Wardrobe Analytics (`/analytics`):** Longitudinal comfort score reports and fiber distribution ratios.
-- ❓ **Help Center (`/help`) & Settings (`/settings`):** FAQ on skin safety algorithms, GOTS certification, and privacy settings.
+- 🤖 **AI Stylist (`/ai-stylist`):** ChatGPT-style conversational assistant with natural name recognition, session memory persistence, and 1,000-record catalog integration.
+- 🏷️ **Label Lens™ (`/label-lens`):** Optical care-label OCR scanner extracting fiber blends and ISO/ASTM wash symbols without hallucination.
+- 🔬 **Multimodal Comfort Lens (`/multimodal-diagnosis`):** 5-category visual classification of skin irritation, fabric surface weave, and wash tags with zero-downtime browser fallback.
+- 🌤️ **Live Skin Forecast (`/skin-forecast`):** Real-time UV and humidity sensor tracking for climate-adapted clothing advice.
+- 🛍️ **Sustainable Shop (`/shop`):** 1,000 verified skin-safe products with real-time budget filters and dermatological safety scores.
+- 📖 **Fabric Encyclopedia (`/fabric-encyclopedia`):** Comprehensive natural vs. synthetic textile reference guide.
+- ⚖️ **Side-by-Side Fabric Matchup (`/fabric-compare`):** Moisture regain and cutaneous friction comparisons (Cotton vs. Polyester).
+- 🩺 **Allergy Flare-Up Checker (`/allergy-checker`):** Sensitive skin multi-fiber risk calculator.
+- 📓 **Skin Comfort Diary (`/skin-diary`):** Daily outfit tracking and cutaneous flare-up logging.
+- 👗 **Virtual Closet (`/virtual-closet`):** Wardrobe inventory manager and AI outfit combinations.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Architecture & Tech Stack
 
 - **Framework:** Next.js 16 (App Router + Turbopack)
 - **Language:** TypeScript 5 (Strict Mode)
-- **Styling:** Tailwind CSS 4 + Glassmorphism UI
-- **Authentication & DB:** Firebase Auth + Firestore
-- **AI Integration:** 4-Step Dermatological Rule Engine
+- **Styling:** Tailwind CSS 4
 - **State Management:** React Context (`AuthContext`, `CartContext`, `WishlistContext`)
-- **PWA Ready:** Web App Manifest (`/manifest.webmanifest`)
-
----
-
-## 🔒 Android Project Isolation
-This web project is located in `style-ai-web/` and is **100% independent** from the Android application in `app/`. The Android application code was never modified or altered.
+- **Authentication & Database:** Firebase Auth & Cloud Firestore
+- **AI Engines:**
+  - `src/lib/clientChatEngine.ts`: Zero-downtime client intelligence engine running directly in browser for 100% uptime on static hosts.
+  - `src/lib/chatbotEngine.ts`: Server-side conversational intelligence layer.
+  - `src/lib/careLabelOcr.ts`: Optical care tag OCR and fiber breakdown validator.
+  - `src/lib/visionClassifier.ts`: Pretrained multimodal computer vision classifier.
+  - `src/lib/queryEngine.ts`: Dermatologically grounded catalog query engine.

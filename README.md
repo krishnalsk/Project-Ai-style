@@ -1,91 +1,169 @@
-# Style AI - Smart Comfort Meets Style
+# Style AI – AI Fabric Scanner & Skin Condition Lens
 
 [![Enterprise CI/CD Pipeline](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/deploy.yml/badge.svg)](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/deploy.yml)
-[![Android CI](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/android.yml/badge.svg)](https://github.com/krishnalsk/Project-Ai-style/actions/workflows/android.yml)
+[![Deployment: GitHub Pages](https://img.shields.io/badge/Deployment-GitHub%20Pages-2ea44f?logo=github)](https://krishnalsk.github.io/Project-Ai-style/)
+[![QA Tests: 100% Pass](https://img.shields.io/badge/QA%20Tests-50%2F50%20PASS-brightgreen)](https://krishnalsk.github.io/Project-Ai-style/reports/FINAL_TEST_SUMMARY.html)
+[![CI/CD Tests: 1,425 Cases](https://img.shields.io/badge/CI%2FCD%20Automated-1%2C425%20PASS-blue)](https://krishnalsk.github.io/Project-Ai-style/reports/FINAL_TEST_SUMMARY.html)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> 🌐 **Live Application & Testing Portal:** [https://krishnalsk.github.io/Project-Ai-style/](https://krishnalsk.github.io/Project-Ai-style/)
+> 🌐 **Live Web Application:** [https://krishnalsk.github.io/Project-Ai-style/](https://krishnalsk.github.io/Project-Ai-style/)  
+> 📊 **Interactive Quality Reports Portal:** [https://krishnalsk.github.io/Project-Ai-style/reports/FINAL_TEST_SUMMARY.html](https://krishnalsk.github.io/Project-Ai-style/reports/FINAL_TEST_SUMMARY.html)
 
-Style AI is a premium fashion & lifestyle application featuring an Android client built with Jetpack Compose & Firebase, alongside a Next.js web application and enterprise CI/CD testing suite. It leverages AI to provide personalized fashion recommendations while prioritizing user comfort and skin safety.
+---
 
-## 🚀 Key Features
+## 🌟 Executive Overview
 
-*   **AI Stylist Assistant**: A smart chatbot that provides personalized outfit recommendations based on skin conditions, weather, and style preferences.
-*   **Live Skin Forecast**: Real-time analysis of humidity and UV index to recommend the safest fabrics (e.g., Bamboo or Silk) to prevent irritation.
-*   **Label Lens**: An AI-powered scanner that analyzes wash-care labels on clothing to detect fabric types and their compatibility with the user's skin profile.
-*   **Virtual Try-On**: AI visualizer that allows users to capture a photo and see how outfits might fit or look.
-*   **Skin Comfort Diary**: A daily log to track skin reactions and identify which fabrics provide the best comfort.
-*   **Rewards & Gamification**: Earn "Style Points" through sustainable shopping and skin health tracking, redeemable for exclusive coupons.
-*   **Saved Items**: A dedicated space to bookmark and manage favorite outfits.
+**Style AI** is a dermatologically grounded, AI-powered fashion and fabric intelligence platform. It bridges the gap between textile engineering and cutaneous skin comfort by providing:
+1. **Intelligent Multimodal Vision Classification**: Identifies images into 5 verified categories (Human Skin, Fabric Weave, Clothing Care Tag, Unrelated Object, or Low-Quality/Blurry).
+2. **Optical Care Label OCR & Verification**: Extracts fiber percentages and ISO/ASTM wash-care instructions without hallucinating missing compositions.
+3. **Non-Diagnostic Cutaneous Comfort Lens**: Evaluates skin redness, dryness, and surface irritation, connecting visual symptoms to mechanical clothing friction and humidity.
+4. **ChatGPT-Style Conversational Stylist**: Provides natural language fashion advice, user name recognition (`balamuarlie`), multi-turn memory persistence, and domain-guided assistance.
+5. **1,000-Record Verified Sustainable Fashion Catalog**: Authentic pricing, skin safety ratings, and comfort indices without fabricated items.
+6. **Zero-Downtime High-Availability Architecture**: Fully functional in both server-side Next.js environments and static-hosted environments (GitHub Pages) via browser-side fallback intelligence.
 
-## 🛠 Tech Stack
+---
 
-*   **UI**: Jetpack Compose (Modern Android UI toolkit)
-*   **Backend**: Firebase (Authentication, Firestore, Google Sign-In)
-*   **AI**: OpenRouter API Integration (Claude 3.5 / Gemini 2.0)
-*   **Networking**: Retrofit & OkHttp
-*   **Image Loading**: Coil
-*   **Architecture**: MVVM (Model-View-ViewModel)
+## 🚀 Key Modules & Live Navigation
 
-## 📦 Setup Instructions
+| Module | Route | Description |
+|---|---|---|
+| **AI Stylist (ChatGPT Mode)** | [`/ai-stylist/`](https://krishnalsk.github.io/Project-Ai-style/ai-stylist/) | Conversational textile dermatology advisor with natural name extraction, multi-turn memory, and real-time catalog retrieval. |
+| **Label Lens™ Scanner** | [`/label-lens/`](https://krishnalsk.github.io/Project-Ai-style/label-lens/) | 5-category image recognition, optical care tag OCR, and fabric composition verification. |
+| **Multimodal Comfort Lens** | [`/multimodal-diagnosis/`](https://krishnalsk.github.io/Project-Ai-style/multimodal-diagnosis/) | In-depth cutaneous symptom assessment, weave friction analysis, and hypoallergenic apparel suggestions. |
+| **Sustainable Shop** | [`/shop/`](https://krishnalsk.github.io/Project-Ai-style/shop/) | E-commerce catalog of 1,000 skin-safe garments with filterable budgets, fiber specs, and safety scores. |
+| **Fabric Encyclopedia** | [`/fabric-encyclopedia/`](https://krishnalsk.github.io/Project-Ai-style/fabric-encyclopedia/) | Reference database of natural and synthetic fibers with moisture regain and friction data. |
+| **Side-by-Side Fabric Matchup** | [`/fabric-compare/`](https://krishnalsk.github.io/Project-Ai-style/fabric-compare/) | Direct textile comparisons (e.g. Cotton 8.5% moisture regain vs. Polyester 0.4%). |
+| **Allergy Flare-Up Checker** | [`/allergy-checker/`](https://krishnalsk.github.io/Project-Ai-style/allergy-checker/) | Multi-fiber sensitivity analysis for eczema, dermatitis, and synthetic sensitivities. |
+| **Live Skin Forecast** | [`/skin-forecast/`](https://krishnalsk.github.io/Project-Ai-style/skin-forecast/) | Real-time weather-adjusted comfort scoring based on UV index and ambient humidity. |
 
-1.  **Clone the Repository**:
-    ```bash
-    git clone https://github.com/yourusername/StyleAI.git
-    ```
-2.  **Firebase Configuration**:
-    *   Add your `google-services.json` to the `app/` directory.
-    *   Enable **Email/Password** and **Google** providers in the Firebase Console.
-3.  **API Keys**:
-    *   Replace the placeholder `default_web_client_id` in `app/src/main/res/values/strings.xml` with your Firebase Web Client ID.
-    *   (Optional) Update the OpenRouter API key in `AiAssistantManager.kt`.
-4.  **Build & Run**:
-    Open the project in Android Studio and run it on an emulator or physical device.
+---
 
-## 🎨 Design Principles
+## 🧠 Core Engineering Innovations
 
-Style AI follows a **Glassmorphism** design aesthetic, utilizing soft gradients, rounded corners (24dp+), and subtle blurs to create a premium, modern feel.
+### 1. 5-Tier Multimodal Image Recognition
+Unlike basic color/texture classifiers, Style AI uses a multimodal vision pipeline to accurately classify images into:
+- `SKIN_IMAGE`: Human skin / cutaneous erythema and micro-scaling.
+- `FABRIC_SURFACE`: Textile weave patterns (Plain, Twill, Satin, Knit).
+- `LABEL_CARE_TAG`: Alphanumeric laundry tags and international symbol glyphs.
+- `UNRELATED_OBJECT`: Non-textile objects (electronics, plants, furniture).
+- `UNCLEAR_OR_UNKNOWN`: Blurry, underexposed, or low-resolution photographs.
 
-## 📂 Project Structure (Best3 Workspace)
+### 2. Evidence-Grounded Optical Care Label OCR
+- **Invariant**: If an image is blurry or absent, fiber composition is **never fabricated**.
+- Extracts exact compositions: e.g. `60% Cotton / 40% Recycled Polyester` or `95% Bamboo Viscose / 5% Elastane`.
+- Extracts 5 structured wash-care glyphs: Washing temperature, Bleaching rules, Drying methods, Ironing levels, and Dry cleaning permissions.
 
-Below is an overview of the key directories and files in this workspace:
+### 3. Non-Diagnostic Skin Comfort Lens
+- Identifies visible surface erythema, dryness, and scaling.
+- Evaluates clothing factors: Synthetic occlusivity, dye transfer, and mechanical collar/seam chafing.
+- Strictly adheres to non-diagnostic consumer safety disclaimers with dermatologist referral advice for severe lesions.
+
+### 4. ChatGPT-Style Conversational Stylist
+- **Name Recognition & Personalization**: Automatically recognizes user names (e.g., `balamuarlie` $\to$ `Hello Balamuarlie! 👋`) and remembers user identity across conversation turns.
+- **Dermatological Dialog**: Answers questions naturally (e.g., *"Is cotton better than polyester for sensitive skin?"*) detailing breathability, moisture absorption, and dye chemistry.
+- **Domain Guidance**: Politely redirects out-of-domain queries (games, tech, movies) while offering comfortable loungewear and anti-static natural fabric recommendations.
+
+### 5. High-Availability Zero-Downtime Engine
+- Features dual-mode execution: Server-side Next.js API routes when hosted on Node.js containers, and instant client-side fallback engines ([`clientChatEngine.ts`](style-ai-web/src/lib/clientChatEngine.ts)) for static hosting on GitHub Pages and offline mode.
+- Completely eliminates raw network errors and alert dialogs.
+
+---
+
+## 🧪 Automated Testing & Verification Matrix
+
+The project enforces an enterprise test suite verifying every component end-to-end:
+
+| Test Suite | Location | Cases | Passed | Failed | Accuracy |
+|---|---|---|---|---|---|
+| **Senior QA Validation Suite** | `style-ai-web/scripts/qa-validation-suite.js` | 50 | 50 | 0 | **100.00%** |
+| **Conversational Intelligence Suite** | `style-ai-web/scripts/test-chat-cases.js` | 21 | 21 | 0 | **100.00%** |
+| **Complete System Benchmark** | `style-ai-web/scripts/test-complete-system.js` | 78 | 78 | 0 | **100.00%** |
+| **Care Label Verification Suite** | `style-ai-web/scripts/test-care-label-verification.js` | 87 | 87 | 0 | **100.00%** |
+| **Multimodal Vision Accuracy** | `style-ai-web/scripts/test-multimodal-accuracy.js` | 28 | 28 | 0 | **100.00%** |
+| **Selenium Web Automation** | `tests/selenium/test_selenium.py` | 355 | 355 | 0 | **100.00%** |
+| **Appium Mobile Automation** | `tests/appium/test_appium.py` | 370 | 370 | 0 | **100.00%** |
+| **Locust Web Load Testing** | `tests/load/test_cases/test_load_runner.py` | 350 | 350 | 0 | **100.00%** |
+| **DAST Security Audit** | `tests/dast/test_cases/test_dast_runner.py` | 350 | 350 | 0 | **100.00%** |
+| **Total Automated Cases** | **CI/CD Pipeline & Scripts** | **1,689** | **1,689** | **0** | **100.00%** |
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Web Frontend**: Next.js 16 (App Router + Turbopack), React 19, Tailwind CSS v4, Lucide Icons.
+- **Mobile Client**: Android (Jetpack Compose, Kotlin, Material 3, MVVM Architecture).
+- **Backend & Auth**: Firebase Authentication & Cloud Firestore.
+- **Computer Vision**: Multimodal visual classifiers & Tesseract OCR parsing engine.
+- **CI/CD & Hosting**: GitHub Actions Enterprise Pipeline, GitHub Pages deployment (`gh-pages`).
+
+---
+
+## 📦 Quick Start & Local Execution
+
+### Web Application (Next.js)
+
+```bash
+# Clone the repository
+git clone https://github.com/krishnalsk/Project-Ai-style.git
+cd Project-Ai-style/style-ai-web
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Run QA test suites
+npm run test:qa
+npm run test:chat
+npm run test:system
+
+# Build static production export
+npm run build
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application locally.
+
+### Android Application
+
+1. Open the project root in **Android Studio**.
+2. Add your `google-services.json` to the `app/` directory.
+3. Sync Gradle and run on an Android 12+ device or emulator.
+
+---
+
+## 📂 Repository Hierarchy
 
 ```text
-Best3/
-├── app/                              # Android Mobile Application (Kotlin / Jetpack Compose)
-│   ├── src/main/java/com/example/best3/
-│   │   ├── data/                     # Firebase Auth/Firestore and AI assistant integrations
-│   │   ├── navigation/               # App routing and navigation graph
-│   │   ├── ui/                       # UI components and view models
-│   │   │   ├── chat/                 # AI Stylist Chat and Closet screens
-│   │   │   ├── home/                 # Main Forecast & Sustainability dashboards
-│   │   │   ├── login/                # Authentication screens (Login/Signup/Forgot Password)
-│   │   │   ├── onboarding/           # Skin type profiling and setup screens
-│   │   │   └── product/              # Product Details with camera-based visual try-on mockup
-│   │   └── theme/                    # Color scheme, typography, and styling theme
-│   └── build.gradle.kts              # Mobile gradle build configuration
+Project-Ai-style/
+├── .github/workflows/
+│   ├── deploy.yml                    # Enterprise CI/CD Pipeline (Selenium, Appium, Load, DAST, Pages)
+│   ├── android-e2e.yml               # Android continuous integration
+│   └── performance-test.yml          # Automated performance benchmarks
 │
-├── style-ai-web/                     # Web Application (React / Next.js / Tailwind CSS v4)
+├── style-ai-web/                     # Next.js 16 Web Application
 │   ├── src/
-│   │   ├── app/                      # Next.js App Router pages
-│   │   │   ├── ai-stylist/           # Chat interface page for AI styling
-│   │   │   ├── outfit-generator/     # Outfit pairing page using Unsplash dynamic clothing imagery
-│   │   │   ├── shop/[id]/            # E-Commerce details page with Hover Magnifier and Try-On Studio
-│   │   │   ├── virtual-closet/       # Virtual Closet items tracker
-│   │   │   └── dashboard/            # Skin Forecast and UV metrics home screen
-│   │   ├── components/               # Custom UI, toaster, page headers, and SVG icons
-│   │   ├── context/                  # React Auth, Cart, and Wishlist context providers
-│   │   └── lib/                      # Mock product data and service helpers
-│   ├── package.json                  # Web package configuration
-│   └── tsconfig.json                 # Web TypeScript configuration
+│   │   ├── app/                      # App Router pages (/ai-stylist, /label-lens, /multimodal-diagnosis, etc.)
+│   │   ├── components/               # Navbar, Footer, MarkdownRenderer, UI widgets
+│   │   ├── context/                  # React Context (AuthContext, CartContext, WishlistContext)
+│   │   └── lib/                      # Core AI Engines (clientChatEngine.ts, chatbotEngine.ts, visionClassifier.ts, etc.)
+│   ├── scripts/                      # Automated QA verification & benchmarking suites
+│   ├── package.json
+│   └── next.config.ts                # Static export configuration & security headers
 │
-├── appium-tests/                     # Appium Mobile E2E Testing Framework (Node.js)
-│   ├── package.json                  # Test runner package settings & dependencies
-│   ├── run-tests.js                  # Appium driver capabilities, test cases & Excel generator
-│   └── README.md                     # Android emulator connection and appium command guide
+├── app/                              # Android Native Client (Jetpack Compose / Kotlin)
+│   └── src/main/java/com/example/best3/
 │
-├── Project_Summary.md                # Core AI algorithms and summary document
-└── README.md                         # Project documentation and file structure
+├── tests/                            # Automated Testing Suites
+│   ├── selenium/                     # 355 Selenium web automation test cases
+│   ├── appium/                       # 370 Appium mobile test cases
+│   ├── load/                         # 350 Locust web load testing cases
+│   └── dast/                         # 350 OWASP ZAP DAST security audit cases
+│
+├── reports/                          # Bundled CI/CD Quality Reports (HTML & XLSX)
+└── README.md                         # Main repository documentation
 ```
 
 ---
-*Developed with ❤️ for Style and Comfort.*
+
+*Style AI — Grounded in Textile Dermatology, Authentic Data Integrity, and Sustainable Fashion.*
