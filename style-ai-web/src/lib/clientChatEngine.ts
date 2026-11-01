@@ -69,7 +69,7 @@ const NON_NAME_WORDS = new Set([
   "dermatitis", "summer", "winter", "spring", "fall", "autumn", "rain", "monsoon",
   "men", "women", "boy", "girl", "outfit", "outfits", "test", "catalog", "brand",
   "buy", "order", "recommend", "recommendation", "suggest", "suggestion",
-  "style", "styles", "fashion", "casual", "formal", "office", "party", "gym",
+  "style", "styles", "fashion", "game", "games", "tech", "technology", "casual", "formal", "office", "party", "gym",
   "weather", "climate", "hot", "cold", "warm", "cool", "dry", "humid", "care", "label",
   "find", "show", "search", "check", "tell", "give", "need", "want", "like"
 ]);
@@ -549,6 +549,104 @@ export async function generateClientChatResponse(context: ClientChatContext): Pr
         "Show me products under ₹2,000",
         "What fabric is suitable for my skin?",
         "Is polyester suitable?",
+      ],
+    };
+  }
+
+  // ==============================================================================
+  // 6b. OUT-OF-DOMAIN / UNRELATED DOMAIN QUERIES (Games, Tech, Entertainment, Food)
+  // ==============================================================================
+  // Games / Video Games / Gaming
+  if (/\b(game|games|gaming|gamer|playstation|ps5|xbox|nintendo|steam|fortnite|minecraft|gta|roblox|pubg|rpg|fps|esports|gameplay)\b/i.test(lowerQuery)) {
+    const nameGreeting = userName ? `, **${userName}**` : "";
+    return {
+      reply:
+        `I don't have verified information about video games as I specialize exclusively in **textile dermatology, skin-safe clothing, and sustainable fashion styling**! 🎮👗\n\n` +
+        `However, if you're looking for ultra-comfortable, breathable cotton loungewear, anti-chafing tees, or relaxed joggers for long gaming or desk sessions, I can recommend the best skin-friendly options${nameGreeting}!\n\n` +
+        `Would you like me to recommend comfortable loungewear, or do you have any questions about fabric comfort and skin sensitivities?`,
+      source: "conversational-ai",
+      matchedProducts: queryCatalog({ preferredFabrics: ["100% GOTS Organic Cotton"], skinType, limit: 3, inStockOnly: true }).items,
+      suggestedPills: [
+        "Suggest a casual summer outfit",
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+        "Is polyester suitable for sensitive skin?",
+      ],
+    };
+  }
+
+  // Technology / Consumer Electronics / "watch tech" / Coding
+  if (/\b(tech|technology|gadget|gadgets|phone|iphone|android|laptop|computer|hardware|software|programming|code|coding|crypto|bitcoin|gpu|cpu|watch\s*tech)\b/i.test(lowerQuery)) {
+    const nameGreeting = userName ? `, **${userName}**` : "";
+    return {
+      reply:
+        `I don't have verified information about consumer technology or gadgets as I specialize exclusively in **textile dermatology, sustainable fashion, and fabric comfort**! 💻👕\n\n` +
+        `I can help you analyze clothing care labels using our optical vision models, recommend anti-static natural fabrics (like 100% GOTS organic cotton) for working around tech hardware, or check clothes for sensitive skin${nameGreeting}.\n\n` +
+        `How can I assist your styling or fabric comfort today?`,
+      source: "conversational-ai",
+      matchedProducts: queryCatalog({ preferredFabrics: ["100% GOTS Organic Cotton"], skinType, limit: 3, inStockOnly: true }).items,
+      suggestedPills: [
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+        "Is polyester suitable for sensitive skin?",
+        "Suggest a casual summer outfit",
+      ],
+    };
+  }
+
+  // Entertainment / Movies / TV / Music
+  if (/\b(movie|movies|film|films|cinema|song|songs|music|actor|actress|album|concert|netflix|hollywood|bollywood)\b/i.test(lowerQuery)) {
+    const nameGreeting = userName ? `, **${userName}**` : "";
+    return {
+      reply:
+        `I don't have verified information about entertainment or media because my expertise is focused on **skin-safe fashion, textile comfort, and sustainable apparel styling**! 🎬👗\n\n` +
+        `If you'd like an outfit recommendation inspired by a particular aesthetic (*e.g., minimalist, casual, evening party, or streetwear*), or want to check which fabrics are best for your skin, I'd love to help${nameGreeting}!\n\n` +
+        `What kind of outfits or styles would you like to explore?`,
+      source: "conversational-ai",
+      matchedProducts: queryCatalog({ skinType, limit: 3, inStockOnly: true }).items,
+      suggestedPills: [
+        "Suggest an evening party outfit",
+        "Show me products under ₹2,000",
+        "What fabric is suitable for my skin?",
+      ],
+    };
+  }
+
+  // Food / Cooking / Dining
+  if (/\b(food|recipe|recipes|cook|cooking|restaurant|restaurants|pizza|burger|cuisine)\b/i.test(lowerQuery)) {
+    const nameGreeting = userName ? `, **${userName}**` : "";
+    return {
+      reply:
+        `I don't have verified information about recipes or food as I specialize in **textile dermatology, skin-safe clothing, and fashion styling**! 🍽️👕\n\n` +
+        `I can, however, help you find breathable, stain-friendly natural cotton aprons and casual dining outfits that keep you comfortable${nameGreeting}.\n\n` +
+        `How can I help with your clothing or skin comfort today?`,
+      source: "conversational-ai",
+      matchedProducts: queryCatalog({ skinType, limit: 3, inStockOnly: true }).items,
+      suggestedPills: [
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+        "Suggest a casual summer outfit",
+      ],
+    };
+  }
+
+  // Missing Information on Incomplete Style Inquiries
+  if (/^(what\s+should\s+i\s+wear|choose\s+clothes|suggest\s+something|help\s+me\s+choose|outfit)$/i.test(lowerQuery.trim())) {
+    const nameGreeting = userName ? `, **${userName}**` : "";
+    return {
+      reply:
+        `To give you the most accurate styling recommendation${nameGreeting}, could you provide a few more details?\n\n` +
+        `1. **Occasion:** Are you looking for casual daily wear, office attire, summer outing, workout, or party wear?\n` +
+        `2. **Skin Sensitivity:** Do you have sensitive skin, eczema, allergies, or sweating concerns?\n` +
+        `3. **Budget & Material:** Do you have a preferred price range (*e.g., under ₹2,000*) or preferred fabrics (*e.g., cotton, linen*)?\n\n` +
+        `In the meantime, here are popular, verified skin-safe styles from our catalog:`,
+      source: "conversational-ai",
+      matchedProducts: queryCatalog({ skinType, limit: 3, inStockOnly: true }).items,
+      suggestedPills: [
+        "Suggest a casual summer outfit",
+        "Office wear for sensitive skin",
+        "Show me products under ₹2,000",
+        "What fabric is suitable for my skin?",
       ],
     };
   }

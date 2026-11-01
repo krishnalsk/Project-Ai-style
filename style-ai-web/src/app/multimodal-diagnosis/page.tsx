@@ -33,6 +33,7 @@ import {
   Search,
 } from "lucide-react";
 import { EvidenceBasedDiagnosisResponse } from "@/app/api/predict-issue/route";
+import { generateClientPrediction } from "@/lib/clientChatEngine";
 
 type DiagnosisResult = EvidenceBasedDiagnosisResponse["prediction"];
 
@@ -278,6 +279,7 @@ export default function MultimodalDiagnosisPage() {
     setIsLoading(true);
     setResult(null);
 
+    let data: any = null;
     try {
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
       const apiUrl = `${basePath}/api/predict-issue/`.replace(/\/{2,}/g, "/");
@@ -294,21 +296,42 @@ export default function MultimodalDiagnosisPage() {
         }),
       });
 
-      const data = await response.json();
+      if (response.ok) {
+        const parsed = await response.json();
+        if (parsed.status === "success" && parsed.prediction) {
+          data = parsed;
+        }
+      }
+    } catch (fetchErr) {
+      console.warn("[Multimodal Diagnosis] API unreachable, activating high-availability client fallback:", fetchErr);
+    }
 
-      // Guard against race conditions
-      if (data.status === "success" && data.prediction) {
+    // High-availability fallback: if API is offline or running on static hosting (GitHub Pages)
+    if (!data || !data.prediction) {
+      data = {
+        status: "success",
+        prediction: generateClientPrediction(
+          selectedImage,
+          textQuery,
+          skinType,
+          climate,
+          effectiveModality === "auto" ? undefined : (effectiveModality as any)
+        ),
+      };
+    }
+
+    try {
+      if (data && data.prediction) {
         if (data.prediction.imageId && activeImageIdRef.current && data.prediction.imageId !== activeImageIdRef.current) {
           console.warn("[Multimodal Diagnosis] Discarded stale async response for superseding image.");
           return;
         }
         setResult(data.prediction);
       } else {
-        alert(data.error || "Failed to analyze inputs. Please try again.");
+        alert("Failed to analyze inputs. Please try again.");
       }
-    } catch (err) {
-      console.error(err);
-      alert("Error contacting the diagnostic engine.");
+    } catch (renderErr) {
+      console.error("[Multimodal Diagnosis] Render error:", renderErr);
     } finally {
       setIsLoading(false);
     }
