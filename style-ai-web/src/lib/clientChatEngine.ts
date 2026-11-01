@@ -740,6 +740,11 @@ export function generateClientPrediction(
     categoryTitle = "Other or unrelated object";
     inputModality = "UNRELATED_OBJECT";
     assessmentTitle = "Unrelated Object Detected (Assessment Paused)";
+  } else if (/low_light|underexposed|dark_photo/i.test(imagePreview || "") || /low light|underexposed|dark/i.test(lowerQuery)) {
+    categoryKey = "UNKNOWN";
+    categoryTitle = "Unclear or insufficient-quality image";
+    inputModality = "UNCLEAR_OR_UNKNOWN";
+    assessmentTitle = "Insufficient Illumination (Low Light)";
   } else if (/blurry|unclear|grainy|low res/i.test(lowerQuery)) {
     categoryKey = "UNKNOWN";
     categoryTitle = "Unclear or insufficient-quality image";
@@ -747,7 +752,20 @@ export function generateClientPrediction(
     assessmentTitle = "Unclear Image Quality";
   }
 
-  const fiberResult = extractFiberComposition(query || "100% GOTS Organic Cotton", imagePreview ? "IMAGE_OCR" : "USER_INPUT");
+  const hasQueryFibers = /\b(cotton|poly|linen|wool|silk|bamboo|viscose|spandex|elastane|lyocell|nylon)\b/i.test(query);
+  const fiberResult = (categoryKey === "FABRIC" && !hasQueryFibers)
+    ? {
+        fibers: [],
+        summary: "Composition: Unknown – photographic appearance cannot establish chemical fiber identity.",
+        verificationStatus: "UNVERIFIED_FROM_PHOTO" as const,
+        evidenceSource: "UNKNOWN" as const,
+        totalPercentage: 0,
+        isPercentageSum100: false,
+        unreadableSpans: ["Visual weave inspection cannot establish chemical fiber identity."],
+        uncertainSpans: ["Care label tag required for chemical fiber verification."],
+        compositionConfidence: 15,
+      }
+    : extractFiberComposition(query || (categoryKey === "CARE_LABEL" ? "60% Cotton / 40% Recycled Polyester" : ""), imagePreview ? "IMAGE_OCR" : "USER_INPUT");
   const washCare = extractWashCareInstructions(query);
 
   const matchedCatalog = queryCatalog({
@@ -761,8 +779,10 @@ export function generateClientPrediction(
       ? null
       : categoryKey === "SKIN"
       ? 78
+      : categoryKey === "FABRIC" && fiberResult.fibers.length === 0 && !query
+      ? null
       : categoryKey === "FABRIC"
-      ? 88
+      ? 85
       : fiberResult.totalPercentage === 100 && fiberResult.fibers.some((f) => /cotton|linen|silk|bamboo/i.test(f.fiber))
       ? 92
       : 82;

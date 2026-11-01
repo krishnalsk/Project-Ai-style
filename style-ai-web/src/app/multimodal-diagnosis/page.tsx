@@ -64,6 +64,7 @@ export default function MultimodalDiagnosisPage() {
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [recognitionResult, setRecognitionResult] = useState<RecognitionData | null>(null);
   const [showManualCategorySelector, setShowManualCategorySelector] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activeImageIdRef = useRef<string | null>(null);
@@ -287,9 +288,10 @@ export default function MultimodalDiagnosisPage() {
     const effectiveModality = overrideModality !== undefined ? overrideModality : modalityHint;
 
     if (!textQuery && !selectedImage) {
-      alert("Please provide either a photo (skin, fabric, or tag) or describe your symptoms!");
+      setFormError("Please provide either a photo (skin, fabric, or tag) or describe your symptoms!");
       return;
     }
+    setFormError(null);
 
     const currentImageId = activeImageIdRef.current || ("req_" + Date.now());
     setIsLoading(true);
@@ -703,6 +705,12 @@ export default function MultimodalDiagnosisPage() {
               </div>
             </div>
 
+            {formError && (
+              <div className="mb-3 p-3 bg-amber-50 text-amber-900 border border-amber-300 rounded-xl text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{formError}</span>
+              </div>
+            )}
             {/* Run Button */}
             <button
               onClick={() => runDiagnosis()}

@@ -11,7 +11,8 @@
     "test:chat": "npx tsx scripts/test-chat-cases.js",
     "test:system": "npx tsx scripts/test-complete-system.js",
     "test:label": "npx tsx scripts/test-care-label-verification.js",
-    "test:multimodal": "npx tsx scripts/test-multimodal-accuracy.js"
+    "test:multimodal": "npx tsx scripts/test-multimodal-accuracy.js",
+    "test:advanced": "npx tsx scripts/test-advanced-image-analysis.js"
   },
   "dependencies": {
     "firebase": "^12.18.0",

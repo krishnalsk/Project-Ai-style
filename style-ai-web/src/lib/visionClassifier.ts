@@ -37,6 +37,15 @@ export interface VisionClassificationResult {
   qualityWarning?: string;
 
   // Observable skin features (Non-Diagnostic)
+  // Observable fabric weave features (Non-Diagnostic, Structural Only)
+  weaveCharacteristics?: {
+    weaveType: "Plain Weave" | "Twill Weave" | "Satin Weave" | "Knit Structure" | "Indeterminate Weave";
+    textureRoughness: "Smooth" | "Fine Grain" | "Coarse / Raised" | "Indeterminate";
+    yarnUniformity: "Uniform" | "Slub / Textured" | "Indeterminate";
+    defectsObserved: string[];
+    frictionWarning?: string;
+  };
+
   skinObservations?: {
     erythemaLevel: "None Observed" | "Localized Mild" | "Confluent Pronounced" | "Indeterminate";
     drynessLevel: "Dry / Rough" | "Normal Hydration" | "Indeterminate";
@@ -315,6 +324,65 @@ export async function classifyImageBuffer(
     // --------------------------------------------------------------------------------
     // OBJECT IDENTITY DECISION LOGIC
     // --------------------------------------------------------------------------------
+
+    // Decision 0: UNDEREXPOSED / LOW-ILLUMINATION PHOTOGRAPH (Test 7)
+    // If luminance < 35 or max channel < 45, the photograph has insufficient lighting.
+    const isUnderexposed =
+      !userExplicitlySelectedFabric &&
+      !userExplicitlySelectedSkin &&
+      !userExplicitlySelectedLabel &&
+      (luminance < 35 || Math.max(rMean, gMean, bMean) < 45);
+
+    if (isUnderexposed) {
+      return {
+        modality: "AMBIGUOUS_UNKNOWN",
+        confidence: 0.28,
+        confidenceTier: "LOW",
+        categoryTitle: "Unclear or insufficient-quality image",
+        categoryConfidence: 28,
+        ocrConfidence: 15,
+        compositionConfidence: 10,
+        skinFeatureConfidence: 10,
+        lowConfidenceWarning: "Unable to identify this image reliably. Please upload a clearer photograph or select the correct category.",
+        detectedSubject: "Underexposed / Low-Illumination Image",
+        objectCategory: "UNKNOWN",
+        detectedFeatures: [
+          "Severely underexposed or poorly illuminated photograph (Luminance < 35)",
+          "Insufficient contrast to discern dermal or textile structures",
+          "Optical features cannot be verified without adequate lighting",
+        ],
+        recommendedModality: "unknown",
+        selectionReason:
+          "Photograph has insufficient illumination (underexposed/too dark). Optical features cannot be verified.",
+        alternativeCategories: [
+          { id: "skin", label: "Skin / Body Surface", confidence: 0.25 },
+          { id: "fabric", label: "Fabric / Textile", confidence: 0.25 },
+          { id: "other", label: "Other Object", confidence: 0.50 },
+        ],
+        isUnrelatedObject: false,
+        isSkin: false,
+        isFabric: false,
+        isCareLabel: false,
+        isLowQuality: true,
+        qualityWarning: "Photograph has insufficient illumination (underexposed/too dark). Optical features cannot be verified.",
+        erythemaScore: 0,
+        textDensityScore: 0,
+        textureEnergyScore: 0,
+        details: {
+          rMean: Math.round(rMean),
+          gMean: Math.round(gMean),
+          bMean: Math.round(bMean),
+          luminance: Math.round(luminance),
+          contrast,
+          saturation: Math.round(saturation * 100) / 100,
+          exG: Math.round(exG),
+          isAchromatic,
+          isSkinTone: false,
+          isBeigeFabric: false,
+          aspectRatio,
+        },
+      };
+    }
 
     // Decision A: UNRELATED OBJECT - Green Plant / Botanical Foliage
     if (isPlantFoliage) {
@@ -607,85 +675,37 @@ export async function classifyImageBuffer(
       };
     }
 
-    // Decision E: DYED / WOVEN TEXTILE (Indigo denim, dark knit, neutral heather, wool, silk, cotton, synthetic)
-    if (
-      userExplicitlySelectedFabric ||
-      textureEnergyScore > 0.5 ||
-      (!isAchromatic && !isSkinTone && saturation > 0.12) ||
-      (luminance >= 35 && luminance <= 220 && !isSkinTone && !isHighLuminanceWhite)
-    ) {
-      return {
-        modality: "FABRIC_SURFACE",
-        confidence: 0.90,
-        confidenceTier: "HIGH",
-        categoryTitle: "Fabric weave or textile surface",
-        categoryConfidence: 90,
-        ocrConfidence: 20,
-        compositionConfidence: 35,
-        skinFeatureConfidence: 15,
-        detectedSubject: "Woven Textile",
-        objectCategory: "FABRIC",
-        detectedFeatures: [
-          "Visible textile weave surface",
-          "Interlacing warp-weft yarn characteristics",
-          "Uniform textile color and drape nap",
-        ],
-        recommendedModality: "fabric",
-        selectionReason: "The image contains a visible textile surface and woven structure.",
-        alternativeCategories: [
-          { id: "fabric", label: "Fabric / Textile", confidence: 0.90 },
-          { id: "apparel", label: "Clothing / Apparel", confidence: 0.07 },
-          { id: "label", label: "Garment Care Label", confidence: 0.03 },
-        ],
-        isUnrelatedObject: false,
-        isSkin: false,
-        isFabric: true,
-        isCareLabel: false,
-        isLowQuality: false,
-        erythemaScore: 0,
-        textDensityScore: 0.2,
-        textureEnergyScore: 0.90,
-        details: {
-          rMean: Math.round(rMean),
-          gMean: Math.round(gMean),
-          bMean: Math.round(bMean),
-          luminance: Math.round(luminance),
-          contrast,
-          saturation: Math.round(saturation * 100) / 100,
-          exG: Math.round(exG),
-          isAchromatic,
-          isSkinTone: false,
-          isBeigeFabric: false,
-          aspectRatio,
-        },
-      };
-    }
+    // Decision E: UNRELATED OBJECT - Non-Textile, Non-Dermal (Electronics, Pets, Plastic, Neon, Hardware)
+    const isUnrelatedSynthetic =
+      !userExplicitlySelectedFabric &&
+      !userExplicitlySelectedSkin &&
+      !userExplicitlySelectedLabel &&
+      (saturation > 0.65 || (avgStd < 6 && contrast < 30 && !isAchromatic && !isBeigeColor));
 
-    // Decision F: UNRELATED OBJECT - Extreme Saturation / Synthetic Non-Textile
-    if (!userExplicitlySelectedFabric && !userExplicitlySelectedSkin && !userExplicitlySelectedLabel && (saturation > 0.68 || luminance < 25)) {
+    if (isUnrelatedSynthetic) {
       return {
         modality: "AMBIGUOUS_UNKNOWN",
-        confidence: 0.88,
+        confidence: 0.92,
         confidenceTier: "HIGH",
         categoryTitle: "Other or unrelated object",
-        categoryConfidence: 88,
+        categoryConfidence: 92,
         ocrConfidence: 10,
         compositionConfidence: 10,
         skinFeatureConfidence: 10,
         detectedSubject: "Unrelated Non-Textile Object",
         objectCategory: "UNRELATED_OBJECT",
         detectedFeatures: [
-          "High synthetic chromatic saturation or deep specular reflection",
-          "Absence of dermal skin margins or textile yarn structures",
-          "Inorganic hard surface contours",
+          "Non-textile surface characteristics (absence of interlaced warp/weft yarns)",
+          "Extreme synthetic saturation or hard specular surface reflection",
+          "Non-clothing item detected (unrelated to textile dermatology)",
         ],
         recommendedModality: "unrelated",
         selectionReason:
-          "The image exhibits non-textile, non-dermal optical characteristics not supported for clothing comfort analysis.",
+          "The uploaded image exhibits optical properties of an unrelated non-clothing object. Dermatological and textile comfort assessments are paused.",
         alternativeCategories: [
-          { id: "other", label: "Other Object (Electronics / Shoe / Hardware)", confidence: 0.88 },
-          { id: "apparel", label: "Clothing / Apparel", confidence: 0.08 },
-          { id: "fabric", label: "Fabric / Textile", confidence: 0.04 },
+          { id: "other", label: "Other Object (Electronics / Hardware / Accessory)", confidence: 0.92 },
+          { id: "fabric", label: "Fabric / Textile", confidence: 0.05 },
+          { id: "skin", label: "Skin / Body Surface", confidence: 0.03 },
         ],
         isUnrelatedObject: true,
         isSkin: false,
@@ -704,6 +724,84 @@ export async function classifyImageBuffer(
           saturation: Math.round(saturation * 100) / 100,
           exG: Math.round(exG),
           isAchromatic: false,
+          isSkinTone: false,
+          isBeigeFabric: false,
+          aspectRatio,
+        },
+      };
+    }
+
+    // Decision F: DYED / WOVEN TEXTILE (Indigo denim, dark knit, neutral heather, wool, silk, cotton, synthetic)
+    const isIndigoDenim = bMean > rMean && bMean > 65 && saturation > 0.10 && avgStd >= 8 && avgStd <= 55;
+    const isHeatherGreyOrKnit = isAchromatic && avgStd >= 10 && avgStd <= 55 && luminance >= 40 && luminance <= 220;
+    const isVerifiedDyedFabric =
+      avgStd >= 8 &&
+      avgStd <= 55 &&
+      saturation >= 0.08 &&
+      saturation <= 0.65 &&
+      luminance >= 35 &&
+      luminance <= 220 &&
+      !isSkinTone &&
+      !isPlantFoliage;
+
+    const isFabricCandidate =
+      userExplicitlySelectedFabric ||
+      isIndigoDenim ||
+      isHeatherGreyOrKnit ||
+      isVerifiedDyedFabric;
+
+    if (isFabricCandidate) {
+      const weaveType = avgStd > 22 && contrast > 50 ? "Twill Weave" : "Plain Weave";
+      const textureRoughness = avgStd > 25 ? "Coarse / Raised" : avgStd < 12 ? "Smooth" : "Fine Grain";
+      const yarnUniformity = avgStd > 25 ? "Slub / Textured" : "Uniform";
+
+      return {
+        modality: "FABRIC_SURFACE",
+        confidence: userExplicitlySelectedFabric ? 0.95 : 0.90,
+        confidenceTier: "HIGH",
+        categoryTitle: "Fabric weave or textile surface",
+        categoryConfidence: userExplicitlySelectedFabric ? 95 : 90,
+        ocrConfidence: 20,
+        compositionConfidence: 35,
+        skinFeatureConfidence: 15,
+        detectedSubject: "Woven Textile",
+        objectCategory: "FABRIC",
+        detectedFeatures: [
+          `Visible textile surface (${weaveType})`,
+          `Yarn structure: ${yarnUniformity} yarns, ${textureRoughness} surface texture`,
+          "Interlacing warp-weft yarn characteristics with natural textile drape",
+        ],
+        recommendedModality: "fabric",
+        selectionReason: "The image contains a visible textile surface and woven structure.",
+        alternativeCategories: [
+          { id: "fabric", label: "Fabric / Textile", confidence: 0.90 },
+          { id: "apparel", label: "Clothing / Apparel", confidence: 0.07 },
+          { id: "label", label: "Garment Care Label", confidence: 0.03 },
+        ],
+        isUnrelatedObject: false,
+        isSkin: false,
+        isFabric: true,
+        isCareLabel: false,
+        isLowQuality: false,
+        weaveCharacteristics: {
+          weaveType,
+          textureRoughness,
+          yarnUniformity,
+          defectsObserved: [],
+          frictionWarning: textureRoughness === "Coarse / Raised" ? "Raised yarn texture may cause mild friction against sensitive skin." : undefined,
+        },
+        erythemaScore: 0,
+        textDensityScore: 0.2,
+        textureEnergyScore: 0.90,
+        details: {
+          rMean: Math.round(rMean),
+          gMean: Math.round(gMean),
+          bMean: Math.round(bMean),
+          luminance: Math.round(luminance),
+          contrast,
+          saturation: Math.round(saturation * 100) / 100,
+          exG: Math.round(exG),
+          isAchromatic,
           isSkinTone: false,
           isBeigeFabric: false,
           aspectRatio,
