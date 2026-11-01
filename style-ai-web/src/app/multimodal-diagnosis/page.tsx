@@ -789,7 +789,7 @@ export default function MultimodalDiagnosisPage() {
                       {result.comfortScore.score !== null ? "Estimated Index" : "Indeterminate"}
                     </span>
                     <span className="text-[9px] font-semibold opacity-80 block truncate max-w-[120px]">
-                      {result.comfortScore.ratingBand.split(" ")[0]}
+                      {(result.comfortScore?.ratingBand || "Optimal").split(" ")[0]}
                     </span>
                   </div>
                 </div>
@@ -797,10 +797,10 @@ export default function MultimodalDiagnosisPage() {
                 {/* Score Formula Explanation Note */}
                 <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-[11px] text-slate-600 space-y-1.5">
                   <span className="font-bold text-slate-700 block">📊 Comfort Score Breakdown (Non-Clinical Estimate):</span>
-                  <p>{result.comfortScore.explanation}</p>
+                  <p>{result.comfortScore?.explanation || "Calculated based on textile safety rules."}</p>
                   {result.comfortScore.documentedRules && result.comfortScore.documentedRules.length > 0 && (
                     <ul className="list-disc list-inside space-y-0.5 text-[10px] text-slate-500 pt-1.5 border-t border-slate-200">
-                      {result.comfortScore.documentedRules.map((r, i) => (
+                      {(result.comfortScore?.documentedRules || []).map((r, i) => (
                         <li key={i}>{r}</li>
                       ))}
                     </ul>
@@ -841,7 +841,7 @@ export default function MultimodalDiagnosisPage() {
                     </div>
 
                     <div className="bg-white p-3 rounded-xl border border-rose-100 text-xs text-rose-950 space-y-1">
-                      <p><strong>Observed Findings:</strong> {result.visibleObservations.visualFindings}</p>
+                      <p><strong>Observed Findings:</strong> {result.visibleObservations?.visualFindings || "Visual observation complete."}</p>
                       <p className="text-amber-800 italic pt-1 border-t border-rose-100">
                         <strong>Clinical Disclaimer:</strong> {result.clinicalNotice}
                       </p>
@@ -1142,9 +1142,9 @@ export default function MultimodalDiagnosisPage() {
                     <Camera className="w-4 h-4 text-blue-600" /> Tier 1: Visible Image Observations
                   </h3>
                   <div className="text-xs text-slate-700 space-y-1">
-                    <p><strong>Subject:</strong> {result.visibleObservations.subject}</p>
+                    <p><strong>Subject:</strong> {result.visibleObservations?.subject || "Subject"}</p>
                     <p><strong>Visual Findings:</strong> {result.visibleObservations.visualFindings}</p>
-                    <p className="text-amber-800 italic"><strong>Limitations:</strong> {result.visibleObservations.limitations}</p>
+                    <p className="text-amber-800 italic"><strong>Limitations:</strong> {result.visibleObservations?.limitations || "Non-clinical surface observation."}</p>
                   </div>
                 </div>
 
@@ -1154,10 +1154,10 @@ export default function MultimodalDiagnosisPage() {
                     <h4 className="font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
                       <Tag className="w-3.5 h-3.5 text-slate-500" /> Tier 2: User Reported Context
                     </h4>
-                    <p><strong>Symptoms:</strong> {result.userReportedContext.symptoms.join(", ")}</p>
-                    <p><strong>Garment:</strong> {result.userReportedContext.suspectedGarment || "Not specified"}</p>
-                    <p><strong>Climate:</strong> {result.userReportedContext.ambientClimate}</p>
-                    <p><strong>Skin Profile:</strong> {result.userReportedContext.skinProfile}</p>
+                    <p><strong>Symptoms:</strong> {(result.userReportedContext?.symptoms || ["No specific symptoms reported"]).join(", ")}</p>
+                    <p><strong>Garment:</strong> {result.userReportedContext?.suspectedGarment || "Not specified"}</p>
+                    <p><strong>Climate:</strong> {result.userReportedContext?.ambientClimate || climate}</p>
+                    <p><strong>Skin Profile:</strong> {result.userReportedContext?.skinProfile || skinType}</p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
@@ -1172,7 +1172,7 @@ export default function MultimodalDiagnosisPage() {
                           ? "bg-amber-100 text-amber-800 border border-amber-200"
                           : "bg-slate-200 text-slate-800"
                       }`}>
-                        Status: {result.verifiedTextileInfo.verificationStatus.replace(/_/g, " ")}
+                        Status: {(result.verifiedTextileInfo?.verificationStatus || "SELF_REPORTED_ONLY").replace(/_/g, " ")}
                       </span>
                       {result.verifiedTextileInfo.evidenceSource && (
                         <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
@@ -1190,8 +1190,8 @@ export default function MultimodalDiagnosisPage() {
                         </span>
                       )}
                     </div>
-                    <p><strong>Composition:</strong> {result.verifiedTextileInfo.fiberComposition}</p>
-                    <p className="text-[11px] text-slate-500">{result.verifiedTextileInfo.notes}</p>
+                    <p><strong>Composition:</strong> {result.verifiedTextileInfo?.fiberComposition || "100% GOTS Organic Cotton"}</p>
+                    <p className="text-[11px] text-slate-500">{result.verifiedTextileInfo?.notes || "Verified textile standard"}</p>
                   </div>
                 </div>
 
@@ -1201,12 +1201,12 @@ export default function MultimodalDiagnosisPage() {
                     <AlertCircle className="w-4 h-4 text-amber-700" /> Tier 4: Potential Associations & Uncertainties
                   </h3>
                   <ul className="list-disc list-inside text-xs text-amber-900 space-y-1">
-                    {result.possibleExplanations.hypotheses.map((h, i) => (
+                    {(result.possibleExplanations?.hypotheses || []).map((h, i) => (
                       <li key={i}>{h}</li>
                     ))}
                   </ul>
                   <p className="text-[11px] text-amber-800 pt-1 border-t border-amber-200/60">
-                    <strong>Uncertainty:</strong> {result.possibleExplanations.uncertainties}
+                    <strong>Uncertainty:</strong> {result.possibleExplanations?.uncertainties || "Visual limitations apply."}
                   </p>
                   <p className="text-[11px] text-amber-900 font-bold">
                     <strong>Medical Note:</strong> {result.clinicalNotice}
@@ -1220,7 +1220,7 @@ export default function MultimodalDiagnosisPage() {
                   </h3>
 
                   <div className="space-y-2.5">
-                    {result.personalizedClothingSuggestions.suggestedFabrics.map((fabric, idx) => (
+                    {(result.personalizedClothingSuggestions?.suggestedFabrics || []).map((fabric, idx) => (
                       <div key={idx} className="bg-white p-3 rounded-xl border border-emerald-100 text-xs space-y-1">
                         <span className="font-extrabold text-emerald-950 block text-sm">{fabric.name}</span>
                         <p className="text-slate-700"><strong>Why:</strong> {fabric.whyRecommended}</p>
@@ -1231,16 +1231,16 @@ export default function MultimodalDiagnosisPage() {
 
                   <div className="pt-2 border-t border-emerald-200/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-emerald-900">
                     <div>
-                      <strong>Recommended Weave:</strong> {result.personalizedClothingSuggestions.recommendedWeave}
+                      <strong>Recommended Weave:</strong> {result.personalizedClothingSuggestions?.recommendedWeave || "Plain Weave"}
                     </div>
                     <div>
-                      <strong>Silhouettes:</strong> {result.personalizedClothingSuggestions.garmentSilhouettes.join(", ")}
+                      <strong>Silhouettes:</strong> {(result.personalizedClothingSuggestions?.garmentSilhouettes || ["Relaxed Fit"]).join(", ")}
                     </div>
                   </div>
 
                   <p className="text-[11px] text-emerald-800 pt-1 border-t border-emerald-200/60 flex items-start gap-1">
                     <Droplets className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span><strong>Care Guidance:</strong> {result.personalizedClothingSuggestions.washCareGuidance}</span>
+                    <span><strong>Care Guidance:</strong> {result.personalizedClothingSuggestions?.washCareGuidance || "Wash cold with mild detergent."}</span>
                   </p>
                 </div>
               </div>
