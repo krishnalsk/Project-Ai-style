@@ -33,7 +33,7 @@ import {
   Search,
 } from "lucide-react";
 import { EvidenceBasedDiagnosisResponse } from "@/app/api/predict-issue/route";
-import { generateClientPrediction } from "@/lib/clientChatEngine";
+import { generateClientPrediction, generateClientRecognition } from "@/lib/clientChatEngine";
 
 type DiagnosisResult = EvidenceBasedDiagnosisResponse["prediction"];
 
@@ -114,25 +114,41 @@ export default function MultimodalDiagnosisPage() {
         }),
       });
 
-      const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
 
-      // Guard against race conditions:
-      if (data.status === "success" && data.recognition) {
-        if (data.imageId !== activeImageIdRef.current) return;
+        // Guard against race conditions:
+        if (data.status === "success" && data.recognition) {
+          if (data.imageId !== activeImageIdRef.current) return;
 
-        setRecognitionResult(data.recognition);
+          setRecognitionResult(data.recognition);
 
-        // Automatic Modality Selection when Auto-Detect (Smart) is selected
-        if (modalityHint === "auto") {
-          const recMod = data.recognition.recommendedModality;
-          if (recMod === "skin" || recMod === "fabric" || recMod === "label") {
-            setModalityHint(recMod);
+          // Automatic Modality Selection when Auto-Detect (Smart) is selected
+          if (modalityHint === "auto") {
+            const recMod = data.recognition.recommendedModality;
+            if (recMod === "skin" || recMod === "fabric" || recMod === "label") {
+              setModalityHint(recMod);
+            }
           }
+          return;
         }
       }
     } catch (err) {
-      console.error("[Real-time recognition error]", err);
+      console.warn("[Real-time recognition using client fallback]", err);
     } finally {
+      setIsRecognizing(false);
+    }
+
+    // High-availability client fallback for static hosting / offline
+    if (activeImageIdRef.current === newImageId) {
+      const clientRec = generateClientRecognition(dataUrl, modalityHint, textQuery);
+      setRecognitionResult(clientRec);
+      if (modalityHint === "auto") {
+        const recMod = clientRec.recommendedModality;
+        if (recMod === "skin" || recMod === "fabric" || recMod === "label") {
+          setModalityHint(recMod);
+        }
+      }
       setIsRecognizing(false);
     }
   };
@@ -315,7 +331,8 @@ export default function MultimodalDiagnosisPage() {
           textQuery,
           skinType,
           climate,
-          effectiveModality === "auto" ? undefined : (effectiveModality as any)
+          effectiveModality === "auto" ? undefined : (effectiveModality as any),
+          currentImageId
         ),
       };
     }
@@ -323,12 +340,24 @@ export default function MultimodalDiagnosisPage() {
     try {
       if (data && data.prediction) {
         if (data.prediction.imageId && activeImageIdRef.current && data.prediction.imageId !== activeImageIdRef.current) {
-          console.warn("[Multimodal Diagnosis] Discarded stale async response for superseding image.");
-          return;
+          if (data.prediction.imageId === currentImageId) {
+            data.prediction.imageId = activeImageIdRef.current;
+          } else {
+            console.warn("[Multimodal Diagnosis] Discarded stale async response for superseding image.");
+            return;
+          }
         }
         setResult(data.prediction);
       } else {
-        alert("Failed to analyze inputs. Please try again.");
+        const fallbackPred = generateClientPrediction(
+          selectedImage,
+          textQuery,
+          skinType,
+          climate,
+          effectiveModality === "auto" ? undefined : (effectiveModality as any),
+          currentImageId
+        );
+        setResult(fallbackPred);
       }
     } catch (renderErr) {
       console.error("[Multimodal Diagnosis] Render error:", renderErr);

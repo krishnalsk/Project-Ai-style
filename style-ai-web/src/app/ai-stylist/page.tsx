@@ -401,19 +401,33 @@ export default function AiStylistPage() {
 
     // High-availability fallback: If network failed or running as static GitHub Pages export
     if (!data || !data.reply) {
-      data = await generateClientChatResponse({
-        message: text.trim(),
-        image: sentImage,
-        skinType: profile?.skinType || "Sensitive / Allergy Prone",
-        climate: "Moderate (18°C - 24°C)",
-        history: updatedMessages.map((m) => ({
-          sender: m.sender,
-          text: m.text,
-          matchedProducts: m.matchedProducts,
-          diagnosis: m.diagnosis,
-        })),
-        allergies: profile?.confirmedAllergies || [],
-      });
+      try {
+        data = await generateClientChatResponse({
+          message: text.trim(),
+          image: sentImage,
+          skinType: profile?.skinType || "Sensitive / Allergy Prone",
+          climate: "Moderate (18°C - 24°C)",
+          history: updatedMessages.map((m) => ({
+            sender: m.sender,
+            text: m.text,
+            matchedProducts: m.matchedProducts,
+            diagnosis: m.diagnosis,
+          })),
+          allergies: profile?.confirmedAllergies || [],
+          userName: profile?.fullName || undefined,
+        });
+      } catch (clientErr) {
+        console.error("[Style AI client fallback error]", clientErr);
+      }
+    }
+
+    if (!data || !data.reply) {
+      data = {
+        reply: "I am ready to assist you! Feel free to ask about skin-safe fabrics (cotton, linen, silk, bamboo), search our verified catalog for clothes under your budget, or upload a photo for textile evaluation.",
+        source: "conversational-ai",
+        matchedProducts: [],
+        suggestedPills: DEFAULT_SUGGESTIONS,
+      };
     }
 
     try {
