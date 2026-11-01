@@ -13,6 +13,21 @@ export function getAssistantRuleResponse(input: string): string | null {
   const query = input.toLowerCase().trim();
 
   // --- CORE RULE MATCHING ---
+  if (
+    query.includes("recommend an outfit") ||
+    query.includes("casual outfit") ||
+    query.includes("what should i wear") ||
+    query.includes("outfit idea") ||
+    query.includes("suggest an outfit") ||
+    query.includes("casual wear") ||
+    query.includes("daily outfit")
+  ) {
+    return `Recommendation: 100% Organic Cotton Relaxed Tee, Breathable Linen-Blend Chinos, and low-friction canvas sneakers.
+Why: Breathable, natural hypoallergenic fibers minimize dermal friction while providing effortless daily versatility.
+Comfort Score: 96%
+Skin Safety Score: 98%`;
+  }
+
   if (query.includes("sensitive skin wear") || query.includes("sensitive skin")) {
     return `Recommendation: Cotton oversized T-shirt, loose-fit cotton pants, breathable sneakers.
 Why: Soft breathable fabrics help reduce irritation and prevent flare-ups.

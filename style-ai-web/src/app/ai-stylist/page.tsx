@@ -385,6 +385,7 @@ export default function AiStylistPage() {
             diagnosis: m.diagnosis,
           })),
           allergies: profile?.confirmedAllergies || [],
+          userName: profile?.fullName || undefined,
         }),
       });
 

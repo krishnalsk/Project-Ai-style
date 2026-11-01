@@ -181,6 +181,81 @@ function searchConversationHistory(history: ChatHistoryMessage[]): {
 /**
  * Processes a single chat turn with the full conversational intelligence layer.
  */
+const NON_NAME_WORDS = new Set([
+  "hi", "hello", "hey", "hola", "yo", "bye", "goodbye", "farewell", "morning", "afternoon", "evening", "night",
+  "thanks", "thank", "thanku", "thx", "welcome", "please", "sorry", "excuse",
+  "yes", "no", "yeah", "yep", "nope", "ok", "okay", "sure", "fine", "good", "great",
+  "awesome", "cool", "nice", "perfect", "wow", "bad", "help", "info", "about",
+  "who", "what", "when", "where", "why", "how", "which",
+  "can", "could", "would", "should", "will", "do", "does", "did",
+  "is", "are", "am", "was", "were", "be", "being", "been",
+  "have", "has", "had", "i", "me", "my", "you", "your", "we", "our", "us",
+  "they", "them", "their", "it", "its", "this", "that", "these", "those",
+  "there", "here", "and", "or", "but", "not", "so", "if", "then", "than",
+  "to", "for", "with", "in", "on", "at", "by", "from", "up", "down", "out",
+  "all", "any", "both", "each", "few", "more", "most", "other", "some",
+  "cotton", "fabric", "textile", "shirt", "shirts", "pant", "pants", "trouser", "trousers",
+  "dress", "dresses", "wear", "clothing", "clothes", "skin", "poly", "polyester",
+  "linen", "silk", "wool", "bamboo", "nylon", "acrylic", "viscose", "rayon", "modal",
+  "size", "cart", "shop", "price", "cost", "budget", "cheap", "expensive",
+  "safe", "safety", "allergy", "allergies", "eczema", "rash", "redness", "itch", "itchy",
+  "dermatitis", "summer", "winter", "spring", "fall", "autumn", "rain", "monsoon",
+  "men", "women", "boy", "girl", "outfit", "outfits", "test", "catalog", "brand",
+  "buy", "order", "recommend", "recommendation", "suggest", "suggestion",
+  "style", "styles", "fashion", "casual", "formal", "office", "party", "gym",
+  "weather", "climate", "hot", "cold", "warm", "cool", "dry", "humid", "care", "label",
+  "find", "show", "search", "check", "tell", "give", "need", "want", "like"
+]);
+
+function capitalize(word: string): string {
+  if (!word) return "";
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
+export function detectNameOrIntroduction(query: string): string | null {
+  const q = query.trim();
+
+  // Pattern 1: Explicit introduction phrases
+  const introMatch = q.match(/(?:my\s+name\s+is|i\s+am|i'm|this\s+is|call\s+me)\s+([A-Za-z]{2,30})/i);
+  if (introMatch) {
+    return capitalize(introMatch[1]);
+  }
+
+  // Pattern 2: Single word or 2-word name string (not containing common english/fashion words)
+  const words = q.split(/\s+/).filter(Boolean);
+  if (words.length >= 1 && words.length <= 2 && /^[a-zA-Z\s]{2,35}$/.test(q)) {
+    const hasNonNameWord = words.some((w) => NON_NAME_WORDS.has(w.toLowerCase()));
+    if (!hasNonNameWord) {
+      return words.map(capitalize).join(" ");
+    }
+  }
+
+  return null;
+}
+
+export function detectUserName(
+  query: string,
+  history: ChatHistoryMessage[] = [],
+  explicitUserName?: string
+): string | null {
+  if (explicitUserName && explicitUserName.trim().length > 1) {
+    return capitalize(explicitUserName.trim());
+  }
+
+  const fromQuery = detectNameOrIntroduction(query);
+  if (fromQuery) return fromQuery;
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msg = history[i];
+    if (msg.sender === "user" && msg.text) {
+      const fromHist = detectNameOrIntroduction(msg.text);
+      if (fromHist) return fromHist;
+    }
+  }
+
+  return null;
+}
+
 export async function processChatTurn(context: ChatbotContext): Promise<ChatbotResponse> {
   const query = (context.message || "").trim();
   const lower = query.toLowerCase();
@@ -189,6 +264,7 @@ export async function processChatTurn(context: ChatbotContext): Promise<ChatbotR
   const climate = context.climate || "Moderate (18°C - 24°C)";
   const history = context.history || [];
   const allergies = context.allergies || [];
+  const userName = detectUserName(query, history, (context as any).userName);
 
   // ==============================================================================
   // 1. IN-CHAT MULTIMODAL IMAGE EVALUATION
@@ -273,7 +349,99 @@ export async function processChatTurn(context: ChatbotContext): Promise<ChatbotR
   }
 
   // ==============================================================================
-  // 2. CONVERSATION HISTORY & MEMORY RECALL
+
+  // ==============================================================================
+  // 1b. NAME INTRODUCTIONS (e.g. "balamuarlie", "Balamurali", "I am Balamurali")
+  // ==============================================================================
+  const detectedName = detectNameOrIntroduction(query);
+  if (detectedName) {
+    const topMatches = queryCatalog({
+      skinType: skinType,
+      limit: 3,
+      inStockOnly: true,
+    }).items;
+
+    return {
+      reply:
+        `Hello **${detectedName}**! 👋 Great to meet you!\n\n` +
+        `I am your **Style AI Assistant**, trained on textile dermatology and our verified 1,000-record sustainable fashion catalog.\n\n` +
+        `Whether you're looking for comfortable, irritation-free outfits for **${skinType}**, searching our catalog by budget (*e.g., "Show me products under ₹2,000"*), or checking which fabrics are best for your skin, I'm here to help.\n\n` +
+        `What kind of outfits or styles would you like to explore today?`,
+      source: "conversational-ai",
+      matchedProducts: topMatches,
+      suggestedPills: [
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+        "Is polyester suitable?",
+        "Suggest a casual summer outfit",
+      ],
+    };
+  }
+
+  // 1c. GRATITUDE / THANKS (e.g. "thank you", "thanks")
+  if (/\b(thank\s+you|thanks|thanku|thx|awesome|great\s+job|appreciate\s+it)\b/i.test(lower)) {
+    return {
+      reply:
+        `You're very welcome! 😊 Always happy to assist you in finding comfortable, skin-friendly styles that look great.\n\n` +
+        `Feel free to ask about fabric care, compare textiles (*e.g., "cotton vs polyester"*), or check out our catalog anytime!`,
+      source: "conversational-ai",
+      matchedProducts: [],
+      suggestedPills: [
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+        "How should I wash sensitive skin clothes?",
+      ],
+    };
+  }
+
+  // 1d. SMALL TALK / "HOW ARE YOU"
+  if (/\b(how\s+are\s+you|how's\s+it\s+going|how\s+do\s+you\s+do|what's\s+up)\b/i.test(lower)) {
+    return {
+      reply:
+        `I'm doing wonderful, thank you for asking! 😊 I'm fully primed with our 1,000-item verified catalog and textile dermatology rules, ready to help you discover comfortable outfits.\n\n` +
+        `How are you feeling today, and what kind of styling or fabric questions can I help you with?`,
+      source: "conversational-ai",
+      matchedProducts: [],
+      suggestedPills: [
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+        "Is polyester suitable?",
+      ],
+    };
+  }
+
+  // 1e. AFFIRMATIONS / ACKNOWLEDGMENTS (e.g. "ok", "okay", "sure", "cool", "nice")
+  if (/^(ok|okay|sure|cool|nice|got it|understood|fine|great|perfect|yes|no)\b/i.test(lower)) {
+    const userPrefix = userName ? `Glad to hear that, **${userName}**! ` : "Glad to hear that! ";
+    return {
+      reply:
+        `${userPrefix}😊 Feel free to ask about fabric care, test another outfit idea, or browse our skin-friendly catalog whenever you're ready.`,
+      source: "conversational-ai",
+      matchedProducts: [],
+      suggestedPills: [
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+        "Suggest a casual summer outfit",
+      ],
+    };
+  }
+
+  // 1f. GOODBYE (e.g. "bye", "goodbye", "see you")
+  if (/^(bye|goodbye|see\s+you|farewell|take\s+care)\b/i.test(lower)) {
+    const byePrefix = userName ? `Goodbye, **${userName}**! 👋` : "Goodbye! 👋";
+    return {
+      reply:
+        `${byePrefix} Have a wonderful day, and stay comfortable in your skin-safe styles! Feel free to come back whenever you need fabric or outfit advice.`,
+      source: "conversational-ai",
+      matchedProducts: [],
+      suggestedPills: [
+        "What fabric is suitable for my skin?",
+        "Show me products under ₹2,000",
+      ],
+    };
+  }
+
+    // 2. CONVERSATION HISTORY & MEMORY RECALL
   // ==============================================================================
   if (
     /\b(what\s+did\s+you\s+(recommend|suggest)|earlier|previously|before|repeat\s+recommendation|what\s+was\s+that)\b/i.test(
@@ -687,14 +855,53 @@ export async function processChatTurn(context: ChatbotContext): Promise<ChatbotR
     };
   }
 
+  const candidateKeywords = query
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !NON_NAME_WORDS.has(w));
+
+  let matchedItems: ScoredProduct[] = [];
+  if (candidateKeywords.length > 0) {
+    const termSearch = queryCatalog({
+      query: candidateKeywords.join(" "),
+      skinType,
+      limit: 3,
+      inStockOnly: true,
+    });
+    matchedItems = termSearch.items;
+  }
+
+  if (matchedItems.length === 0) {
+    matchedItems = queryCatalog({
+      skinType,
+      limit: 3,
+      inStockOnly: true,
+    }).items;
+  }
+
+  let conversationalReply = "";
+  if (userName) {
+    conversationalReply += `I understand, **${userName}**! `;
+  } else {
+    conversationalReply += "I understand! ";
+  }
+
+  conversationalReply += `Regarding **"${query}"**:\n\n` +
+    `As your Style AI assistant, I evaluate fabrics, clothing construction, and textile comfort specifically for **${skinType}** skin.\n\n` +
+    `• **For Comfort & Health:** We recommend natural fibers like 100% GOTS Organic Cotton, Linen, and Bamboo Viscose that maintain low cutaneous friction and high moisture regain.\n` +
+    `• **From Our Catalog:** I've found ${matchedItems.length} verified skin-friendly options below that match your skin profile.\n\n` +
+    `Could you clarify if you'd like an outfit recommendation, advice on a specific fabric, or to filter clothes by budget or occasion?`;
+
   return {
-    reply: `${MISSING_INFO_DISCLAIMER} You can ask me about fabrics, skin sensitivities, outfits for specific weather, or search for clothes by budget.`,
+    reply: conversationalReply,
     source: "conversational-ai",
-    matchedProducts: [],
+    matchedProducts: matchedItems,
     suggestedPills: [
       "What fabric is suitable for my skin?",
       "Show me products under ₹2,000",
-      "Is polyester suitable?",
+      "Is polyester suitable for sensitive skin?",
+      "Suggest a casual summer outfit",
     ],
   };
 }
